@@ -3,12 +3,24 @@ M=Main_Library
 P=Proof_of_Extensionality
 COQFLAGS = -opt -q
 MADE_FILES = 
-%.glob %.vo: %.v; cd $(dir $*) && coqc $(COQFLAGS) $(notdir $*.v)
-%.dvi: %.tex; cd $(dir $*) && latex $(notdir $*)
-%.pdf: %.tex; cd $(dir $*) && pdflatex $(notdir $*)
-all: Main_Library-all Proof_of_Extensionality-all
-Main_Library-all: $M/Generalities/uu0.vo $M/Generalities/uu1.vo $M/Generalities/uu1uu0.vo
-Proof_of_Extensionality-all: $P/univ01.vo
+%.glob %.vo: %.v
+	@ echo "make: Entering directory \`$(dir $*)'"
+	cd $(dir $*) && coqc $(COQFLAGS) $(notdir $*.v)
+	@ echo "make: Leaving directory \`$(dir $*)'"
+all: 							\
+	$M/Generalities/uu0.vo				\
+	$M/Generalities/uu1.vo				\
+	$M/Generalities/uu1uu0.vo			\
+	$P/univ01.vo					\
+	$M/hlevel1/hProp.vo				\
+	$M/hlevel2/finite_sets.vo			\
+	$M/hlevel1/hProp_up.vo				\
+	$M/hlevel1/hProp_r.vo				\
+	$M/hlevel1/hProp_r_up.vo			\
+	$M/hlevel2/hSet_r.vo				\
+	$M/hlevel2/hSet_r_up.vo				\
+	$M/hlevel2/set_quotients_constr2_r_up.vo	\
+	$M/hlevel2/set_quotients_r_up.vo
 
 MADE_FILES += $M/Generalities/uu1.v
 $M/Generalities/uu1.v: $M/Generalities/uu0.v

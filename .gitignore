@@ -6,6 +6,4 @@
 *.glob
 *.vo
 *.pdf
-Main_Library/u1.v
-Main_Library/u2.v
-Proof_of_Extensionality/univ12.v
+Main_Library/Generalities/uu1.v
