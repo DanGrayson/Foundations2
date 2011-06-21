@@ -23,6 +23,15 @@ all:								\
 	$M/hlevel2/set_quotients_constr2_r_up.vo		\
 	make-doc
 
+Makefile.depends:
+	find . -name \*.v |\
+	   >$@ xargs coqdep \
+		-I Main_Library/Generalities \
+		-I Main_Library/hlevel1 \
+		-I Main_Library/hlevel2 \
+		-I Proof_of_Extensionality
+include Makefile.depends
+
 MADE_FILES += doc
 make-doc:
 	mkdir -p doc
