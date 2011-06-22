@@ -131,12 +131,8 @@ Definition hinhimplinhdneg (X:UU0)(inx1: ishinh X): isinhdneg X := inx1 hfalse.
 
 (* End of the file hlevel1_UU0_generalities.v *)
 
-
-
-
 (* 
-*** Local Variables: ***
-*** coq-prog-name: "/opt/local/bin/coqtop" ***
-*** coq-prog-args: ("-emacs-U") ***
-*** End: ***
+ Local Variables: 
+ compile-command: "make -C ../.. Main_Library/hlevel1/hProp.vo "
+ End: 
  *)

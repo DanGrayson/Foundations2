@@ -92,9 +92,9 @@ Proof. intros X Y P xpp ypp xyp. apply xpp. intro x. apply ypp. intro y. apply x
 (** ***  Basic constructions related to the adjoint evaluation function [ X -> ((X -> Y) -> Y) ]. *)
 
 
-Definition adjev (X Y:UU): X -> ((X -> Y)->Y) := fun x:X => fun f:_ => f x.
+Definition adjev (X Y:UU): X -> ((X -> Y)->Y) := fun x f => f x.
 
-Definition adjev2 (X Y:UU): (((X -> Y) -> Y) ->Y) -> (X -> Y)  := fun phi:_ => (fun x:X => phi (fun f:X -> Y => f x)).
+Definition adjev2 (X Y:UU): (((X -> Y) -> Y) ->Y) -> (X -> Y)  := fun phi x => phi (fun f => f x).
 
 
 
@@ -105,7 +105,7 @@ Definition neg (X:UU):= X -> empty.
 
 Definition negf (X:UU)(Y:UU)(f:X -> Y): (neg Y) -> (neg X):= fun phi:Y -> empty => fun x:X => phi (f x).
 
-Definition dneg (X:UU):= (X-> empty)->empty.
+Definition dneg (X:UU):= neg (neg X).
 
 Definition dnegf (X:UU)(Y:UU)(f:X->Y): (dneg X) -> (dneg Y):= negf _ _ (negf _ _ f).
 
@@ -114,7 +114,7 @@ Definition todneg (X:UU): X -> (dneg X):= adjev X empty.
 Definition dnegnegtoneg (X:UU): dneg (neg X) -> neg X := negf _ _  (todneg X).
 
 Lemma dneganddnegl1 (X:UU)(Y:UU): dneg X -> dneg Y -> (X -> neg Y) -> empty.
-Proof. intros X Y X0 X1 X2. assert (X3:dneg X -> neg Y). apply (fun xx: dneg X => dnegnegtoneg _ (dnegf _ _ X2 xx)).  apply (X1 (X3 X0)). Defined.
+Proof. intros X Y xx yy f. apply xx. apply (negf _ _ f).  exact yy. Defined.
 
 Definition dneganddnegimpldneg (X:UU)(Y:UU)(dx: dneg X)(dy:dneg Y): dneg (dirprod X Y):= ddualand X Y empty dx dy. 
 
@@ -141,7 +141,7 @@ Inductive paths (T:UU)(t:T): T -> UU := idpath: paths T t t.
 Definition pathscomp0 (T:UU) (a:T)(b:T) (c:T)(e1: paths _ a b)(e2:paths _ b c): paths _ a c.
 Proof. intros. induction e1.  assumption. Defined.
 
-Definition pathscomp0rid  (T:UU) (a:T)(b:T)(e1: paths _ a b): paths _ (pathscomp0 _ _ b b e1 (idpath _ b)) e1. 
+Definition pathscomp0rid  (T:UU) (a:T)(b:T)(e1: paths _ a b): paths _ (pathscomp0 _ _ _ _ e1 (idpath _ b)) e1. 
 Proof. intros.  induction e1. simpl. apply idpath.  Defined. 
 
 Definition pathsinv0 (T:UU) (a:T) (b:T)(e: paths _ a b): paths _ b a.
@@ -247,17 +247,29 @@ Proof. intros. induction e.  simpl. unfold pathssec2. unfold pathssec1.  simpl. 
 Definition tppr (T:UU)(P:T -> UU)(x: total2 T P): paths _ x (tpair _ _ (pr21 _ _ x) (pr22 _ _ x)).
 Proof. intros. induction x. apply idpath. Defined. 
 
+(* this construction lifts a path e from x to x' in the base to a family of paths between the fibers P x and P x' *)
+Definition constr1 (X:UU)(P:X -> UU)(x:X)(x':X)(e:paths _ x x'): 
+           total2 (P x -> P x')
+                  (fun f: P x -> P x' => 
+                    (total2
+                      (
+                        forall  p: P x, paths _ (tpair _ _ x p) (tpair _ _ x' (f p)))
+                      (fun ee: 
+                        forall  p: P x, paths _ (tpair _ _ x p) (tpair _ _ x' (f p)) =>
+                        forall pp: P x, paths _ (maponpaths _ _ (pr21 _ _) _ _ (ee pp)) e
+                      )
+                    )
+                  ). 
+Proof. intros. induction e. split with (fun p: P x => p). split with (fun p: P x => idpath _ _). intro. apply idpath. Defined. 
 
-Definition constr1 (X:UU)(P:X -> UU)(x:X)(x':X)(e:paths _ x x'): total2 (P x -> P x') (fun f: P x -> P x' => (total2 (forall p: P x, paths _ (tpair _ _ x p) (tpair _ _ x' (f p))) (fun ee: forall p: P x, paths _ (tpair _ _ x p) (tpair _ _ x' (f p)) => forall pp: P x, paths _ (maponpaths _ _ (pr21 X P) _ _ (ee pp)) e))). 
-Proof. intros. induction e. split with (fun p: P x => p). simpl. split with (fun p: P x => idpath _ _). unfold maponpaths. simpl. apply (fun pp: P x => idpath _ _ ). Defined. 
-
-
+(* this function lifts a path e from x to x' in X "forward" to a function from the fiber P x to the fiber P x' *)
 Definition transportf (X:UU)(P:X -> UU)(x:X)(x':X)(e:paths _ x x'): P x -> P x' := pr21 _ _ (constr1 X P x x' e).
 
 Lemma  transportfid (X:UU)(P:X -> UU)(x:X)(p: P x): paths _ (transportf _ P _ _ (idpath _ x) p) p.
 Proof. intros. unfold transportf. unfold constr1.  simpl. apply idpath. Defined. 
 
 
+(* this function lifts a path e from x to x' in X "backward" to a function from the fiber P x' to the fiber P x *)
 Definition transportb (X:UU)(P:X -> UU)(x:X)(x':X)(e:paths _ x x'): P x' -> P x := transportf _ P x' x (pathsinv0 _ _ _ e).
 
 
@@ -273,28 +285,30 @@ Proof.  intros.  induction e. apply idpath. Defined.
 
 
 
-Definition iscontr (T:UU) : UU := total2 T (fun cntr:T => forall t:T, paths T t cntr).
+Definition iscontr (T:UU) : UU := total2 _ (fun cntr => forall t, paths T t cntr).
 
-Definition iscontrpair (T:UU) (cntr: T) (e: forall t:T, paths T t cntr) : iscontr T := tpair T  (fun cntr:T => forall t:T, paths T t cntr) cntr e. 
+Definition iscontrpair (T:UU) cntr (e: forall t, paths T t cntr) : iscontr T := tpair T (fun cntr => forall t, paths T t cntr) cntr e. 
 
 
 
-Lemma contrl1 (X:UU)(Y:UU)(f:X -> Y)(g: Y-> X)(efg: forall y:Y, paths Y y (f(g y))): iscontr X -> iscontr Y.
-Proof. intros X Y f g efg X0.  destruct X0 as [t x] .  set (y:= f t).  split with y.  intro.  
+Lemma contrl1 (X Y:UU)(f:X -> Y)(g: Y-> X)(efg: forall y, paths Y y (f(g y))): iscontr X -> iscontr Y.
+Proof. intros X Y f g efg X0.  
+destruct X0 as [t x].  set (y:= f t).  split with y.  intro t0.  
 assert (e1: paths _ (f (g t0)) y). apply (maponpaths _ _ f _ _ (x (g t0))).
-assert (e2: paths _ t0 (f (g t0))). apply (efg t0).
+assert (e2: paths _ t0 (f (g t0))). apply efg.
 induction e2.  assumption.  Defined. 
 
 
-Lemma contrl1' (X:UU)(Y:UU)(f:X -> Y)(g: Y-> X)(efg: forall y:Y, paths Y (f(g y)) y): iscontr X -> iscontr Y.
+Lemma contrl1' (X Y:UU)(f:X -> Y)(g: Y -> X)(efg: forall y, paths Y (f(g y)) y): iscontr X -> iscontr Y.
 Proof. intros. set (efg' := fun y:Y => pathsinv0 _ _ _ (efg y)).  apply contrl1 with X f g. assumption. assumption. Defined.
 
 Lemma contrl2 (X:UU)(is: iscontr X)(x:X)(x':X): paths _ x x'.
-Proof. intros. unfold iscontr in is.  destruct is as [ t x0 ]. set (e:= x0 x). set (e':= pathsinv0 _ _ _ (x0 x')). apply (pathscomp0 _ _ _ _ e e'). Defined. 
+Proof. intros. unfold iscontr in is.  destruct is as [ t x0 ]. set (e:= x0 x). set (e':= pathsinv0 _ _ _ (x0 x')). exact (pathscomp0 _ _ _ _ e e'). Defined. 
 
 
-Definition coconustot (T:UU) (t:T) := total2 T (fun t':T => paths T t' t).
-Definition coconustotpair (T:UU) (t:T) (t':T) (e: paths T t' t):coconustot T t := tpair T (fun t':T => paths T t' t) t' e.
+(* coconustot = co conus to t *)
+Definition coconustot (T:UU) (t:T) := total2 T (fun t' => paths _ t' t).
+Definition coconustotpair (T:UU) (t t':T) (e: paths T t' t) : coconustot T t := tpair _ (fun t' => paths _ t' t) t' e.
 
 Lemma connectedcoconustot: forall T:UU, forall t:T, forall e1: coconustot T t, forall e2:coconustot T t, paths (coconustot T t) e1 e2.
 Proof. intros. destruct e1 as [ x0 x ]. destruct x. destruct e2 as [ x1 x ]. destruct x. apply idpath. Defined. 
@@ -2175,7 +2189,7 @@ Proof. intro. apply (isapropisofhlevel (S O)). Defined.
 
 
 Theorem isapropneg (X:UU): isaprop (X -> empty).
-Proof. intro. apply (impredfun (S O) X empty isapropempty). Qed.
+Proof. intro. apply (impredfun (S O) X empty isapropempty). Defined.
 
 Corollary isapropdneg (X:UU): isaprop (dneg X).
 Proof. intro. apply (isapropneg (neg X)). Defined.
@@ -2944,16 +2958,8 @@ assert (psi: (paths _ (g y) x -> empty) -> (paths _ y (f x) -> empty)). intros X
 
 (* End of the file uu0.v *)
 
-
-
-
-
-
 (* 
-*** Local Variables: ***
-*** coq-prog-name: "/opt/local/bin/coqtop" ***
-*** coq-prog-args: ("-emacs-U") ***
-*** End: ***
+ Local Variables: 
+ compile-command: "make -C ../.. Main_Library/Generalities/uu0.vo "
+ End: 
  *)
-
-

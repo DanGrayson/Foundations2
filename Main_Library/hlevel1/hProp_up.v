@@ -60,13 +60,8 @@ Proof. unfold isaset.  simpl. intro. intro. apply (uu1.isofhlevelweqb (S O) _ _ 
 
 (* End of the file univalence_for_hProp.v *)
 
-
-
-
-
 (* 
-*** Local Variables: ***
-*** coq-prog-name: "/opt/local/bin/coqtop" ***
-*** coq-prog-args: ("-emacs-U") ***
-*** End: ***
+ Local Variables: 
+ compile-command: "make -C ../.. Main_Library/hlevel1/hProp_up.vo "
+ End: 
  *)

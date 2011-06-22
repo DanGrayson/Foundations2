@@ -98,18 +98,8 @@ Coercion u1isasettou0isaset : uu1.isaset >-> isaset.
 
 (* End of the file uu0uu1.v *)
 
-
-
-
-
-
 (* 
-*** Local Variables: ***
-*** coq-prog-name: "/opt/local/bin/coqtop" ***
-*** coq-prog-args: ("-emacs-U") ***
-*** End: ***
+ Local Variables: 
+ compile-command: "make -C ../.. Main_Library/Generalities/uu1uu0.vo "
+ End: 
  *)
-
-
-
-

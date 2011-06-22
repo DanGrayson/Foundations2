@@ -145,13 +145,8 @@ set (is3:= is2 (g1 y) (g2 y)). simpl in is3. apply (hinhuniv (paths Z (g1 y) (g2
 
 (* End of the file hSet_r.v *)
 
-
-
-
-
 (* 
-*** Local Variables: ***
-*** coq-prog-name: "/opt/local/bin/coqtop" ***
-*** coq-prog-args: ("-emacs-U") ***
-*** End: ***
+ Local Variables: 
+ compile-command: "make -C ../.. Main_Library/hlevel2/hSet_r.vo "
+ End: 
  *)

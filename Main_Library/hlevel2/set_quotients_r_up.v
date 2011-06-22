@@ -150,12 +150,8 @@ Definition pi0pr (X:UU0):= setquoteqrelpr X (pathconnected X) (iseqrelpathconnec
 
 (* End of the file set_quotients_UU0.v *)
 
-
-
-
 (* 
-*** Local Variables: ***
-*** coq-prog-name: "/opt/local/bin/coqtop" ***
-*** coq-prog-args: ("-emacs-U") ***
-*** End: ***
+ Local Variables: 
+ compile-command: "make -C ../.. Main_Library/hlevel2/set_quotients_r_up.vo "
+ End: 
  *)

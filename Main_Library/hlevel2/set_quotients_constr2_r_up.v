@@ -96,14 +96,8 @@ Proof. intros X R is X0. apply (setquotuniv X R (hSetpair _ (isasetsetquot2 X R)
 
 (* End of the file set_quotients_constr2.v *)
 
-
-
-
-
-
 (* 
-*** Local Variables: ***
-*** coq-prog-name: "/opt/local/bin/coqtop" ***
-*** coq-prog-args: ("-emacs-U") ***
-*** End: ***
+ Local Variables: 
+ compile-command: "make -C ../.. Main_Library/hlevel2/set_quotients_constr2_r_up.vo "
+ End: 
  *)
