@@ -530,31 +530,30 @@ assert (e3: paths (paths unit tt tt)  (unitl1 (unitl0 (idpath unit tt))) (idpath
  induction e1. clear e0. induction e2. assumption.  Defined. 
 
 
-Theorem iscontrunit: iscontr (unit).
-Proof. assert (pp:forall x:unit, paths unit x tt). intros. induction x. apply (idpath _ _).
-apply (tpair unit (fun cntr:unit => forall t:unit, paths unit  t cntr) tt pp). Defined. 
+Theorem iscontrunit: iscontr unit.
+Proof. assert (forall x, paths unit x tt). intros. induction x. apply idpath.
+  apply tpair with tt.  assumption. Defined. 
 
-
-Lemma ifcontrthenunitl0: forall e1: paths unit tt tt, forall e2: paths unit tt tt, paths (paths unit tt tt) e1 e2.
-Proof. intros. assert (e3: paths (paths unit tt tt) e1 (idpath unit tt) ). apply unitl3.
-assert (e4: paths (paths unit tt tt) e2 (idpath unit tt)). apply unitl3. induction e3.  induction e4. apply idpath. Defined. 
+Lemma ifcontrthenunitl0: forall e1: paths _ tt tt, forall e2: paths _ tt tt, paths _ e1 e2.
+Proof. intros. assert (e3: paths _ e1 (idpath _ tt) ). apply unitl3.
+assert (e4: paths _ e2 (idpath _ tt)). apply unitl3. induction e3.  induction e4. apply idpath. Defined. 
 
 Lemma isweqcontrtounit: forall T:UU, (iscontr T) -> (isweq T unit (fun t:T => tt)).
 Proof. intros T X. unfold isweq. intros. induction y.
-assert (c: hfiber T unit (fun x:T => tt) tt). destruct X as [ t x0 ]. eapply (hfiberpair T unit _ tt t (idpath unit tt)).
-assert (e: forall d: (hfiber T unit (fun x:T => tt) tt), paths _ d c). intros. destruct c as [ t x] . destruct d as [ t0 x0 ]. 
-assert (e': paths (paths unit tt tt) x x0). apply ifcontrthenunitl0.
-assert (e'': paths T t t0). destruct X as [t1 x1 ].
-assert (e''': paths T t t1). apply x1.
-assert (e'''': paths T t0 t1). apply x1. 
-induction e''''. assumption.
-induction e''. induction e'. apply idpath. apply (iscontrpair _ c e). Defined. 
+assert (c: hfiber _ _ (fun x:T => tt) tt). destruct X as [ t x0 ]. eapply (hfiberpair _ _ _ tt t (idpath _ tt)).
+assert (e: forall d: (hfiber _ _ (fun x:T => tt) tt), paths _ d c). intros. destruct c as [t x]. destruct d as [ t0 x0 ]. 
+  assert (e': paths _ x x0). apply ifcontrthenunitl0.
+  assert (e'': paths _ t t0).
+    destruct X as [t1 x1]. 
+    assert (e''': paths _ t t1). apply x1.
+    assert (e'''': paths _ t0 t1). apply x1. 
+    induction e''''. assumption.
+  induction e''. induction e'. apply idpath. 
+apply (iscontrpair _ c e). Defined. 
 
 
 Theorem iscontrifweqtounit (X:UU): weq X unit -> iscontr X.
-Proof. intros X X0.  apply (iscontrxifiscontry X unit _ (pr22 _ _ X0)). apply iscontrunit. Defined. 
-
-
+Proof. intros X X0.  apply (iscontrxifiscontry _ _ _ (pr22 _ _ X0)), iscontrunit. Defined.
 
 
 (** *** A homotopy equivalence is a weak equivalence *)
@@ -683,32 +682,72 @@ Theorems showing that if any two of three functions f, g, gf are weak equivalenc
 
 
 
-Theorem twooutof3a (X:UU)(Y:UU)(Z:UU)(f:X->Y)(g:Y->Z)(isgf: isweq _ _ (fun x:X => g(f x)))(isg: isweq _ _ g):isweq _ _ f.
-Proof. intros. set (invg:= invmap _ _ g isg). set (invgf:= invmap _ _ (fun x:X => g(f x)) isgf). set (invf := (fun y:Y => invgf (g y))). 
-
-assert (efinvf: forall y:Y, paths _ (f (invf y)) y). intro.   assert (int1: paths _ (g (f (invf y))) (g y)). unfold invf.  apply (weqfg _ _ (fun x:X => (g (f x))) isgf (g y)). apply (pathsweq2 _ _ g isg _ _ int1). 
-
-assert (einvff: forall x: X, paths _ (invf (f x)) x). intro. unfold invf. apply (weqgf _ _ (fun x:X => (g (f x))) isgf x).
-
-apply (gradth _ _ f invf einvff efinvf).  Defined.
-
-
-Corollary ifcontrcontrthenweq (X:UU)(Y:UU)(f:X -> Y)(isx: iscontr X)(isy: iscontr Y): isweq _ _ f.
-Proof. intros. set (py:= (fun y:Y => tt)). apply (twooutof3a _ _ _ f py (isweqcontrtounit X isx) (isweqcontrtounit Y isy)). Defined. 
-
-
-
-Theorem twooutof3b (X:UU)(Y:UU)(Z:UU)(f:X->Y)(g:Y->Z)(isf: isweq _ _ f)(isgf: isweq _ _ (fun x:X => g(f x))):isweq _ _ g.
-Proof. intros. set (invf:= invmap _ _ f isf). set (invgf:= invmap _ _ (fun x:X => g(f x)) isgf). set (invg := (fun z:Z => f ( invgf z))). set (gf:= fun x:X => (g (f x))). 
-
-assert (eginvg: forall z:Z, paths _ (g (invg z)) z). intro. apply (weqfg _ _ (fun x:X => (g (f x))) isgf z).  
-
-assert (einvgg: forall y:Y, paths _ (invg (g y)) y). intro.  assert (isinvf: isweq _ _ invf). apply isweqinvmap.  assert (isinvgf: isweq _ _ invgf).  apply isweqinvmap. assert (int1: paths _ (g y) (gf (invf y))).  apply (maponpaths _ _ g _ _ (pathsinv0 _ _ _ (weqfg _ _ f isf y))). assert (int2: paths _ (gf (invgf (g y))) (gf (invf y))). assert (int3: paths _ (gf (invgf (g y))) (g y)). apply (weqfg _ _ gf isgf). induction int1. assumption. assert (int4: paths _ (invgf (g y)) (invf y)). apply (pathsweq2 _ _ gf isgf). assumption. assert (int5:paths _ (invf (f (invgf (g y)))) (invgf (g y))). apply (weqgf _ _ f isf). assert (int6: paths _ (invf (f (invgf (g (y))))) (invf y)).  induction int4. assumption. apply (pathsweq2 _ _ invf isinvf). assumption. apply (gradth _ _ g invg  einvgg eginvg). Defined.
+Theorem twooutof3a (X Y Z:UU)(f:X->Y)(g:Y->Z)(isgf: isweq _ _ (compose g f))(isg: isweq _ _ g):isweq _ _ f.
+Proof. intros. 
+  set (invg := invmap _ _ g isg).
+  set (gf := (compose g f)).
+  set (gf':= invmap _ _ gf isgf).
+  set (f' := (compose gf' g)). 
+  assert (forall y, paths _ (f (f' y)) y).
+    intro.   
+    assert (paths _ (gf (f' y)) (g y)).
+      apply (weqfg _ _ gf isgf (g y)).
+    apply (pathsweq2 _ _ g isg); assumption. 
+  assert (forall x, paths _ (f' (f x)) x).
+    intro. 
+    apply (weqgf _ _ gf).
+  apply (gradth _ _ f f'); assumption.  Defined.
 
 
+Corollary ifcontrcontrthenweq (X:UU)(Y:UU)(f:X -> Y) : (iscontr X)->(iscontr Y)->isweq _ _ f.
+Proof.
+  intros X Y f isx isy.
+  set (py:= (fun y:Y => tt)).
+  exact (twooutof3a _ _ _ f py (isweqcontrtounit X isx) (isweqcontrtounit Y isy)). 
+Defined. 
 
-Lemma isweql3 (X:UU)(Y:UU)(f:X-> Y)(g:Y->X)(egf: forall x:X, paths _ (g (f x)) x): isweq _ _ f -> isweq _ _ g.
-Proof. intros X Y f g egf X0. set (gf:= fun x:X => g (f x)). assert (int1: isweq _ _ gf). apply (isweqhomot _ _ (fun x:X => x) gf  (fun x:X => (pathsinv0 _ _ _ (egf x)))). apply idisweq.  apply (twooutof3b _ _ _ f g X0 int1). Defined. 
+Theorem twooutof3b (X Y Z:UU)(f:X->Y)(g:Y->Z) : (isweq _ _ f) -> (isweq _ _ (compose g f)) -> isweq _ _ g.
+Proof.
+ intro. intro. intro. intro. intro. intros isf isgf.
+ set (invf:= invmap _ _ f isf).
+ set (gf:= (compose g f)).
+ set (invgf:= invmap _ _ gf isgf).
+ set (invg := (compose f invgf)).
+ assert (forall z, paths _ (g (invg z)) z).
+  intro.
+  apply (weqfg _ _ gf).
+ assert (forall y, paths _ (invg (g y)) y).
+  intro.
+  assert (isweq _ _ invf).
+   apply isweqinvmap.
+  assert (int1: paths _ (g y) (gf (invf y))).
+   apply (maponpaths _ _ g _ _ (pathsinv0 _ _ _ (weqfg _ _ f isf y))).
+  assert (paths _ (gf (invgf (g y))) (gf (invf y))).
+   assert (paths _ (gf (invgf (g y))) (g y)).
+    apply (weqfg _ _ gf isgf).
+   induction int1.
+   assumption.
+  assert (int4: paths _ (invgf (g y)) (invf y)).
+   apply (pathsweq2 _ _ gf isgf).
+   assumption.
+  assert (paths _ (invf (f (invgf (g y)))) (invgf (g y))).
+   apply (weqgf _ _ f isf).
+  assert (paths _ (invf (f (invgf (g y)))) (invf y)).
+   induction int4.
+   assumption.
+  apply (pathsweq2 _ _ invf); assumption.
+ apply (gradth _ _ g invg); assumption.
+ Defined.
+
+
+Lemma isweql3 (X Y:UU)(f:X-> Y)(g:Y->X) : (forall x:X, paths _ (g (f x)) x) -> isweq _ _ f -> isweq _ _ g.
+Proof. 
+  intros X Y f g egf X0.
+  set (gf := (compose g f)).
+  assert (int1: isweq _ _ gf).
+  apply (isweqhomot _ _ (fun x => x) gf  (fun x => (pathsinv0 _ _ _ (egf x)))).
+  apply idisweq.  apply (twooutof3b _ _ _ f g X0 int1). 
+Defined. 
 
 Theorem twooutof3c (X:UU)(Y:UU)(Z:UU)(f:X->Y)(g:Y->Z)(isf: isweq _ _ f)(isg: isweq _ _ g):isweq _ _  (fun x:X => g(f x)).
 Proof. intros. set (gf:= fun x:X => g (f x)). set (invf:= invmap _ _ f isf). set (invg:= invmap _ _ g isg). set (invgf:= fun z:Z => invf (invg z)). assert (egfinvgf: forall x:X, paths _ (invgf (gf x)) x). unfold gf. unfold invgf.  intro.  assert (int1: paths _ (invf (invg (g (f x))))  (invf (f x))). apply (maponpaths _ _ invf _ _ (weqgf _ _ g isg (f x))). assert (int2: paths _ (invf (f x)) x). apply weqgf.  induction int1. assumption. 
