@@ -2477,58 +2477,62 @@ Proof. intros. apply isofhlevelfd1fcor. assumption. Defined.
 
 
 
-Definition isdeceq (X:UU): UU :=  forall (x x':X), coprod (paths _ x' x) (paths _ x' x -> empty).
+Definition isdeceq (X:UU): UU :=  forall x x':X, decidable (paths _ x' x).
 
+Lemma dnegdec (X:UU): dneg (decidable X).
+Proof. intros X r. cut (neg X). intro f. apply r.  apply no. exact f. unfold neg. intro x. apply r. apply yes. exact x. Defined.
 
-Lemma dnegdec (X:UU): dneg (coprod X (neg X)).
-Proof. intros. intro X0.   set (a:= fun x:X => X0 (ii1 _ _ x)). set (b:= fun x:neg X => X0 (ii2 _ _ x)). apply (b a). Defined. 
-
-
-Theorem isasetifdeceq (X:UU): (isdeceq X) -> isaset X.
-Proof. intro. intro X0. unfold isdeceq in X0.  
-assert (l1: forall x:X, iscontr (paths _ x x)). intro.  set (f:= fun e: paths _ x x => coconusfromtpair _ x x e). 
-assert (is: isweq _ _ f). apply (onefiber X (fun x':X => paths _ x x') x (fun x':X => X0 x' x)).
-assert (is2: iscontr (coconusfromt _ x)). apply iscontrcoconusfromt. 
-apply (iscontrxifiscontry _ _ f is). assumption. apply isaset1. assumption. Defined. 
-
-
+Theorem isasetifdeceq (X:UU): isdeceq X -> isaset X.
+Proof.
+  intro. intro X0. unfold isdeceq in X0.  
+  assert (l1: forall x:X, iscontr (paths _ x x)). 
+    intro.  
+    set (f:= fun e: paths _ x x => coconusfromtpair _ x x e). 
+    assert (is: isweq _ _ f). 
+      apply onefiber.
+      intro.
+      apply tocoprod.
+      apply X0.
+    assert (is2: iscontr (coconusfromt _ x)). 
+      apply iscontrcoconusfromt. 
+    apply (iscontrxifiscontry _ _ f is). 
+    assumption. 
+  apply isaset1. 
+  assumption.
+Defined. 
 
 
 Theorem isapropisdeceq (X:UU): isaprop (isdeceq X).
 Proof. intro. unfold isdeceq.
 assert (X0:forall u u':isdeceq X, paths _ u u'). intros. 
-assert (X1: forall x x':X, isaprop (coprod (paths X x x') (paths X x x' -> empty))). intros. 
+assert (X1: forall x x':X, isaprop (decidable (paths X x x'))). intros. 
 assert (is0:isaprop (paths _ x x')). assert (is1: isaset X). apply (isasetifdeceq _ u).  set (is2:= is1 x x'). simpl in is2. unfold isaprop. unfold isofhlevel. assumption. 
 apply (isapropisdec _ is0). 
 assert (X2: isaprop (isdeceq X)). apply impredtwice. intros.  apply (X1 t' t). 
 apply (proofirrelevance _ X2 u u'). apply (invproofirrelevance _ X0). Defined.
-   
 
 
 Corollary eqfromdnegeq (X:UU)(is: isdeceq X)(x x':X): dneg( paths _ x x') -> paths _ x x'.
-Proof. intros X is x x' X0. set (a:= dirprodpair (isaprop (paths _ x x')) (coprod (paths _ x x') (paths _ x x' -> empty)) (isasetifdeceq X is x x') (is x' x)). set (isinv:= isaninv1 _ a). apply (invimpl _ isinv X0). Defined. 
+Proof. intros X is x x' X0. set (a:= dirprodpair (isaprop (paths _ x x')) (decidable (paths _ x x')) (isasetifdeceq X is x x') (is x' x)). set (isinv:= isaninv1 _ a). apply (invimpl _ isinv X0). Defined. 
 
+Definition curry (x:bool) : UU := match x with false => empty | true => unit end.
 
-
-
-
-Fixpoint curry (x:bool) : UU := 
-match x with
-false => empty|
-true => unit
-end.
-
-
-
-Theorem nopathstruetofalse: paths _ true false -> empty.
-Proof. intro X.  apply (transportf _ curry _ _ X tt).  Defined.
+Theorem nopathstruetofalse: neg ( paths _ true false ).
+Proof. intro X. exact (transportf _ curry _ _ X tt).   Defined.
 
 Corollary nopathsfalsetotrue: paths _ false true -> empty.
-Proof. intro X. apply (transportb _ curry _ _ X tt). Defined. 
+Proof. intro X. exact (transportb _ curry _ _ X tt). Defined. 
 
 Theorem isdeceqbool: isdeceq bool.
-Proof. unfold isdeceq. intros. induction x. induction x'. apply (ii1 _ _ (idpath _ true)). apply (ii2 _ _ nopathsfalsetotrue). induction x'.  apply (ii2 _ _ nopathstruetofalse). apply (ii1 _ _ (idpath _ false)). Defined. 
-
+Proof. unfold isdeceq. intros.
+  induction x. 
+    induction x'. 
+      apply yes. apply idpath. 
+      apply no. unfold neg. apply nopathsfalsetotrue.
+    induction x'.  
+      apply no. unfold neg. apply nopathstruetofalse. 
+      apply yes. apply idpath. 
+Defined.
 
 Theorem isasetbool: isaset bool.
 Proof. apply (isasetifdeceq _ isdeceqbool). Defined. 
@@ -2537,37 +2541,38 @@ Proof. apply (isasetifdeceq _ isdeceqbool). Defined.
 Lemma noneql1 (X Y: UU)(f:X -> Y)(x x':X): (paths _ (f x) (f x') -> empty) -> (paths _ x x' -> empty).
 Proof. intros X Y f x x' X0 X1. apply (X0 (maponpaths _ _ f _ _ X1)). Defined.  
 
-
-Theorem nopathsOtoSx: forall x:nat, paths _ O (S x) -> empty.
+Theorem nopathsOtoSx: forall x:nat, neg (paths _ O (S x)).
 Proof. intro. 
-set (f:= fun n:nat => match n with 
-O => true|
-S m => false
-end). 
+    set (f:= fun n:nat => match n with O => true | S m => false end). 
+    unfold neg.
+    apply (noneql1 _ _ f O (S x) nopathstruetofalse).
+Defined. 
 
-apply (noneql1 _ _ f O (S x) nopathstruetofalse). Defined. 
-
-Corollary nopathsSxtoO: forall x:nat, paths _ (S x) O -> empty.
+Corollary nopathsSxtoO: forall x:nat, neg ( paths _ (S x) O ).
 Proof. intros x X. apply (nopathsOtoSx x (pathsinv0 _ _ _ X)). Defined. 
 
 Lemma noeqinjS: forall (x x':nat),  (paths _ x x' -> empty) -> (paths _ (S x) (S x') -> empty).
-Proof. set (f:= fun n:nat => match n with 
-O => O|
-S m => m
-end). 
-
-intro. intro. intro X. apply (noneql1 _ _ f (S x) (S x') X). Defined. 
+Proof. 
+  set (f:= fun n:nat => match n with O => O| S m => m end). 
+  intro. intro. intro X. apply (noneql1 _ _ f (S x) (S x') X). Defined. 
  
 
 Theorem isdeceqnat: isdeceq nat.
-Proof. unfold isdeceq.  intro. induction x. intro. destruct x'. apply (ii1 _ _ (idpath _ O)). apply (ii2 _ _ (nopathsSxtoO x')). intro.  destruct x'.  apply (ii2 _ _ (nopathsOtoSx x)). destruct (IHx x').   apply (ii1 _ _ (maponpaths _ _ S _ _ p)).  apply (ii2 _ _ (noeqinjS _ _  e)). Defined. 
-
-
+Proof. 
+    unfold isdeceq.
+    intro. induction x. 
+    intro. destruct x'.
+       apply yes. apply idpath.
+       apply no. unfold neg. apply nopathsSxtoO.
+    intro.  destruct x'.
+       apply no. exact (nopathsOtoSx x).
+       destruct (IHx x').
+            apply yes. apply maponpaths. assumption.
+            apply no. unfold neg. apply noeqinjS. assumption. 
+Defined. 
 
 Theorem isasetnat: isaset nat.
 Proof.  apply (isasetifdeceq _ isdeceqnat). Defined. 
-
-
 
 
 
