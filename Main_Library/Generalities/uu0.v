@@ -86,7 +86,7 @@ Definition dirprodf (X Y X' Y':UU)(f:X-> Y)(f':X' -> Y'): dirprod X X' -> dirpro
 
 
 Definition ddualand (X Y P:UU)(xp: (X -> P) -> P)(yp: (Y -> P) -> P): ((dirprod X Y) -> P) -> P.
-Proof. intros X Y P xp yp X0. set (int1 := fun ypp:((Y->P)->P) => fun x:X => yp (fun y:Y => X0 (dirprodpair _ _ x y))).   apply (xp (int1 yp)). Defined. 
+Proof. intros X Y P xpp ypp xyp. apply xpp. intro x. apply ypp. intro y. apply xyp. apply dirprodpair;assumption. Defined.
 
 
 (** ***  Basic constructions related to the adjoint evaluation function [ X -> ((X -> Y) -> Y) ]. *)
