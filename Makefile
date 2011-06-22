@@ -44,7 +44,6 @@ $M/Generalities/uu1.v: $M/Generalities/uu0.v Makefile uu1.sed
 	rm -f $@
 	sed <$< >$@ -f uu1.sed
 	chmod a-w $@
-	head $@
 
 $P/univ01.vo $M/Generalities/uu1uu0.vo: $M/Generalities/uu0.vo $M/Generalities/uu1.vo
 clean:
