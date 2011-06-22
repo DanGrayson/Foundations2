@@ -2250,12 +2250,10 @@ unfold isaprop in is1. unfold isofhlevel in is1.  apply (is1 x). Defined.
 
 
 Lemma isapropifnegtrue (X:UU): neg X -> isaprop X.
-Proof. intros X X0. assert (is:isweq _ _ X0). intro. apply (initmap _ y).   apply (isofhlevelweqb (S O) _ _ _ is isapropempty). Defined. 
+Proof. intros. assert (is:isweq _ _ X0). intro. apply (initmap _ y).   apply (isofhlevelweqb 1 _ _ _ is isapropempty). Defined.
 
 
-
-Definition isdecprop (X:UU):= dirprod (isaprop X) (coprod X (X -> empty)).
-
+Definition isdecprop (X:UU):= dirprod (isaprop X) (decidable X).
 
 
 
@@ -2286,7 +2284,7 @@ Proof. intros.  unfold isaprop.  unfold isofhlevel. intros. assert (is: iscontr(
 
 
 Theorem isapropisweq (X:UU)(Y:UU)(f:X-> Y) : isaprop (isweq _ _ f).
-Proof. intros. unfold isweq.  apply (impred (S O) _ (fun y:Y => iscontr (hfiber X Y f y)) (fun y:Y => isapropiscontr (hfiber X Y f y))).  Defined. 
+Proof. intros. unfold isweq.  apply (impred 1 _ (fun y:Y => iscontr (hfiber X Y f y)) (fun y:Y => isapropiscontr (hfiber X Y f y))).  Defined. 
 
 
 Theorem isapropisofhlevel (n:nat)(X:UU): isaprop (isofhlevel n X).
@@ -2302,10 +2300,10 @@ assert (is1:
          match n0 with
          | O => iscontr X1
          | S m => forall x0 x'0 : X1, isofhlevel m (paths X1 x0 x'0)
-         end) n (paths X x x')))). intro.  apply (impred (S O) _ _ (X0 x)). apply (impred (S O) _ _ is1). Defined. 
+         end) n (paths X x x')))). intro.  apply (impred 1 _ _ (X0 x)). apply (impred 1 _ _ is1). Defined. 
 
 Corollary isapropisaprop (X:UU) : isaprop (isaprop X).
-Proof. intro. apply (isapropisofhlevel (S O)). Defined. 
+Proof. intro. apply (isapropisofhlevel 1). Defined. 
 
 
 
@@ -2316,20 +2314,20 @@ Proof. intro. apply (isapropisofhlevel (S O)). Defined.
 
 
 Theorem isapropneg (X:UU): isaprop (X -> empty).
-Proof. intro. apply (impredfun (S O) X empty isapropempty). Defined.
+Proof. intro. apply (impredfun 1 X empty isapropempty). Defined.
 
 Corollary isapropdneg (X:UU): isaprop (dneg X).
 Proof. intro. apply (isapropneg (neg X)). Defined.
 
 
-Definition isaninvprop (X:UU):= isweq _ _  (todneg X).
+Definition isaninvprop (X:UU):= isweq _ _ (todneg X).
 
-Definition invimpl (X:UU)(is: isaninvprop X): (dneg X) -> X:= invmap _ _ (todneg X) is. 
+Definition invimpl (X:UU)(is: isaninvprop X): dneg X -> X := invmap _ _ (todneg X) is. 
 
 
 Lemma isapropaninvprop (X:UU): isaninvprop X -> isaprop X.
 Proof. intros X X0. 
-apply (isofhlevelweqb (S O) _ _ (todneg X) X0 (isapropdneg X)). Defined. 
+apply (isofhlevelweqb 1 _ _ (todneg X) X0 (isapropdneg X)). Defined. 
 
 
 Theorem isaninvpropneg (X:UU): isaninvprop (neg X).
@@ -2337,26 +2335,28 @@ Proof. intros.
 set (f:= todneg (neg X)). set (g:= negf _ _ (todneg X)). set (is1:= isapropneg X). set (is2:= isapropneg (dneg X)). apply (isweqimplimpl _ _ f g is1 is2).  Defined.
 
 
-Theorem isapropisdec (X:UU): (isaprop X) -> (isaprop (coprod X (X-> empty))).
-Proof. intros X X0. 
-assert (X1: forall (x x': X), paths _ x x'). apply (proofirrelevance _ X0).  
-assert (X2: forall (x x': coprod X (X -> empty)), paths _ x x'). intros.  
-induction x.  induction x'.   apply (maponpaths _ _ (fun x:X => ii1 _ _ x) _ _ (X1 x x0)).    
-apply (initmap _ (y x)). induction x'.   apply (initmap _ (y x)). 
-assert (e: paths _ y y0). apply (proofirrelevance _ (isapropneg X) y y0). apply (maponpaths _ _ (fun f: X -> empty => ii2 _ _ f) _ _ e).
-apply (invproofirrelevance _ X2).  Defined. 
-
+Theorem isapropisdec (X:UU): isaprop X -> isaprop (decidable X).
+Proof. 
+    intros X X0. 
+    apply invproofirrelevance.
+    intro x.
+    induction x.
+    (* yes *) intro x'. induction x'.
+        (* yes *) apply maponpaths, proofirrelevance; assumption.
+        (* no  *) apply initmap; auto.
+    (* no  *) intro x'. induction x'.   
+        (* yes *) apply initmap; auto.
+        (* no  *) apply maponpaths, proofirrelevance, isapropneg.
+    Defined. 
 
 Theorem isaninv1 (X:UU): isdecprop X  -> isaninvprop X.
-Proof. unfold isaninvprop. intros X X0. rename X0 into is.  set (is1:= pr21 _ _ is). set (is2:= pr22 _ _ is). simpl in is2. 
-assert (adjevinv: dneg X -> X). intro X0.  induction is2.  assumption. induction (X0 y). 
+Proof. unfold isaninvprop. intros X is.  set (is1:= pr21 _ _ is). set (is2:= pr22 _ _ is). simpl in is2. 
+assert (adjevinv: dneg X -> X). intro X0.  induction is2 as [ x | y ].  assumption. induction (X0 y). 
 assert (is3: isaprop (dneg X)). apply (isapropneg (X -> empty)). apply (isweqimplimpl _ _ (todneg X) adjevinv is1 is3). Defined. 
 
 
 
-
-
-Definition isincl (X Y:UU)(f:X -> Y):= isofhlevelf (S O) _ _ f.
+Definition isincl (X Y:UU)(f:X -> Y):= isofhlevelf 1 _ _ f.
 
 Lemma isofhlevelfsnincl (n:nat)(X Y:UU)(f:X -> Y)(is: isincl _ _ f): isofhlevelf (S n) _ _ f.
 Proof. intros. unfold isofhlevelf.  intro. apply isofhlevelsnprop. apply (is y). Defined.   
@@ -2365,30 +2365,31 @@ Lemma iscontrhfiberofincl (X:UU)(Y:UU)(f:X -> Y): isincl _ _ f -> (forall x:X, i
 Proof. intros X Y f X0 x. unfold isofhlevelf in X0. set (isy:= X0 (f x)).  apply (iscontraprop1 _ isy (hfiberpair _ _ f (f x) x (idpath _ (f x)))). Defined.
 
 
-Lemma isweqonpathsincl (X:UU)(Y:UU)(f:X -> Y)(is: isincl _ _ f)(x x':X): isweq _ _ (maponpaths _ _ f x x').
-Proof. intros. apply (isofhlevelfonpaths O _ _ f x x' is). Defined.
+Lemma isweqonpathsincl (X:UU)(Y:UU)(f:X -> Y) : (isincl _ _ f) -> forall (x x':X), isweq _ _ (maponpaths _ _ f x x').
+Proof. intros X Y f is x x'. apply (isofhlevelfonpaths O _ _ f x x' is). Defined.
 
-
-Definition invmaponpathsincl (X Y:UU)(f:X -> Y) (is: isincl _ _ f)(x x':X): paths _ (f x) (f x') -> paths _ x x':= invmap _ _ (maponpaths _ _ f x x') (isweqonpathsincl _ _ f is x x').
-
+Definition invmaponpathsincl (X Y:UU)(f:X -> Y) : (isincl _ _ f) -> forall (x x':X), paths _ (f x) (f x') -> paths _ x x'. 
+Proof. intros X Y f is x x'.
+ exact (invmap _ _ _ (isweqonpathsincl _ _ f is x x')).
+ Defined.
 
 Lemma isinclweqonpaths (X Y:UU)(f:X -> Y): (forall x x':X, isweq _ _ (maponpaths _ _ f x x')) -> isincl _ _ f.
 Proof. intros X Y f X0.  apply (isofhlevelfsn O _ _ f X0). Defined.
 
 Definition isofhlevelsourceofincl (n:nat)(X Y:UU)(f:X -> Y)(is: isincl _ _ f): isofhlevel (S n) Y -> isofhlevel (S n) X:= isofhlevelinfibseq (S n) _ _ f (isofhlevelfsnincl n _ _ f is).
 
-Definition isinclpr21 (X:UU)(P:X -> UU)(is: forall x:X, isaprop (P x)): isincl _ _ (pr21 X P):= isofhlevelfpr21 (S O) X P is.
+Definition isinclpr21 (X:UU)(P:X -> UU)(is: forall x:X, isaprop (P x)): isincl _ _ (pr21 X P):= isofhlevelfpr21 1 X P is.
 
 
 
 
 Theorem isapropweq (P P':UU)(is': isaprop P'): isaprop (weq P P').
-Proof. intros. set (p:= underlying_function P P').    assert (is: isincl _ _ p). apply (isofhlevelfpr21 (S O) (P -> P') _ (fun f: P -> P' => isapropisweq _ _ f)). assert (is2: isaprop (P -> P')). apply impred. intro. apply is'.  apply (isofhlevelsourceofincl O _ _ p is is2). Defined. 
+Proof. intros. set (p:= underlying_function P P').    assert (is: isincl _ _ p). apply (isofhlevelfpr21 1 (P -> P') _ (fun f: P -> P' => isapropisweq _ _ f)). assert (is2: isaprop (P -> P')). apply impred. intro. apply is'.  apply (isofhlevelsourceofincl O _ _ p is is2). Defined. 
 
 
 
 
-Theorem samehfibers (X Y Z : UU) (f: X -> Y) (g: Y -> Z) (is1: isofhlevelf (S O) _ _ g) ( y: Y): isweq _ _ (hfibersftogf _ _ _ f g (g y) (hfiberpair _ _ g (g y) y (idpath _ _ ))).
+Theorem samehfibers (X Y Z : UU) (f: X -> Y) (g: Y -> Z) (is1: isofhlevelf 1 _ _ g) ( y: Y): isweq _ _ (hfibersftogf _ _ _ f g (g y) (hfiberpair _ _ g (g y) y (idpath _ _ ))).
 Proof. intros. set (z:= g y). set (ye:= hfiberpair _ _ g z y (idpath _ _ )).  unfold isweq. intro xe.  
 assert (is2: isfibseq (hfiber _ _ f (pr21 _ _ ye)) (hfiber _ _ (fun x:X => g (f x)) z) (hfiber _ _ g z)  (hfibersftogf _ _ _ f g z ye) (hfibersgftog _ _ _ f g z) ye (hfibersez _ _ _ f g z ye)). apply isfibseqhfibers. 
 set (is3:= isfibseqdiff1 _ _ _ _ _ _ _ is2 xe). 
@@ -2428,21 +2429,27 @@ apply (isapropifcontr _  is4 _ _ ). Defined.
 
 
 Corollary isapropisaset (X:UU): isaprop (isaset X).
-Proof. intro. apply (isapropisofhlevel (S (S O))). Defined.
+Proof. intro. apply (isapropisofhlevel 2). Defined.
 
 
 Lemma isaset1 (X:UU): (forall x:X, iscontr (paths _ x x)) -> isaset X.
 Proof. intros X X0. unfold isaset. unfold isofhlevel. intros.   induction x0. set (is:= X0 x). apply isapropifcontr. assumption.  Defined. 
 
-Lemma isaset2 (X:UU): (isaset X) -> (forall x:X, iscontr (paths _ x x)).
-Proof. intros X X0 x. unfold isaset in X0. unfold isofhlevel in X0.  change (forall (x x' : X) (x0 x'0 : paths X x x'), iscontr (paths (paths X x x') x0 x'0))  with (forall (x x':X),  isaprop (paths _ x x')) in X0.  apply (iscontraprop1 _ (X0 x x) (idpath _ x)). Defined.
-
+Lemma isaset2 (X:UU): isaset X -> forall x:X, iscontr (paths _ x x).
+Proof. 
+  intros X X0 x.
+  unfold isaset in X0.
+  unfold isofhlevel in X0.
+  change (forall (x x' : X) (x0 x'0 : paths _ x x'), iscontr (paths _ x0 x'0)) 
+    with (forall (x x' : X), isaprop (paths _ x x')) in X0.
+  apply (iscontraprop1 _ (X0 x x) (idpath _ x)).
+Defined.
 
 
 (**  A monic subtype of a set is a set. *)
 
 Theorem isasetsubset (X Y : UU) (f: X -> Y) (is1: isaset Y) (is2: isincl _ _ f): isaset X.
-Proof. intros. apply  (isofhlevelsourceofincl (S O) X Y f is2). apply is1. Defined. 
+Proof. intros. apply  (isofhlevelsourceofincl 1 X Y f is2). apply is1. Defined. 
 
 
 
@@ -2612,17 +2619,17 @@ Proof. intros. apply (isweqinvmap _ _ _ (isweqcoprodtoboolsum X Y)). Defined.
 Theorem isinclii1 (X Y:UU): isincl _ _ (ii1 X Y).
 Proof. intros. set (f:= ii1 X Y). set (g:= coprodtoboolsum X Y). set (gf:= fun x:X => (g (f x))). set (gf':= fun x:X => tpair _ (boolsumfun X Y) true x). 
 assert (h: forall x:X , paths _ (gf' x) (gf x)). intro. apply idpath. 
-assert (is1: isofhlevelf (S O) _ _ gf'). apply (isofhlevelfsnfib O bool (boolsumfun X Y) true (isasetbool true true)).
-assert (is2: isofhlevelf (S O) _ _ gf). apply (isofhlevelfhomot (S O) _ _ gf' gf h is1).  
-apply (isofhlevelff (S O) _ _ _ _ _ is2 (isofhlevelfweq (S (S O)) _ _ _ (isweqcoprodtoboolsum X Y))). Defined. 
+assert (is1: isofhlevelf 1 _ _ gf'). apply (isofhlevelfsnfib O bool (boolsumfun X Y) true (isasetbool true true)).
+assert (is2: isofhlevelf 1 _ _ gf). apply (isofhlevelfhomot 1 _ _ gf' gf h is1).  
+apply (isofhlevelff 1 _ _ _ _ _ is2 (isofhlevelfweq 2 _ _ _ (isweqcoprodtoboolsum X Y))). Defined. 
 
 
 Theorem isinclii2 (X Y:UU): isincl _ _ (ii2 X Y).
 Proof. intros. set (f:= ii2 X Y). set (g:= coprodtoboolsum X Y). set (gf:= fun y:Y => (g (f y))). set (gf':= fun y:Y => tpair _ (boolsumfun X Y) false y). 
 assert (h: forall y:Y , paths _ (gf' y) (gf y)). intro. apply idpath. 
-assert (is1: isofhlevelf (S O) _ _ gf'). apply (isofhlevelfsnfib O bool (boolsumfun X Y) false (isasetbool false false)).
-assert (is2: isofhlevelf (S O) _ _ gf). apply (isofhlevelfhomot (S O) _ _ gf' gf h is1).  
-apply (isofhlevelff (S O) _ _ _ _ _ is2 (isofhlevelfweq (S (S O)) _ _ _ (isweqcoprodtoboolsum X Y))). Defined. 
+assert (is1: isofhlevelf 1 _ _ gf'). apply (isofhlevelfsnfib O bool (boolsumfun X Y) false (isasetbool false false)).
+assert (is2: isofhlevelf 1 _ _ gf). apply (isofhlevelfhomot 1 _ _ gf' gf h is1).  
+apply (isofhlevelff 1 _ _ _ _ _ is2 (isofhlevelfweq 2 _ _ _ (isweqcoprodtoboolsum X Y))). Defined. 
 
 
 
@@ -2823,16 +2830,16 @@ ii1 x0 => pr21 _ _ x0|
 ii2 tt => x
 end.
 
-Definition maponcomplementsincl (X:UU)(Y:UU)(f:X -> Y)(is: isofhlevelf (S O) _ _ f)(x:X): complement X x -> complement Y (f x):= fun x0':_ =>
+Definition maponcomplementsincl (X:UU)(Y:UU)(f:X -> Y)(is: isofhlevelf 1 _ _ f)(x:X): complement X x -> complement Y (f x):= fun x0':_ =>
 match x0' with
 tpair x' neqx => tpair _ _ (f x') (negf _ _ (invmaponpathsincl _ _ _ is x' x) neqx)
 end.
 
-Definition maponcomplementsweq (X Y:UU)(f:X -> Y)(is: isweq _ _ f)(x:X):= maponcomplementsincl _ _ f (isofhlevelfweq (S O) _ _ f is) x.
+Definition maponcomplementsweq (X Y:UU)(f:X -> Y)(is: isweq _ _ f)(x:X):= maponcomplementsincl _ _ f (isofhlevelfweq 1 _ _ f is) x.
 
 
 Theorem isweqmaponcomplements (X Y:UU)(f:X -> Y)(is: isweq _ _ f)(x:X): isweq _ _ (maponcomplementsweq _ _ f is x).
-Proof. intros.  set (is1:= isofhlevelfweq (S O) _ _ f is).   set (map1:= totalfun X (fun x':X => neg (paths _ x' x)) (fun x':X => neg (paths _ (f x') (f x))) (fun x':X => negf _ _ (invmaponpathsincl _ _ _ is1 x' x))). set (map2:= fpmap _ _ f (fun y:Y => neg (paths _ y (f x)))). 
+Proof. intros.  set (is1:= isofhlevelfweq 1 _ _ f is).   set (map1:= totalfun X (fun x':X => neg (paths _ x' x)) (fun x':X => neg (paths _ (f x') (f x))) (fun x':X => negf _ _ (invmaponpathsincl _ _ _ is1 x' x))). set (map2:= fpmap _ _ f (fun y:Y => neg (paths _ y (f x)))). 
 assert (is2: forall x':X, isweq  _ _ (negf _ _ (invmaponpathsincl _ _ _ is1 x' x))). intro. 
 set (invimpll:= (negf _ _ (maponpaths _ _ f x' x))). apply (isweqimplimpl _ _ (negf _ _ (invmaponpathsincl _ _ _ is1 x' x)) (negf _ _ (maponpaths _ _ f x' x)) (isapropneg _) (isapropneg _)). 
 assert (is3: isweq _ _ map1). apply isweqfibtototal. assumption. 
@@ -2997,7 +3004,7 @@ end.
 Definition locsplitsecissec  (X Y:UU)(f:X->Y)(ls: locsplit _ _ f)(u:dnegimage _ _ f): paths _ (xtodnegimage _ _ f (locsplitsec _ _ f ls u)) u.
 Proof. intros.  set (p:= xtodnegimage _ _ f). set (s:= locsplitsec _ _ f ls).  
 assert (paths _ (pr21 _ _ (p (s u))) (pr21 _ _ u)). unfold p. unfold xtodnegimage. unfold s. unfold locsplitsec. simpl. induction u. set (lst:= ls t). induction lst.  simpl. apply (pr22 _ _ x0). induction (x y).  
-assert (is: isofhlevelf (S O) _ _ (dnegimageincl _ _ f)). apply (isofhlevelfpr21 (S O) _ _ (fun y:Y => isapropdneg (hfiber _ _ f y))).  
+assert (is: isofhlevelf 1 _ _ (dnegimageincl _ _ f)). apply (isofhlevelfpr21 1 _ _ (fun y:Y => isapropdneg (hfiber _ _ f y))).  
 assert (isw: isweq _ _ (maponpaths _ _ (dnegimageincl _ _ f) (p (s u)) u)). apply (isofhlevelfonpaths O _ _ _ _ _ is). 
 apply (invmap _ _ _ isw X0). Defined.
 
