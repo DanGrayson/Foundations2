@@ -806,30 +806,59 @@ Proof. intros. induction phi. simpl. simpl in e1. assumption. Defined.
 
 
 
-Lemma isweqdiff1invezmap  (X Y Z:UU)(f:X -> Y)(g:Y->Z)(z:Z)(ez: forall x:X, paths _ (g (f x)) z)(is: isfibseq _ _ _ f g z ez)(y:Y): isweq _ _ (diff1invezmap _ _ _ f g z ez y).
-Proof. intros. set (ff:= diff1invezmap _ _ _ f g z ez y). set (ezm:= ezmap _ _ _ f g z ez). set (invezm:= invmap _ _ (ezmap _ _ _ f g z ez) is). set (pr21y:= pr21 Y (fun y:Y => paths _ (g y) z)).
-set (gg:= fun ee:paths _ (g y) z => hfiberpair _ _ f y (invezm (hfiberpair _ _ g z y ee)) (maponpaths _ _ pr21y _ _ (weqfg _ _ ezm is (hfiberpair _ _ g z y ee)))). 
+Lemma isweqdiff1invezmap (X Y Z:UU) (f:X -> Y) (g:Y->Z) (z:Z) (ez: forall x, paths _ (g (f x)) z) (is: isfibseq _ _ _ f g z ez) (y:Y)
+  : isweq _ _ (diff1invezmap _ _ _ f g z ez y).
+Proof. 
+   intros.
 
-assert (efg: forall ee:paths _ (g y) z, paths _ (ff (gg ee)) ee). intro.
-assert (e1: paths _ (pr22 _ _ (ezm (invezm (hfiberpair _ _ g z y ee)))) (pathscomp0 _ _ _ _ (maponpaths _ _ g _ _ (maponpaths _ _ pr21y _ _ (weqfg _ _ ezm is (hfiberpair _ _ g z y ee)))) ee)). apply (hfibertriangle1 _ _ g z _ _ (weqfg _ _ ezm is (hfiberpair _ _ g z y ee))).
-apply (diaglemma1 _ _ g y (f (invezm (hfiberpair _ _ g z y ee))) z (maponpaths _ _ pr21y _ _ (weqfg _ _ ezm is (hfiberpair _ _ g z y ee))) ee (pr22 _ _ (ezm (invezm (hfiberpair _ _ g z y ee)))) e1). 
+   set (ff:= diff1invezmap _ _ _ f g z ez y).
+   set (ezm:= ezmap _ _ _ f g z ez).
+   set (invezm:= invmap _ _ (ezmap _ _ _ f g z ez) is).
+   set (pr21y:= pr21 Y (fun y:Y => paths _ (g y) z)).
+   set (gg:= fun ee:paths _ (g y) z => 
+        hfiberpair _ _ f y (invezm (hfiberpair _ _ g z y ee)) (maponpaths _ _ pr21y _ _ (weqfg _ _ ezm is (hfiberpair _ _ g z y ee)))). 
 
-assert (egf: forall yee: hfiber _ _ f y, paths _ (gg (ff yee)) yee). intro. destruct yee as [ x e ]. destruct e. simpl. 
-set (e:=weqgf _ _ ezm is x).
-assert (ee: paths _ (pr22 _ _ (gg (ez x))) (maponpaths _ _ f _ _ (weqgf _ _ ezm is x))).
-assert (e2: paths _ (pr22 _ _ (gg (ez x))) (maponpaths _ _ pr21y _ _ (maponpaths _ _ ezm _ _ (weqgf _ _ ezm is x)))).
-assert (e3: paths _ (pr22 _ _ (gg (ez x))) (maponpaths _ _ pr21y _ _ (weqfg _ _ ezm is (ezm x)))). simpl. apply idpath.
-assert (e4: paths _ (maponpaths _ _ pr21y _ _ (weqfg _ _ ezm is (ezm x))) (maponpaths _ _ pr21y _ _ (maponpaths _ _ ezm _ _ (weqgf _ _ ezm is x)))). 
-assert (e5: paths _ (weqfg _ _ ezm is (ezm x))  (maponpaths _ _ ezm _ _ (weqgf _ _ ezm is x))). apply (pathsinv0 _ _ _ (weqfgf _ _ ezm is x)).
-apply (maponpaths _ _ (fun e:_ => maponpaths _ _ pr21y _ _ e) _ _ e5).  assumption. 
-assert (e6: paths _ (maponpaths _ _ pr21y _ _ (maponpaths _ _ ezm _ _ (weqgf _ _ ezm is x))) (maponpaths _ _ f _ _ (weqgf _ _ ezm is x))). apply 
-(maponpathsfuncomp _ _ _ ezm pr21y _ _ (weqgf _ _ ezm is x)).
-apply (pathscomp0 _ _ _ _ e2 e6). 
-assert (eee: paths _ (pr22 _ _ (gg (ez x))) (pathscomp0 _ _ _ _ (maponpaths _ _ f _ _ (weqgf _ _ ezm is x)) (idpath _ (f x)))). apply (pathscomp0 _ _ _ _ ee (pathsinv0 _ _ _ (pathscomp0rid _ _ _ (maponpaths _ _ f _ _ (weqgf _ _ ezm is x))))). 
-apply (hfibertriangle2 _ _ f (f x) (gg (ez x)) (hfiberpair _ _ f (f x) x (idpath _ (f x))) e eee). 
-apply (gradth _ _ ff gg egf efg). Defined.
+   assert (efg: forall ee:paths _ (g y) z, paths _ (ff (gg ee)) ee).
+      intro.
+      assert (e1: 
+        paths _ 
+          (pr22 _ _ (ezm (invezm (hfiberpair _ _ g z y ee))))
+          (pathscomp0 _ _ _ _ (maponpaths _ _ g _ _ (maponpaths _ _ pr21y _ _ (weqfg _ _ ezm is (hfiberpair _ _ g z y ee)))) ee)
+      ).
+         apply (hfibertriangle1 _ _ g z _ _ (weqfg _ _ ezm is (hfiberpair _ _ g z y ee))).
+      apply (
+        diaglemma1 _ _ g y
+        (f (invezm (hfiberpair _ _ g z y ee))) 
+        z
+        (maponpaths _ _ pr21y _ _ (weqfg _ _ ezm is (hfiberpair _ _ g z y ee)))
+        ee
+        (pr22 _ _ (ezm (invezm (hfiberpair _ _ g z y ee))))
+        e1). 
 
-
+   assert (egf: forall yee: hfiber _ _ f y, paths _ (gg (ff yee)) yee). 
+      intro.  destruct yee as [x e]. induction e. simpl.
+      set (e:=weqgf _ _ ezm is x).
+      assert (ee: paths _ (pr22 _ _ (gg (ez x))) (maponpaths _ _ f _ _ (weqgf _ _ ezm is x))).
+         assert (e2: paths _ (pr22 _ _ (gg (ez x))) (maponpaths _ _ pr21y _ _ (maponpaths _ _ ezm _ _ (weqgf _ _ ezm is x)))).
+            assert (e3: paths _ (pr22 _ _ (gg (ez x))) (maponpaths _ _ pr21y _ _ (weqfg _ _ ezm is (ezm x)))). 
+                simpl. apply idpath.
+            assert (e4: 
+              paths _
+              (maponpaths _ _ pr21y _ _ (weqfg _ _ ezm is (ezm x)))
+              (maponpaths _ _ pr21y _ _ (maponpaths _ _ ezm _ _ (weqgf _ _ ezm is x)))
+            ). 
+               assert (e5: paths _ (weqfg _ _ ezm is (ezm x))  (maponpaths _ _ ezm _ _ (weqgf _ _ ezm is x))). 
+                   apply (pathsinv0 _ _ _ (weqfgf _ _ ezm is x)).
+               apply (maponpaths _ _ (fun e:_ => maponpaths _ _ pr21y _ _ e) _ _ e5).  
+            exact e4.
+         assert (e6: paths _ (maponpaths _ _ pr21y _ _ (maponpaths _ _ ezm _ _ (weqgf _ _ ezm is x))) (maponpaths _ _ f _ _ (weqgf _ _ ezm is x))). 
+            apply (maponpathsfuncomp _ _ _ ezm pr21y _ _ (weqgf _ _ ezm is x)).
+         apply (pathscomp0 _ _ _ _ e2 e6). 
+      assert (eee: paths _ (pr22 _ _ (gg (ez x))) (pathscomp0 _ _ _ _ (maponpaths _ _ f _ _ (weqgf _ _ ezm is x)) (idpath _ (f x)))). 
+         apply (pathscomp0 _ _ _ _ ee (pathsinv0 _ _ _ (pathscomp0rid _ _ _ (maponpaths _ _ f _ _ (weqgf _ _ ezm is x))))). 
+      apply (hfibertriangle2 _ _ f (f x) (gg (ez x)) (hfiberpair _ _ f (f x) x (idpath _ (f x))) e eee). 
+   apply (gradth _ _ ff gg egf efg).
+Defined.
 
 Definition diff1ezmap  (X Y Z:UU)(f:X -> Y)(g:Y->Z)(z:Z)(ez: forall x:X, paths _ (g (f x)) z)(is: isfibseq _ _ _ f g z ez)(y:Y) : paths _ (g y) z -> hfiber _ _ f y := fun e: paths _ (g y) z => 
 hfiberpair _ _ _ _ (pr21 _ _ (invmap _ _ (diff1invezmap _ _ _ f g z ez y) (isweqdiff1invezmap _ _ _ f g z ez is y) e))  (pr22 _ _ (invmap _ _ (diff1invezmap _ _ _ f g z ez y) (isweqdiff1invezmap _ _ _ f g z ez is y) e)).
@@ -1357,6 +1386,16 @@ apply (gradth _ _ f g egf efg). Defined.
 
 Inductive coprod (X Y:UU) :UU := ii1: X -> coprod X Y | ii2: Y -> coprod X Y.
 
+(* we use "decidable" instead of "coprod" now for clarity, if the word fits *)
+Inductive decidable (X:UU) :UU := yes : X -> decidable X | no : neg X -> decidable X.
+
+Definition tocoprod (X:UU)(d : decidable X) : coprod X (neg X).
+Proof.
+  intros.
+  induction d.
+  apply ii1; assumption.
+  apply ii2; assumption.
+  Defined.
 
 
 Definition sumofmaps {X Y Z:UU}(fx: X -> Z)(fy: Y -> Z): (coprod X Y) -> Z := fun xy:_ => match xy with ii1 x => fx x | ii2 y => fy y end.
@@ -1371,10 +1410,10 @@ apply (gradth _ _ f g egf efg). Defined.
 
 
 Definition coprodasstor (X Y Z:UU): coprod (coprod X Y) Z -> coprod X (coprod Y Z).
-Proof. intros X Y Z X0. destruct X0.  destruct c.  apply (ii1 _ _ x). apply (ii2 _ _ (ii1 _ _ y)). apply (ii2 _ _ (ii2 _ _ z)). Defined.
+Proof. intros X Y Z c. induction c. induction x. apply ii1. exact x. apply ii2. apply ii1. assumption. apply ii2. apply ii2. assumption. Defined.
 
 Definition coprodasstol (X Y Z: UU): coprod X (coprod Y Z) -> coprod (coprod X Y) Z.
-Proof. intros X Y Z X0. destruct X0.  apply (ii1 _ _ (ii1 _ _ x)). destruct c.   apply (ii1 _ _ (ii2 _ _ y)). apply (ii2 _ _ z). Defined.
+Proof. intros X Y Z c. induction c. apply ii1. apply ii1. assumption. induction y. apply ii1. apply ii2. assumption. apply ii2. assumption. Defined.
 
 Theorem isweqcoprodasstor (X Y Z:UU): isweq _ _ (coprodasstor X Y Z).
 Proof. intros. set (f:= coprodasstor X Y Z). set (g:= coprodasstol X Y Z).
@@ -1492,8 +1531,11 @@ Summary: We consider two axioms which address functional extensionality. The fir
 
 Axiom etacorrection: forall T:UU, forall P:T -> UU, forall f: (forall t:T, P t), paths _ f (fun t:T => f t). 
 
-Lemma isweqetacorrection (T:UU)(P:T -> UU): isweq _ _ (fun f: forall t:T, P t => (fun t:T => f t)).
-Proof. intros.  apply (isweqhomot _ _ (fun f: forall t:T, P t => f) (fun f: forall t:T, P t => (fun t:T => f t)) (fun f: forall t:T, P t => etacorrection _ P f) (idisweq _)). Defined. 
+Lemma isweqetacorrection (T:UU)(P:T -> UU): isweq _ _ (fun f: forall t, P t => fun t => f t).
+Proof. 
+  intros.
+  exact ( isweqhomot _ _ (fun f => f) (fun f t => f t) (fun f => etacorrection _ P f) (idisweq _) ).
+Defined. 
 
 Lemma etacorrectiononpaths (T:UU)(P:T->UU)(s1:forall t:T, P t)(s2:forall t:T, P t): paths _ (fun t:T => s1 t) (fun t:T => s2 t)-> paths _ s1 s2. 
 Proof. intros T P s1 s2 X. set (ec:= fun s:forall t:T, P t => (fun t:T => s t)). set (is:=isweqetacorrection T P). apply (pathsweq2 _ _ ec is s1 s2 X). Defined. 
@@ -1815,27 +1857,27 @@ apply (gradth _ _ map invmapp egf efg). Defined.
 
 
 Fixpoint isofhlevel (n:nat) (X:UU): UU:=
-match n with
-O => iscontr X |
-S m => forall x:X, forall x':X, (isofhlevel m (paths _ x x'))
-end.
+    match n with
+        O => iscontr X |
+        S m => forall x x':X, isofhlevel m (paths _ x x')
+    end.
 
-Definition isaprop (X:UU): UU := isofhlevel (S O) X. 
+Definition isaprop (X:UU): UU := isofhlevel 1 X. 
 
-Definition isaset (X:UU): UU := isofhlevel (S (S O)) X. 
+Definition isaset (X:UU): UU := isofhlevel 2 X. 
 
-Theorem hlevelretract (n:nat)(X:UU)(Y:UU)(p:X -> Y)(s:Y ->X)(eps: forall y:Y, paths _  (p (s y)) y): (isofhlevel n X) -> (isofhlevel n Y).
+Theorem hlevelretract (n:nat)(X Y:UU)(p:X -> Y)(s:Y ->X)(eps: forall y:Y, paths _  (p (s y)) y): isofhlevel n X -> isofhlevel n Y.
 Proof. intro. induction n.  intros X Y p s eps X0. unfold isofhlevel.  apply (contrl1' _ _ p s eps X0). 
  unfold isofhlevel. intros X Y p s eps X0 x x'. unfold isofhlevel in X0. assert (is: isofhlevel n (paths _ (s x) (s x'))).  apply X0. set (s':= maponpaths _ _ s x x'). set (p':= pathssec2 _ _ s p eps x x'). set (eps':= pathssec3 _ _ s p eps x x').  simpl. apply (IHn _ _ p' s' eps' is). Defined. 
 
-Corollary  isofhlevelweqf (n:nat)(X:UU)(Y:UU)(f:X -> Y)(is: isweq _ _ f): (isofhlevel n X) -> (isofhlevel n Y).
+Corollary  isofhlevelweqf (n:nat)(X Y:UU)(f:X -> Y)(is: isweq _ _ f): isofhlevel n X -> isofhlevel n Y.
 Proof. intros.  apply (hlevelretract n _ _ f (invmap _ _ f is) (weqfg _ _ f is)). assumption. Defined. 
 
-Corollary  isofhlevelweqb (n:nat)(X:UU)(Y:UU)(f:X -> Y)(is: isweq _ _ f): (isofhlevel n Y) -> (isofhlevel n X).
+Corollary  isofhlevelweqb (n:nat)(X Y:UU)(f:X -> Y)(is: isweq _ _ f): isofhlevel n Y -> isofhlevel n X.
 Proof. intros.  apply (hlevelretract n _ _ (invmap _ _ f is) f (weqgf _ _ f is)). assumption. Defined. 
 
 Lemma isofhlevelsn (n:nat)(X:UU) : (X -> isofhlevel (S n) X) -> isofhlevel (S n) X.
-Proof. intros n X X0.  simpl.  intros.  apply (X0 x x x'). Defined.
+Proof. intros n X X0.  simpl.  intros.  apply (X0 x'). Defined.
 
 
 Lemma isofhlevelssn (n:nat)(X:UU): (forall x:X, isofhlevel (S n) (paths _ x x)) -> isofhlevel (S (S n)) X.
@@ -1843,38 +1885,45 @@ Proof. intros n X X0. simpl.  intro. intro.  change (forall (x0 x'0 : paths X x 
 assert (X1: paths _ x x' -> (isofhlevel (S n) (paths _ x x'))). intro X2. destruct X2. apply (X0 x). apply  (isofhlevelsn n _ X1). Defined. 
 
 
-Theorem isapropunit: isofhlevel (S O) unit.
+Theorem isapropunit: isofhlevel 1 unit.
 Proof. unfold isofhlevel. intros. 
 assert (c:paths unit x x'). induction x. induction x'. apply idpath.
 assert (X: forall g:paths unit x x', paths _ g c). intros. assert (e:paths (paths unit x x') c c).   apply idpath. induction c. induction x. apply unitl3. apply (iscontrpair _ c X). Defined.  
 
 
 
-Theorem isapropifcontr (X:UU): (iscontr X) -> (isofhlevel (S O) X).
-Proof. intros. set (f:= fun x:X => tt). assert (is: isweq _ _ f). apply isweqcontrtounit.  assumption. apply (isofhlevelweqb (S O) X unit f is).  apply isapropunit. Defined. 
-
+Theorem isapropifcontr (X:UU): iscontr X -> isofhlevel 1 X.
+Proof.
+   intros. set (f:= fun x:X => tt). assert (is: isweq _ _ f). 
+   apply isweqcontrtounit.  assumption. 
+   apply (isofhlevelweqb 1 _ _ f is).  apply isapropunit. Defined. 
 
 Theorem hlevelsincl (n:nat) (T:UU) : isofhlevel n T -> isofhlevel (S n) T.
-Proof. intro.   induction n. intro. apply (isapropifcontr T). intro.  intro X. change (forall t1 t2:T, isofhlevel (S n) (paths _ t1 t2)). intros. change (forall t1 t2 : T, isofhlevel n (paths _ t1 t2)) in X. set (XX := X t1 t2). apply (IHn _ XX).  Defined.
-
+Proof. intro.
+  induction n.
+  intro. apply (isapropifcontr T).
+  intro.  intro.
+  change (forall t1 t2:T, isofhlevel (S n) (paths _ t1 t2)).
+  intros.
+  change (forall t1 t2 : T, isofhlevel n (paths _ t1 t2)) in X.
+  apply IHn, X.
+Defined.
 
 Corollary isofhlevelcontr (n:nat)(X:UU): iscontr X -> isofhlevel n X.
-Proof. intro. induction n. intros. assumption. 
-intros X X0. simpl. intros. assert (is: iscontr (paths _ x x')). apply (isapropifcontr _ X0 x x'). apply (IHn _ is). Defined.
+Proof.
+  intro. induction n. intros. assumption. 
+  intros. simpl. intros. assert (iscontr (paths _ x x')). apply isapropifcontr, X0. apply IHn; assumption.
+Defined.
 
 Corollary isofhlevelsnprop (n:nat)(X:UU): isaprop X -> isofhlevel (S n) X.
 Proof. intros n X X0. simpl. unfold isaprop in X0.  simpl in X0. intros. apply isofhlevelcontr. apply (X0 x x'). Defined. 
 
-Lemma iscontraprop1 (X:UU): (isofhlevel (S O) X) -> (X -> (iscontr X)).
+Lemma iscontraprop1 (X:UU): isofhlevel 1 X -> X -> iscontr X.
 Proof. intros X X0 X1. unfold iscontr. split with X1. intro.  unfold isofhlevel in X0.  set (is:= X0 t X1). apply (pr21 _ _ is). 
 Defined. 
 
-Lemma iscontraprop1inv (X:UU): (X -> iscontr X) -> (isofhlevel (S O) X).
-Proof. intros X X0. assert (H: X -> isofhlevel (S O) X). intro X1.  apply (hlevelsincl O _ (X0 X1)). apply (isofhlevelsn O _ H). Defined.
-
-
-
-
+Lemma iscontraprop1inv (X:UU): (X -> iscontr X) -> (isofhlevel 1 X).
+Proof. intros. assert (X -> isofhlevel 1 X). intro.  apply (hlevelsincl O _ (X0 X1)). apply (isofhlevelsn O _ X1). Defined.
 
 
 (** *** h-levels of functions *)
@@ -2093,65 +2142,67 @@ Theorem saying that if a fibration has only one non-empty fiber then the total s
 
 
 
-Theorem onefiber (X:UU)(P:X -> UU)(x:X)(c: forall x':X, coprod (paths _ x x') (P x' -> empty)):
-isweq _ _ (fun p: P x => tpair X P x p).
-Proof. intros.  
-
-set (f:= fun p: P x => tpair _ _ x p). 
-
-set (cx := c x). 
-set (cnew:=  fun x':X  =>
-match cx with 
-ii1 x0 =>
-match c x' with 
-ii1 ee => ii1 _ _ (pathscomp0 _ _ _ _ (pathsinv0 _ _ _ x0) ee)|
-ii2 phi => ii2 _ _ phi
-end |
-ii2 phi => c x'
-end).
-
-set (g:= fun pp: total2 X P => 
-match (cnew (pr21 _ _ pp)) with
-ii1 e => transportb X P _ _ e (pr22 _ _ pp) |
-ii2 phi =>  initmap _ (phi (pr22 _ _ pp))
-end).
-
-
-assert (efg: forall pp: total2 X P, paths _ (f (g pp)) pp).  intro. destruct pp as [ t x0 ]. set (cnewt:= cnew t).  unfold g. unfold f. simpl. change (cnew t) with cnewt. destruct cnewt as [ x1 | y ].  apply (pathsinv0 _ _ _ (pr21 _ _ (pr22 _ _ (constr1 X P t x (pathsinv0 _ _ _ x1))) x0)). induction (y x0). 
-
- 
-set (cnewx:= cnew x). 
-assert (e1: paths _ (cnew x) cnewx). apply idpath. 
-unfold cnew in cnewx. change (c x) with cx in cnewx.  
-induction cx.  
-assert (e: paths _ (cnewx) (ii1 _ _ (idpath _ x))).  apply (maponpaths _ _ (ii1 (paths X x x) (P x -> empty)) _ _ (pathsinv0l1 _ _ _ x0)). 
-
-
-
-
-assert (egf: forall p: P x, paths _ (g (f p)) p).  intro. simpl in g. unfold g.  unfold f.   simpl.   
-
-set (ff:= fun cc:coprod (paths X x x) (P x -> empty) => 
-match cc with
-     | ii1 e0 => transportb X P x x e0 p
-     | ii2 phi => initmap (P x) (phi p)
+Theorem onefiber (X:UU)(P:X -> UU)(x:X)(c: forall x':X, coprod (paths _ x x') (neg (P x')))
+      : isweq _ _ (fun p => tpair X P x p).
+Proof.
+ intros.  
+ set (f := fun p => tpair X P x p). 
+ set (cx := c x). 
+ set (cnew := fun x':X  =>
+     match cx with 
+         ii1 exx =>
+             match c x' with 
+                 ii1 exx' => ii1 _ _ (pathscomp0 _ _ _ _ (pathsinv0 _ _ _ exx) exx')|
+                 ii2 phi => ii2 _ _ phi
+             end |
+         ii2 phi => c x'
      end).
-assert (ee: paths _ (ff (cnewx)) (ff (ii1 (paths X x x) (P x -> empty) (idpath X x)))).  apply (maponpaths _ _ ff _ _ e). 
-assert (eee: paths _  (ff (ii1 (paths X x x) (P x -> empty) (idpath X x))) p). apply idpath.  fold (ff (cnew x)). 
-assert (e2: paths _ (ff (cnew x)) (ff cnewx)). apply (maponpaths _ _ ff _ _ e1). 
-apply (pathscomp0 _ _ _ _ (pathscomp0 _ _ _ _ e2 ee) eee).
-apply (gradth _ _ f g egf efg).
-
-unfold isweq.  intro. induction (y (g y0)). Defined.
-
-
-
-
-
-
-
-
-
+ set (cnewx:= cnew x).
+ set (g := fun pp: total2 X P => 
+     match cnew (pr21 _ _ pp) with
+         ii1 e => transportb _ _ _ _ e (pr22 _ _ pp) |
+         ii2 phi =>  initmap _ (phi (pr22 _ _ pp))
+     end).
+ assert (efg: forall pp, paths _ (f (g pp)) pp).
+  intro.
+  induction pp as [t x0].
+  unfold g.
+  unfold f.
+  simpl.
+  induction (cnew t) as [x1|y].
+   apply (pathsinv0 _ _ _ (pr21 _ _ (pr22 _ _ (constr1 _ _ t x (pathsinv0 _ _ _ x1))) x0)).
+  induction (y x0).
+ assert (e1: paths _ (cnew x) cnewx).
+  apply idpath. 
+ unfold cnew in cnewx.
+ change (c x) with cx in cnewx.  
+ induction cx.  
+  assert (e: paths _ cnewx (ii1 _ _ (idpath _ x))).
+   apply (maponpaths _ _ (ii1 (paths X x x) (neg (P x))) _ _ (pathsinv0l1 _ _ _ x0)).
+  assert (egf: forall p, paths _ (g (f p)) p).
+   intro.
+   simpl in g.
+   unfold g.
+   unfold f.
+   simpl.
+   set (ff:= fun cc:coprod (paths X x x) (neg (P x)) => 
+     match cc with
+          | ii1 e0 => transportb _ _ x x e0 p
+          | ii2 phi => initmap (P x) (phi p)
+          end).
+   assert (ee: paths _ (ff (cnewx)) (ff (ii1 (paths X x x) (neg (P x)) (idpath X x)))).
+    apply (maponpaths _ _ ff _ _ e).
+   assert (eee: paths _  (ff (ii1 (paths X x x) (neg (P x)) (idpath X x))) p).
+    apply idpath.
+   fold (ff (cnew x)).
+   assert (e2: paths _ (ff (cnew x)) (ff (cnewx))).
+    apply (maponpaths _ _ ff _ _ e1).
+   apply (pathscomp0 _ _ _ _ (pathscomp0 _ _ _ _ e2 ee) eee).
+  apply (gradth _ _ f g egf efg).
+ unfold isweq.
+ intro.
+ induction (y (g y0)).
+Defined.
 
 (** ** Propositions, inclusions  and sets. *)
 
@@ -2166,12 +2217,22 @@ unfold isweq.  intro. induction (y (g y0)). Defined.
 
 
 
-Lemma isweqimplimpl (X:UU)(Y:UU)(f:X->Y)(g:Y->X)(isx: isaprop X)(isy: isaprop Y): isweq _ _ f.
-Proof. intros. assert (isx0: forall x:X, paths _ (g (f x)) x). intro. 
-assert (X0:iscontr X). apply (iscontraprop1 X isx x).  apply (contrl2 X X0 (g (f x)) x). 
-assert (isy0: forall y:Y, paths _ (f (g y)) y). intro. 
-assert (X0:iscontr Y). apply (iscontraprop1 Y isy y). apply (contrl2 Y X0 (f (g y)) y). apply (gradth _ _ f g isx0 isy0).  Defined. 
-
+Lemma isweqimplimpl (X:UU)(Y:UU)(f:X->Y) : (Y->X) -> isaprop X -> isaprop Y -> isweq _ _ f.
+Proof.
+  intros X Y f g isx isy.
+   assert (isx0: forall x:X, paths _ (g (f x)) x).
+    intro.
+    assert (iscontr X).
+     apply (iscontraprop1 X isx x).
+    apply (contrl2 X X0 (g (f x)) x).
+   assert (isy0: forall y:Y, paths _ (f (g y)) y).
+    intro.
+    assert (iscontr Y).
+     apply (iscontraprop1 Y isy y).
+    apply (contrl2 Y X0 (f (g y)) y).
+   apply (gradth _ _ f g isx0 isy0).
+Defined.
+   
 Theorem isapropempty: isaprop empty.
 Proof. unfold isaprop. unfold isofhlevel. intros. induction x. Defined. 
 
