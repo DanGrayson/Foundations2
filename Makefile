@@ -48,7 +48,8 @@ $M/Generalities/uu1.v: $M/Generalities/uu0.v Makefile uu1.sed
 	rm -f $@
 	sed <$< >$@ -f uu1.sed
 	chmod a-w $@
-$M/Generalities/uu1.vo:| $M/Generalities/uu0.vo
+$M/Generalities/uu1.vo: $M/Generalities/uu0.vo
+	sed 's/#uu0@/#uu1@/' <$< >$@
 
 $P/univ01.vo $M/Generalities/uu1uu0.vo: $M/Generalities/uu0.vo $M/Generalities/uu1.vo
 clean:
