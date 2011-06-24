@@ -23,7 +23,7 @@ MADE_FILES =
 	cd $(dir $*) && coqc $(COQFLAGS) $(notdir $*.v)
 	@ echo "make: Leaving directory \`$(dir $*)'"
 all: TAGS $(VOFILES) make-doc
-COQDEFS := -r "/^[[:space:]]*\(Inductive\|Record\|Definition\|Theorem\|Notation\|Lemma\)[[:space:]]+[[:alnum:]]+/"
+COQDEFS := -r "/^[[:space:]]*\(Inductive\|Record\|Definition\|Theorem\|Notation\|Lemma\)[[:space:]]+['[:alnum:]]+/"
 TAGS : $(VFILES)
 	etags --language=none $(COQDEFS) $^
 Makefile.depends:
