@@ -467,11 +467,11 @@ Eval lazy in carddneg _ (isfinitecomplement _ (ii1 _ _ tt) (isfinitecoprod _ _ (
 
 (*Definition finitestructunit: finitestruct unit := finitestructpair _ 1 (weqfromcoprodwithempty unit).*)
 
-Eval lazy in (pr21 _ _ (finitestructcomplement _ (dirprodpair _ _ tt tt) (finitestructdirprod _ _ (finitestructunit) (finitestructunit)))).
+Eval lazy in (pr21 _ _ (finitestructcomplement _ (dirprodpair tt tt) (finitestructdirprod _ _ (finitestructunit) (finitestructunit)))).
  
 
 
-Eval lazy in carddneg _ (isfinitecomplement _ (dirprodpair _ _ true (dirprodpair _ _ true false)) (isfinitedirprod _ _ (isfinitebool) (isfinitedirprod _ _ (isfinitebool) (isfinitebool)))).
+Eval lazy in carddneg _ (isfinitecomplement _ (dirprodpair true (dirprodpair true false)) (isfinitedirprod _ _ (isfinitebool) (isfinitedirprod _ _ (isfinitebool) (isfinitebool)))).
 
 
 

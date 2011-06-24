@@ -119,7 +119,7 @@ Definition pathconnected (X:UU0):= fun (x x':X) =>  (ishinh_hprop (paths _ x x')
 Definition isreflpathconnected (X:UU0): isrefl X (pathconnected X):= fun x:_ =>  (hinhpr _ (idpath _ x)).
 Definition issymmpathconnected (X:UU0): issymm _ (pathconnected X):= fun x x':_ => fun a:_ => ((hinhfunct _ _ (fun e:paths _ x x' => pathsinv0 _ _ _ e) a)). 
 Definition istranspathconnected (X:UU0): istrans _ (pathconnected X):= fun x x' x'':_ => fun a:_ => fun b:_ =>  ((hinhfunct2 _ _ _ (fun e1: paths _ x x' => fun e2: paths _ x' x'' => pathscomp0 _ _ _ _ e1 e2)  a  b)).
-Definition iseqrelpathconnected (X:UU0): iseqrel _ (pathconnected X):= dirprodpair _ _ (isreflpathconnected  _ ) (dirprodpair _ _ (issymmpathconnected _ ) (istranspathconnected  _ )).
+Definition iseqrelpathconnected (X:UU0): iseqrel _ (pathconnected X):= dirprodpair (isreflpathconnected  _ ) (dirprodpair (issymmpathconnected _ ) (istranspathconnected  _ )).
 
 Definition pi0 (X:UU0):= setquot X (pathconnected X). 
 Definition pi0pr (X:UU0):= setquoteqrelpr X (pathconnected X) (iseqrelpathconnected X).

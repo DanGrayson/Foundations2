@@ -184,16 +184,16 @@ Record total2 (T:UU) (P: T -> UU) := tpair {pr21 : T ; pr22 : P pr21}.
 
 
 Definition dirprod (X:UU)(Y:UU):= total2 X (fun x:X => Y).
-Definition dirprodpair (X:UU)(Y:UU):= tpair X (fun x:X => Y).
+Definition dirprodpair {X Y:UU}:= tpair X (fun x:X => Y).
 
 
 
 
 
-Definition dirprodadj (X Y Z:UU): ((dirprod X Y) -> Z) -> (X -> Y -> Z) := fun f:_ => fun x:X => fun y:Y => f (dirprodpair _ _ x y).
+Definition dirprodadj (X Y Z:UU): ((dirprod X Y) -> Z) -> (X -> Y -> Z) := fun f:_ => fun x:X => fun y:Y => f (dirprodpair x y).
 
 
-Definition dirprodf (X Y X' Y':UU)(f:X-> Y)(f':X' -> Y'): dirprod X X' -> dirprod Y Y':= fun xx':_ => match xx' with tpair x x' => dirprodpair _ _ (f x) (f' x') end. 
+Definition dirprodf (X Y X' Y':UU)(f:X-> Y)(f':X' -> Y'): dirprod X X' -> dirprod Y Y':= fun xx':_ => match xx' with tpair x x' => dirprodpair (f x) (f' x') end. 
 
 
 Definition ddualand (X Y P:UU)(xp: (X -> P) -> P)(yp: (Y -> P) -> P): ((dirprod X Y) -> P) -> P.
@@ -492,7 +492,7 @@ Definition tococonusf (X Y:UU)(f: X -> Y) : X -> coconusf _ _ f := fun x:_ => tp
 Definition isweq (X Y:UU)(F:X -> Y) : UU := forall y:Y, iscontr (hfiber _ _ F y) .
 
 Definition invmap (X:UU) (Y:UU) (f:X-> Y) (isw: isweq X Y f): Y->X.
-Proof. intros X Y f isw X0. unfold isweq in isw. apply (pr21 _ _ (pr21 _ _ (isw X0))). Defined.
+Proof. intros X Y f isw y. unfold isweq in isw. apply (pr21 _ _ (pr21 _ _ (isw y))). Defined.
 
 Lemma idisweq (T:UU) : isweq T T (fun t:T => t).
 Proof. intros. 
@@ -784,7 +784,7 @@ apply (gradth _ _ _ _ egf efg). Defined.
 
 
 Corollary isweqpr21pr21 (T:UU) : isweq (pathsspace' T) T (fun a:_ => (pr21 _ _ (pr21 _ _ a))).
-Proof. intros. set (f:=  (fun a:_ => (pr21 _ _ (pr21 _ _ a))): pathsspace' T -> T). set (g:= (fun t:T => tpair _ _ (dirprodpair _ _ t t) (idpath _ t)): T -> pathsspace' T). 
+Proof. intros. set (f:=  (fun a:_ => (pr21 _ _ (pr21 _ _ a))): pathsspace' T -> T). set (g:= (fun t:T => tpair _ _ (dirprodpair t t) (idpath _ t)): T -> pathsspace' T). 
 assert (efg: forall t:T, paths _ (f (g t)) t). intro. apply idpath. 
 assert (egf: forall a: pathsspace' T, paths _ (g (f a)) a). intro. destruct a as [ t x ].  destruct t. destruct x.   simpl. apply idpath. 
 apply (gradth _ _ _ _ egf efg). Defined. 
@@ -1509,7 +1509,7 @@ Proof. intros. destruct w as [ t x ]. destruct w' as [ t0 x0 ]. split with (dirp
 
 
 Definition weqtodirprodwithunit (X:UU): weq X (dirprod X unit).
-Proof. intros. set (f:=fun x:X => dirprodpair X unit x tt). split with f.  set (g:= fun xu:dirprod X unit => pr21 _ _ xu). 
+Proof. intros. set (f:=fun x:X => dirprodpair x tt). split with f.  set (g:= fun xu:dirprod X unit => pr21 _ _ xu). 
 assert (egf: forall x:X, paths _ (g (f x)) x). intro. apply idpath.
 assert (efg: forall xu:_, paths _ (f (g xu)) xu). intro. destruct xu as  [ t x ]. destruct x. apply idpath.    
 apply (gradth _ _ f g egf efg). Defined.
@@ -1630,11 +1630,11 @@ Proof. intros. intro X0. set (dist:= fun xy: coprod X Y => match xy with ii1 x =
 
 
 Definition rdistrtocoprod (X Y Z:UU): dirprod X (coprod Y Z) -> coprod (dirprod X Y) (dirprod X Z).
-Proof. intros X Y Z X0. destruct X0 as [ t x ].  destruct x.   apply (ii1 _ _ (dirprodpair _ _ t y)). apply (ii2 _ _ (dirprodpair _ _ t z)). Defined.
+Proof. intros X Y Z X0. destruct X0 as [ t x ].  destruct x.   apply (ii1 _ _ (dirprodpair t y)). apply (ii2 _ _ (dirprodpair t z)). Defined.
 
 
 Definition rdistrtoprod (X Y Z:UU): coprod (dirprod X Y) (dirprod X Z) ->  dirprod X (coprod Y Z).
-Proof. intros X Y Z X0. destruct X0 as [ d | d ].  destruct d as [ t x ]. apply (dirprodpair _ _ t (ii1 _ _ x)). destruct d as [ t x ]. apply (dirprodpair _ _ t (ii2 _ _ x)). Defined. 
+Proof. intros X Y Z X0. destruct X0 as [ d | d ].  destruct d as [ t x ]. apply (dirprodpair t (ii1 _ _ x)). destruct d as [ t x ]. apply (dirprodpair t (ii2 _ _ x)). Defined. 
 
 
 Theorem isweqrdistrtoprod (X Y Z:UU): isweq _ _ (rdistrtoprod X Y Z).
@@ -2666,7 +2666,11 @@ apply (proofirrelevance _ X2 u u'). apply (invproofirrelevance _ X0). Defined.
 
 
 Corollary eqfromdnegeq (X:UU)(is: isdeceq X)(x x':X): dneg( paths _ x x') -> paths _ x x'.
-Proof. intros X is x x' X0. set (a:= dirprodpair (isaprop (paths _ x x')) (decidable (paths _ x x')) (isasetifdeceq X is x x') (is x' x)). set (isinv:= isaninv1 _ a). apply (invimpl _ isinv X0). Defined. 
+Proof. intros X is x x' X0. 
+  set (a:= dirprodpair (isasetifdeceq X is x x') (is x' x)).
+  set (isinv:= isaninv1 _ a).
+  apply (invimpl _ isinv X0).
+Defined. 
 
 Definition curry (x:bool) : UU := match x with false => empty | true => unit end.
 
