@@ -402,20 +402,33 @@ Definition iscontrpair (T:UU) cntr (e: forall t, paths T t cntr) : iscontr T := 
 
 
 
-Lemma contrl1 (X Y:UU)(f:X -> Y)(g: Y-> X)(efg: forall y, paths Y y (f(g y))): iscontr X -> iscontr Y.
-Proof. intros X Y f g efg X0.  
-destruct X0 as [t x].  set (y:= f t).  split with y.  intro t0.  
-assert (e1: paths _ (f (g t0)) y). apply (maponpaths _ _ f _ _ (x (g t0))).
-assert (e2: paths _ t0 (f (g t0))). apply efg.
-induction e2.  assumption.  Defined. 
+Lemma contrl1 (X Y:UU)(f:X -> Y)(g: Y-> X) : (forall y, paths _ y (f(g y))) -> iscontr X -> iscontr Y.
+Proof.
+  intros X Y f g efg is.  
+  destruct is as [u x].
+  set (y:= f u).
+  split with y.
+  intro y'.
+  assert (e1: paths _ (f (g y')) y).
+  apply (maponpaths _ _ f _ _ (x (g y'))).
+  induction (efg y').
+  assumption.
+Defined. 
 
+Lemma contrl1' (X Y:UU)(f:X -> Y)(g: Y -> X) : (forall y, paths _ (f(g y)) y) -> iscontr X -> iscontr Y.
+Proof.
+  intros X Y f g efg X0.
+  set (efg' := fun y:Y => pathsinv0 _ _ _ (efg y)).
+  apply contrl1 with X f g; assumption. 
+Defined.
 
-Lemma contrl1' (X Y:UU)(f:X -> Y)(g: Y -> X)(efg: forall y, paths Y (f(g y)) y): iscontr X -> iscontr Y.
-Proof. intros. set (efg' := fun y:Y => pathsinv0 _ _ _ (efg y)).  apply contrl1 with X f g. assumption. assumption. Defined.
-
-Lemma contrl2 (X:UU)(is: iscontr X)(x:X)(x':X): paths _ x x'.
-Proof. intros. unfold iscontr in is.  destruct is as [ t x0 ]. set (e:= x0 x). set (e':= pathsinv0 _ _ _ (x0 x')). exact (pathscomp0 _ _ _ _ e e'). Defined. 
-
+Lemma contrl2 (X:UU) : iscontr X -> forall x x':X, paths _ x x'.
+Proof.
+   intros X is x x'.
+   unfold iscontr in is.
+   destruct is as [ t x0 ].
+   exact (pathscomp0 _ _ _ _ (x0 x) (pathsinv0 _ _ _ (x0 x'))).
+Defined.
 
 (* coconustot = co conus to t *)
 Definition coconustot (T:UU) (t:T) := total2 T (fun t' => paths _ t' t).
@@ -693,38 +706,40 @@ Proof.
      (fun y' => pr22 _ _ (constr2 _ _ _ _ efg z y'))).
    Defined.
 
-Lemma isweql2 (X:UU)(Y:UU)(f1:X-> Y) (f2:X->Y) (h: forall x:X, paths _ (f2 x) (f1 x))(y:Y): iscontr (hfiber _ _ f2 y) -> iscontr (hfiber _ _ f1 y).
-Proof. intros X Y f1 f2 h y X0. 
 
-set (f:= (fun z:(hfiber _ _ f1 y) =>
-match z with 
-(tpair x e) => hfiberpair _ _ f2 y x (pathscomp0 _ _ _ _ (h x) e)
-end)). 
+Lemma isweql2 (X:UU)(Y:UU)(f1:X-> Y) (f2:X->Y) : (forall x:X, paths _ (f2 x) (f1 x)) -> forall y:Y, iscontr (hfiber _ _ f2 y) -> iscontr (hfiber _ _ f1 y).
+Proof.
+  intros X Y f1 f2 h y X0.
+  set (f:= (fun z:(hfiber _ _ f1 y) => match z with (tpair x e) => hfiberpair _ _ f2 y x (pathscomp0 _ _ _ _ (h x) e) end)).
+  set (g:= (fun z:(hfiber _ _ f2 y) => match z with (tpair x e) => hfiberpair _ _ f1 y x (pathscomp0 _ _ _ _ (pathsinv0 _ _ _ (h x)) e) end)).
+  assert (egf: forall z:(hfiber _ _ f1 y), paths _ (g (f z)) z).
+    intros.
+    destruct z as [ x e ].
+    apply (constr3 _ _ f1 y x (pathscomp0 _ _ _ _ (pathsinv0 _ _ _ (h x)) (pathscomp0 _ _ _ _ (h x) e)) e (pathsinv1l _ _ _ y (h x) e)).
+  apply (contrl1' _ _ g f egf X0).
+Defined.
 
-set (g:= (fun z:(hfiber _ _ f2 y) =>
-match z with
-(tpair x e) => hfiberpair _ _ f1 y x (pathscomp0 _ _ _ _ (pathsinv0 _ _ _ (h x)) e)
-end)). 
-
-assert (egf: forall z:(hfiber _ _ f1 y), paths _ (g (f z)) z). intros. destruct z as [ x e ].  
-
-apply (constr3 _ _ f1 y x (pathscomp0 _ _ _ _ (pathsinv0 _ _ _ (h x)) (pathscomp0 _ _ _ _ (h x) e)) e (pathsinv1l _ (f2 x) (f1 x) y (h x) e)).
-
-apply (contrl1' _ _ g f egf X0). Defined.
 
 Corollary isweqhomot (X:UU)(Y:UU)(f1:X-> Y) (f2:X->Y) (h: forall x:X, paths _ (f1 x) (f2 x)): isweq _ _ f1 -> isweq _ _ f2.
 Proof. intros X Y f1 f2 h X0. unfold isweq. intro. set (Y0:= X0 y).  apply (isweql2 _ _ f2 f1 h). assumption. Defined. 
 
 
 
-Theorem gradth (X:UU)(Y:UU)(f:X->Y)(g:Y->X)(egf: forall x:X, paths _ (g (f x)) x)(efg: forall y:Y, paths _ (f (g y)) y ): isweq _ _ f.
-Proof. intros.  unfold isweq.  intro y'.
-assert (iscontr (hfiber _ _ (fun y:Y => (f (g y))) y')). 
-assert (efg': forall y:Y, paths _ y (f (g y))). intro y. apply pathsinv0. exact (efg y).
-apply (isweql2 Y Y (fun y:Y => (f (g y)))  (fun  y:Y => y)  efg' y' (idisweq Y y')). 
-apply (isweql1 _ _ g f egf y'). assumption. 
+Theorem gradth (X:UU)(Y:UU)(f:X->Y)(g:Y->X) : (forall x:X, paths _ (g (f x)) x) -> (forall y:Y, paths _ (f (g y)) y) -> isweq _ _ f.
+Proof.
+  intros X Y f g egf efg.
+  unfold isweq.
+  intro y'.
+  assert (iscontr (hfiber _ _ (compose f g) y')).
+    assert (efg': forall y, paths _ y (f (g y))).
+      intro y.
+      apply pathsinv0.
+      exact (efg y).
+    apply (isweql2 _ _ (compose f g)  (fun y => y)  efg' y' (idisweq _ y')).
+  apply (isweql1 _ _ g f egf y').
+  assumption.
 Defined.
- 
+
 
 
 (** *** Some basic weak equivalences *)
