@@ -54,7 +54,7 @@ set (is2:= uu1.gradth _ _ _ _ egf efg).
 apply ( uu1.isweqtotaltofib _ P1 P2  (fun XY: uu1.dirprod hProp hProp => (match XY with  uu1.tpair X Y => eqweqmaphProp X Y end)) is2 ( uu1.dirprodpair _ _ P P')). Defined. 
 
 Corollary uu1isasethProp : uu1.isaset hProp.
-Proof. unfold isaset.  simpl. intro. intro. apply (uu1.isofhlevelweqb (S O) _ _ _ (univfromtwoaxiomshProp x x') (uu1.isapropweq x x' (uu1.pr22 _ _ x'))). Defined.
+Proof. unfold isaset.  simpl. intro. intro. apply (uu1.isofhlevelweqb 1 _ _ _ (univfromtwoaxiomshProp x x') (uu1.isapropweq x x' (uu1.pr22 _ _ x'))). Defined.
 
 
 

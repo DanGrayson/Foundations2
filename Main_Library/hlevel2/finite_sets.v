@@ -120,14 +120,14 @@ Proof. intros X X0. apply (hinhpr _ (weqinv _ _ (weqpair _ _ _ (isweqtoempty _ X
 Corollary isof0elempty: isofnel O empty.
 Proof. apply (isof0elb empty (fun x:_ => x)). Defined. 
 
-Lemma isof1ela (X:UU0): isofnel (S O) X -> iscontr X.
-Proof. intros X X0.  apply (isofnelimpl (S O) X X0 (iscontr_hprop X)).  set (w2:= (weqinv _ _ (weqfromcoprodwithempty unit))). intro X1.  set (w3:= weqcomp _ _ _ w2 X1). apply (iscontrifweqtounit _ (weqinv _ _ w3)). assumption. Defined.  
+Lemma isof1ela (X:UU0): isofnel 1 X -> iscontr X.
+Proof. intros X X0.  apply (isofnelimpl 1 X X0 (iscontr_hprop X)).  set (w2:= (weqinv _ _ (weqfromcoprodwithempty unit))). intro X1.  set (w3:= weqcomp _ _ _ w2 X1). apply (iscontrifweqtounit _ (weqinv _ _ w3)). assumption. Defined.  
 
-Lemma isof1elb (X:UU0): (iscontr X) -> isofnel (S O) X.
+Lemma isof1elb (X:UU0): (iscontr X) -> isofnel 1 X.
 Proof. intros X X0. set (w1:= weqpair _ _ _ (isweqcontrtounit _ X0)). set (w2:= weqfromcoprodwithempty unit).  set (w:= weqcomp _ _ _ w2 (weqinv _ _ w1)). apply (hinhpr _ w). Defined. 
 
 
-Lemma isof1elunit: isofnel (S O) unit.
+Lemma isof1elunit: isofnel 1 unit.
 Proof. apply (hinhpr _ (weqfromcoprodwithempty unit)). Defined. 
 
 
@@ -140,8 +140,8 @@ Lemma isofnelweqf (n:nat)(X Y:UU0)(f:X -> Y)(is: isweq _ _ f): isofnel n X -> is
 Proof. intros n X Y f is X0.  set (ff:= fun u:weq (stn n) X => weqcomp _ _ _ u (weqpair _ _ f is)). apply (hinhfunct _ _ ff X0). Defined.
 
 
-Lemma isof2elbool : isofnel (S (S O)) bool.
-Proof. apply (isofnelweqf _ _ _ _ (pr22 _ _ boolascoprod) (isofsnel (S O) unit isof1elunit)). Defined. 
+Lemma isof2elbool : isofnel 2 bool.
+Proof. apply (isofnelweqf _ _ _ _ (pr22 _ _ boolascoprod) (isofsnel 1 unit isof1elunit)). Defined. 
 
 
 
@@ -214,7 +214,7 @@ Defined.
    
 Definition weqtoinitintervalsn  (n:nat) : weq  (coprod (initinterval n) unit) (initinterval (S n)).
 Proof. intro. set (f:= toinitintervalsn n). set (g:= frominitintervalsn n). split with f. 
-set (u:= coprodf _ _ _ _ (initintervaltonat n) (fun t:unit => t)).   assert (is: isincl _ _ u). apply (isofhlevelfcoprodf (S O) _ _ _ _ _ _ (isinclinitintervaltonat n) (isofhlevelfweq (S O) _ _ _ (idisweq unit))).  
+set (u:= coprodf _ _ _ _ (initintervaltonat n) (fun t:unit => t)).   assert (is: isincl _ _ u). apply (isofhlevelfcoprodf 1 _ _ _ _ _ _ (isinclinitintervaltonat n) (isofhlevelfweq 1 _ _ _ (idisweq unit))).  
 assert (egf: forall x:_, paths _ (g (f x)) x).  intro. 
 assert (egf0: paths _ (u (g (f x))) (u x)).  destruct x. simpl. destruct i as [ t x ]. destruct t.   simpl.  apply idpath. simpl. destruct (isdeceqnat n t).    simpl. induction p. apply (initmap _ (neglebsnn t x)).  simpl.  apply idpath.  destruct u0. destruct n.  apply idpath. simpl.  destruct (isdeceqnat n n) as [|e]. apply idpath.  apply (initmap _ (e (idpath _ _))). apply (invmaponpathsincl _ _ _ is _ _ egf0). 
 assert (efg: forall x:_, paths _ (f (g x)) x). intro. 
@@ -264,7 +264,7 @@ Proof.
     assert (c1: decidable (paths _ t t0)).
     apply isdeceqnat.
     destruct c1.
-      apply (invmaponpathsincl (isfinite0 X) nat (pr21 _ _) (isofhlevelfpr21 (S O) _ _  (fun n:nat => isapropdneg (weq (stn n) X))) (tpair nat (fun n : nat => isofnel0 n X) t x0) (tpair nat (fun n : nat => isofnel0 n X) t0 x) p).
+      apply (invmaponpathsincl (isfinite0 X) nat (pr21 _ _) (isofhlevelfpr21 1 _ _  (fun n:nat => isapropdneg (weq (stn n) X))) (tpair nat (fun n : nat => isofnel0 n X) t x0) (tpair nat (fun n : nat => isofnel0 n X) t0 x) p).
     assert (is1: dneg (dirprod (weq (stn t0) X) (weq (stn t) X))).
       apply (dneganddnegimpldneg _ _ x x0).
     assert (is2: dneg (weq (stn t0) (stn t))).
@@ -302,10 +302,10 @@ Definition isfinitestn (n:nat): isfinite (stn n) := hinhpr _ (finitestructstn n)
 Definition finitestructempty := finitestructpair _ O (idweq _).
 Definition isfiniteempty : isfinite empty := hinhpr _ finitestructempty.
 
-Definition finitestructunit: finitestruct unit := finitestructpair _ (S O) (weqfromcoprodwithempty unit).
+Definition finitestructunit: finitestruct unit := finitestructpair _ 1 (weqfromcoprodwithempty unit).
 Definition isfiniteunit : isfinite unit := hinhpr _ finitestructunit. 
 
-Definition finitestructbool := finitestructpair _ (S (S O)) (weqcomp _ _ _ (weqcoprodf _ _ _ _ (weqfromcoprodwithempty unit) (idweq unit)) boolascoprod).
+Definition finitestructbool := finitestructpair _ 2 (weqcomp _ _ _ (weqcoprodf _ _ _ _ (weqfromcoprodwithempty unit) (idweq unit)) boolascoprod).
 Definition isfinitebool : isfinite bool  := hinhpr _ finitestructbool.
 
 Definition finitestructinitinterval (n:nat) := finitestructpair _ (S n) (weqstntoinitinterval n).
@@ -434,7 +434,7 @@ Proof. intros. *)
 
 
 
-(*Eval compute in carddneg _  (isfinitedirprod _ _ (isfinitestn (S (S (S (S O)))))  (isfinitestn (S (S (S O))))).*)
+(*Eval compute in carddneg _  (isfinitedirprod _ _ (isfinitestn 4)  (isfinitestn 3)).*)
 
 Eval compute in carddneg _ (isfiniteempty).
 
@@ -456,7 +456,7 @@ Eval compute in carddneg _ (isfinitedirprod _ _ isfinitebool isfinitebool).
 
 Eval compute in carddneg _ (isfinitedirprod _ _ isfinitebool (isfinitedirprod _ _ isfinitebool isfinitebool)).
 
-Eval compute in carddneg _ (isfinitecoprod _ _ (isfinitebool) (isfinitecomplement _ (ii1 _ _ (ii2 _ _ tt)) (isfinitestn (S (S (S O)))))).
+Eval compute in carddneg _ (isfinitecoprod _ _ (isfinitebool) (isfinitecomplement _ (ii1 _ _ (ii2 _ _ tt)) (isfinitestn 3))).
 
 Eval lazy in carddneg _ (isfinitecomplement _ (ii1 _ _ tt) (isfinitecoprod _ _ (isfiniteunit) (isfinitebool))).
 
@@ -465,7 +465,7 @@ Eval lazy in carddneg _ (isfinitecomplement _ (ii1 _ _ tt) (isfinitecoprod _ _ (
 (*Eval compute in carddneg _ (isfinitecomplement _ (dirprodpair _ _ tt tt) (isfinitedirprod _ _ isfiniteunit isfiniteunit)).*)
 
 
-(*Definition finitestructunit: finitestruct unit := finitestructpair _ (S O) (weqfromcoprodwithempty unit).*)
+(*Definition finitestructunit: finitestruct unit := finitestructpair _ 1 (weqfromcoprodwithempty unit).*)
 
 Eval lazy in (pr21 _ _ (finitestructcomplement _ (dirprodpair _ _ tt tt) (finitestructdirprod _ _ (finitestructunit) (finitestructunit)))).
  
@@ -483,16 +483,16 @@ Eval lazy in carddneg _ (isfinitecomplement _ (dirprodpair _ _ true (dirprodpair
 
 (*
 
-Eval compute in (pr21 _ _ (isfinitedirprod _ _ (isfinitestn (S (S (S (S O)))))  (isfinitestn (S (S (S O)))))).
+Eval compute in (pr21 _ _ (isfinitedirprod _ _ (isfinitestn 4)  (isfinitestn 3))).
 
 
 Print empty_rect. 
 
-Lemma isof1elfrom0el (X Y:UU0): isofnel O X -> isofnel (S O) (X -> Y).
+Lemma isof1elfrom0el (X Y:UU0): isofnel O X -> isofnel 1 (X -> Y).
 Proof. intros. unfold isofnel. intro.   simpl. 
 
 Theorem isfinitefunctions (X Y:UU0)(isx: isfinite X)(isy: isfinite Y): isfinite (X -> Y).
-Proof. intros. destruct isx.  generalize Y isy X x. clear isy Y x X.  induction t.  intros. split with (S O). 
+Proof. intros. destruct isx.  generalize Y isy X x. clear isy Y x X.  induction t.  intros. split with 1. 
 
 
 

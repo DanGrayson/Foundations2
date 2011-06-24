@@ -102,7 +102,7 @@ set (r1:= pr21 _ _ (pr22 _ _ is)). unfold issymm in r1.
 set (ax := is1 x x' a). set (ax' := is1 x' x (r1 _ _ a)). 
 set (f:= fun u: R x t => (r1 _ _ (ax (r1 _ _ u)))). set (g:= fun u: R x' t => (r1 _ _ (ax' (r1 _ _ u)))). 
 apply (uahp _ _ f g). 
-set (is2:= isofhlevelfpr21 (S O) _ _ (fun A: hsubtypes X =>  (isapropiseqclass X R A))).  
+set (is2:= isofhlevelfpr21 1 _ _ (fun A: hsubtypes X =>  (isapropiseqclass X R A))).  
 apply (invmaponpathsincl _ _ _ is2 _ _ e). Defined. (* Uses univalence for hProp *)
 
 

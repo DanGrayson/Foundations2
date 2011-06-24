@@ -88,7 +88,7 @@ Definition hfalse : hProp := hProppair empty isapropempty.
 Canonical Structure hfalse.
 
 
-Definition hconj (P Q : hProp) : hProp := hProppair (dirprod P Q) (isofhleveldirprod (S O) _ _ (uu1.pr22 _ _ P) (uu1.pr22 _ _ Q)). 
+Definition hconj (P Q : hProp) : hProp := hProppair (dirprod P Q) (isofhleveldirprod 1 _ _ (uu1.pr22 _ _ P) (uu1.pr22 _ _ Q)). 
 Canonical Structure hconj.
 
 Definition uu1hdisj (P Q : hProp) :=  ishinh (coprod P Q). 

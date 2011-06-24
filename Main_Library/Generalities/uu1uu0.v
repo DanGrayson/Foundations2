@@ -74,11 +74,11 @@ assert (s: uu1.isofhlevel n (paths _ x x')). apply (IHn _ (X0 x x')). apply (uu1
 
 Coercion u0isofhleveltou1isofhlevel: isofhlevel >-> uu1.isofhlevel.
 
-Definition u0isaproptou1isaprop (X : UU0) := u0isofhleveltou1isofhlevel (S O) X : isaprop X -> uu1.isaprop X.
+Definition u0isaproptou1isaprop (X : UU0) := u0isofhleveltou1isofhlevel 1 X : isaprop X -> uu1.isaprop X.
 Coercion u0isaproptou1isaprop : isaprop >-> uu1.isaprop.
 
 
-Definition u1isaproptou0isaprop (X : UU0) := u1isofhleveltou0isofhlevel (S O) X : uu1.isaprop X -> isaprop X.
+Definition u1isaproptou0isaprop (X : UU0) := u1isofhleveltou0isofhlevel 1 X : uu1.isaprop X -> isaprop X.
 Coercion u1isaproptou0isaprop : uu1.isaprop >-> isaprop.
 
 
