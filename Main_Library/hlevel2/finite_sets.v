@@ -176,9 +176,12 @@ Lemma lebsnchoice0 (x n:nat): paths _ (leb x (S n)) true -> (neg (paths _ x (S n
 Proof. intro. induction x.  intros. apply idpath.  intro. destruct n.  intros X X0.  simpl in X.  destruct x.  apply (initmap _ (X0 (idpath _ _))). simpl in X.  apply (initmap _ (nopathsfalsetotrue X)). intros X X0. simpl in X.  set (a:= IHx n X (negf _ _ (maponpaths _ _ S _ _) X0)).  assumption.  Defined. 
 
 Lemma lebsnchoice (x n:nat) : paths _ (leb x (S n)) true -> coprod (paths _ (leb x n) true) (paths _ x (S n)).
-Proof. intros x n X. set (s:= isdeceqnat (S n) x).  destruct s.  apply (ii2 _ _ p).
-apply (ii1 _ _ (lebsnchoice0 x n X e)).  Defined. 
-
+Proof.
+  intros x n X.
+  destruct (isdeceqnat (S n) x).
+    apply ii2; trivial.
+    apply ii1, lebsnchoice0; trivial.
+Defined.
 
 Definition initinterval (n:nat) := total2 nat (fun x:nat => paths _ (leb x n) true).
 Definition initintervalpair (n:nat):= tpair  nat (fun x:nat => paths _ (leb x n) true).
@@ -199,14 +202,21 @@ Proof. split with (initintervalpair O O (isreflleb O)).  intro. destruct t as [ 
 Definition toinitintervalsn (n:nat):  (coprod (initinterval n) unit) -> (initinterval (S n)) := sumofmaps ( initintervalsincl n (S n) (islebnsn n)) (fun t:unit => initintervalpair (S n) (S n) (isreflleb (S n))).
 
 Definition frominitintervalsn (n:nat): initinterval (S n) -> coprod (initinterval n) unit.
-Proof. intros n X.   destruct X as [ t x ].  destruct (isdeceqnat (S n) t).  apply (ii2 _ _ tt).  apply (ii1 _ _ (initintervalpair n t (lebsnchoice0 t n x e))).   Defined. 
-
-
+Proof. 
+  intros n X.
+  destruct X as [ t ].
+  destruct (isdeceqnat (S n) t).
+    apply ii2; exact tt.
+  apply ii1.
+  apply (initintervalpair n t).
+  apply lebsnchoice0; trivial.
+Defined.
+   
 Definition weqtoinitintervalsn  (n:nat) : weq  (coprod (initinterval n) unit) (initinterval (S n)).
 Proof. intro. set (f:= toinitintervalsn n). set (g:= frominitintervalsn n). split with f. 
 set (u:= coprodf _ _ _ _ (initintervaltonat n) (fun t:unit => t)).   assert (is: isincl _ _ u). apply (isofhlevelfcoprodf (S O) _ _ _ _ _ _ (isinclinitintervaltonat n) (isofhlevelfweq (S O) _ _ _ (idisweq unit))).  
 assert (egf: forall x:_, paths _ (g (f x)) x).  intro. 
-assert (egf0: paths _ (u (g (f x))) (u x)).  destruct x. simpl. destruct i as [ t x ]. destruct t.   simpl.  apply idpath. simpl. destruct (isdeceqnat n t).    simpl. induction p. apply (initmap _ (neglebsnn t x)).  simpl.  apply idpath.  destruct u0. destruct n.  apply idpath. simpl.  destruct (isdeceqnat n n). apply idpath.  apply (initmap _ (e (idpath _ _))). apply (invmaponpathsincl _ _ _ is _ _ egf0). 
+assert (egf0: paths _ (u (g (f x))) (u x)).  destruct x. simpl. destruct i as [ t x ]. destruct t.   simpl.  apply idpath. simpl. destruct (isdeceqnat n t).    simpl. induction p. apply (initmap _ (neglebsnn t x)).  simpl.  apply idpath.  destruct u0. destruct n.  apply idpath. simpl.  destruct (isdeceqnat n n) as [|e]. apply idpath.  apply (initmap _ (e (idpath _ _))). apply (invmaponpathsincl _ _ _ is _ _ egf0). 
 assert (efg: forall x:_, paths _ (f (g x)) x). intro. 
 assert (efg0: paths _ (initintervaltonat (S n) (f (g x))) (initintervaltonat (S n) x)).  destruct x as [ t x ]. simpl.  destruct t. apply idpath. destruct (isdeceqnat n t).  simpl. apply (pathsinv0 _ _ _ (maponpaths _ _ S _ _ p)).  simpl.  apply idpath.  apply  (invmaponpathsincl _ _ _ (isinclinitintervaltonat _)  _ _ efg0). 
 apply (gradth _ _ _ _ egf efg). Defined.  
@@ -242,11 +252,26 @@ Definition isfinite0 (X:UU0):= total2 nat (fun n:_ => isofnel0 n X).
 
 
 Lemma isapropisfinite0 (X:UU0): isaprop (isfinite0 X).
-Proof. intros. assert (is1: (isfinite0 X) -> (iscontr (isfinite0 X))).  intro X0. unfold iscontr. split with X0.  intro. destruct X0 as [ t0 x ].  destruct t as [ t x0 ].
-assert (c1: coprod (paths _ t t0) (neg (paths _ t t0))). apply isdeceqnat. destruct c1.  apply (invmaponpathsincl (isfinite0 X) nat (pr21 _ _) (isofhlevelfpr21 (S O) _ _  (fun n:nat => isapropdneg (weq (stn n) X))) (tpair nat (fun n : nat => isofnel0 n X) t x0) (tpair nat (fun n : nat => isofnel0 n X) t0 x) p).  
-assert (is1: dneg (dirprod (weq (stn t0) X) (weq (stn t) X))). apply (dneganddnegimpldneg _ _ x x0). 
-assert (is2: dneg (weq (stn t0) (stn t))). apply (dnegf _ _ (fun fg: dirprod (weq (stn t0) X) (weq (stn t) X) => weqcomp _ _ _ (pr21 _ _ fg) (weqinv _ _ (pr22 _ _ fg))) is1).   apply (initmap _ (dnegf _ _ (fun ee:_ => pathsinv0 _ _ _ (stnsweqtoeq t0 t ee)) is2 n)). apply (iscontraprop1inv _ is1). Defined. 
-
+Proof.
+  intro X.
+  assert (is1: (isfinite0 X) -> (iscontr (isfinite0 X))).
+    intro X0.
+    unfold iscontr.
+    split with X0.
+    intro t.
+    destruct X0 as [ t0 x ].
+    destruct t as [ t x0 ].
+    assert (c1: decidable (paths _ t t0)).
+    apply isdeceqnat.
+    destruct c1.
+      apply (invmaponpathsincl (isfinite0 X) nat (pr21 _ _) (isofhlevelfpr21 (S O) _ _  (fun n:nat => isapropdneg (weq (stn n) X))) (tpair nat (fun n : nat => isofnel0 n X) t x0) (tpair nat (fun n : nat => isofnel0 n X) t0 x) p).
+    assert (is1: dneg (dirprod (weq (stn t0) X) (weq (stn t) X))).
+      apply (dneganddnegimpldneg _ _ x x0).
+    assert (is2: dneg (weq (stn t0) (stn t))).
+      apply (dnegf _ _ (fun fg: dirprod (weq (stn t0) X) (weq (stn t) X) => weqcomp _ _ _ (pr21 _ _ fg) (weqinv _ _ (pr22 _ _ fg))) is1).
+    apply (initmap _ (dnegf _ _ (fun ee:_ => pathsinv0 _ _ _ (stnsweqtoeq t0 t ee)) is2 n)).
+  apply (iscontraprop1inv _ is1).
+Defined.
 
 Definition isfinite0_hprop (X : UU0) := hProppair (isfinite0 X) (isapropisfinite0 X).
 

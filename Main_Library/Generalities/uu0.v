@@ -1477,10 +1477,10 @@ Proof. intros. destruct w1 as [ t x ]. destruct w2 as [ t0 x0 ]. split with (cop
 
 
 Lemma negpathsii1ii2 (X Y:UU)(x:X)(y:Y): neg (paths _ (ii1 _ _ x) (ii2 _ _ y)).
-Proof. intros. unfold neg. intro X0. set (dist:= fun xy: coprod X Y => match xy with ii1 x => unit | ii2 y => empty end). apply (transportf _ dist _ _ X0 tt). Defined.
+Proof. intros. intro X0. set (dist:= fun xy: coprod X Y => match xy with ii1 x => unit | ii2 y => empty end). apply (transportf _ dist _ _ X0 tt). Defined.
 
 Lemma negpathsii2ii1  (X Y:UU)(x:X)(y:Y): neg (paths _ (ii2 _ _ y) (ii1 _ _ x)).
-Proof. intros. unfold neg. intro X0. set (dist:= fun xy: coprod X Y => match xy with ii1 x => empty | ii2 y => unit end). apply (transportf _ dist _ _ X0 tt). Defined.
+Proof. intros. intro X0. set (dist:= fun xy: coprod X Y => match xy with ii1 x => empty | ii2 y => unit end). apply (transportf _ dist _ _ X0 tt). Defined.
 
 
 
@@ -2480,7 +2480,7 @@ Proof. intros. apply isofhlevelfd1fcor. assumption. Defined.
 Definition isdeceq (X:UU): UU :=  forall x x':X, decidable (paths _ x' x).
 
 Lemma dnegdec (X:UU): dneg (decidable X).
-Proof. intros X r. cut (neg X). intro f. apply r.  apply no. exact f. unfold neg. intro x. apply r. apply yes. exact x. Defined.
+Proof. intros X r. cut (neg X). intro f. apply r.  apply no. exact f. intro x. apply r. apply yes. exact x. Defined.
 
 Theorem isasetifdeceq (X:UU): isdeceq X -> isaset X.
 Proof.
@@ -2593,20 +2593,21 @@ true => X|
 false => Y
 end.
 
-Definition coprodtoboolsum (X Y:UU): (coprod X Y) -> (total2 bool (boolsumfun X Y)):=  (fun xy: coprod X Y =>
-match xy with
-ii1 x => tpair _ (boolsumfun X Y) true x|
-ii2 y => tpair _ (boolsumfun X Y) false y
-end).
+Definition coprodtoboolsum (X Y:UU): coprod X Y -> total2 bool (boolsumfun X Y).
+Proof.
+ intros X Y xy.
+ set (P := boolsumfun X Y).
+ destruct xy as [x|y].
+  exact (tpair _ P true x).
+  exact (tpair _ P false y).
+Defined.
 
-
-Definition boolsumtocoprod (X Y:UU): (total2 bool (boolsumfun X Y)) -> coprod X Y := (fun xy:_ =>
-match xy with 
-tpair true x => ii1 _ _ x|
-tpair false y => ii2 _ _ y
-end).
-
-
+Definition boolsumtocoprod (X Y:UU): total2 bool (boolsumfun X Y) -> coprod X Y := (
+  fun xy:_ =>
+    match xy with 
+      tpair true x => ii1 _ _ x|
+      tpair false y => ii2 _ _ y
+    end).
 
 Theorem isweqcoprodtoboolsum (X Y:UU): isweq _ _ (coprodtoboolsum X Y).
 Proof. intros. set (f:= coprodtoboolsum X Y). set (g:= boolsumtocoprod X Y). 
@@ -2615,10 +2616,6 @@ assert (efg: forall xy: total2 bool (boolsumfun X Y), paths _ (f (g xy)) xy). in
 
 Corollary isweqboolsumtocoprod (X Y:UU): isweq _ _ (boolsumtocoprod X Y ).
 Proof. intros. apply (isweqinvmap _ _ _ (isweqcoprodtoboolsum X Y)). Defined.
-
-
-
-
 
 
 Theorem isinclii1 (X Y:UU): isincl _ _ (ii1 X Y).
@@ -3034,66 +3031,129 @@ end.
 (** ** Some results on types with an isolated point. *)
 
 
-
-
-Definition isisolated (X:UU)(x:X):= forall x':X, coprod (paths _ x' x) (paths _ x' x -> empty).
-
+Definition isisolated (X:UU)(x:X):= forall x':X, decidable (paths _ x' x).
 
 Lemma disjointl1 (X:UU): isisolated (coprod X unit) (ii2 _ _ tt).
-Proof. intros.  unfold isisolated. intros.  destruct x'. apply (ii2 _ _ (negpathsii1ii2 _ _ x tt)).  destruct u.  apply (ii1 _ _ (idpath _ _ )). Defined.
+Proof. intros.
+   unfold isisolated. intros.  destruct x'. apply no. apply negpathsii1ii2.
+   destruct u.  apply yes.  apply idpath.  
+Defined.
 
 Lemma isolatedtoisolatedii1 (X Y:UU)(x:X)(is:isisolated _ x): isisolated _ (ii1 X Y x).
-Proof. intros.  intro.  destruct x'. destruct (is x0).  apply (ii1 _ _ (maponpaths _ _ (ii1 X Y) _ _ p)). apply (ii2 _ _ (negf _ _ (invmaponpathsincl _ _ (ii1 X Y) (isinclii1 X Y) _ _ ) e)). apply (ii2 _ _ (negpathsii2ii1 _ _ x y)). Defined. 
-
+Proof. intros.  intro.
+   destruct x'. 
+      destruct (is x0) as [|e].  
+            apply yes. apply maponpaths. assumption.
+            apply no. apply (negf _ _ (invmaponpathsincl _ _ (ii1 X Y) (isinclii1 X Y) _ _ ) e).
+      apply no. apply negpathsii2ii1.
+Defined. 
 
 Lemma isolatedtoisolatedii2 (X Y:UU)(y:Y)(is:isisolated _ y): isisolated _ (ii2 X Y y).
-Proof. intros.  intro.  destruct x'. apply (ii2 _ _ (negpathsii1ii2 _ _ x y)). destruct (is y0).  apply (ii1 _ _ (maponpaths _ _ (ii2 X Y) _ _ p)). apply (ii2 _ _ (negf _ _ (invmaponpathsincl _ _ (ii2 X Y) (isinclii2 X Y) _ _ ) e)).  Defined. 
-
+Proof. intros.  intro.  
+   destruct x'.
+       apply no. apply negpathsii1ii2.
+       destruct (is y0) as [ | e].
+          apply yes. apply maponpaths. assumption.
+          apply no.  exact (negf _ _ (invmaponpathsincl _ _ (ii2 X Y) (isinclii2 X Y) _ _ ) e).
+Defined. 
 
 Lemma isolatedifisolatedii1 (X Y:UU)(x:X)(is: isisolated _ (ii1 X Y x)): isisolated _ x.
-Proof. intros. intro.  destruct (is (ii1 _ _ x')).  apply (ii1 _ _ (invmaponpathsincl _ _ _ (isinclii1 _ _) _ _ p)). apply (ii2 _ _ (negf _ _ (maponpaths _ _ (ii1 _ _) _ _) e)). Defined. 
-
-
+Proof. intros. intro.  
+   destruct (is (ii1 _ _ x')) as [ | e ].  
+        apply yes.  exact (invmaponpathsincl _ _ _ (isinclii1 _ _) _ _ p).
+        apply no.   exact (negf _ _ (maponpaths _ _ (ii1 _ _) _ _) e).
+Defined. 
 
 Lemma isolatedifisolatedii2 (X Y:UU)(y:Y)(is: isisolated _ (ii2 X Y y)): isisolated _ y.
-Proof. intros. intro.    destruct (is (ii2 _ _ x')).  apply (ii1 _ _ (invmaponpathsincl _ _ _ (isinclii2 _ _) _ _ p)). apply (ii2 _ _ (negf _ _ (maponpaths _ _ (ii2 _ _) _ _) e)).  Defined. 
-
-
-
+Proof. intros. intro y'.
+    destruct (is (ii2 _ _ y')) as [p|e].
+         apply yes. exact (invmaponpathsincl _ _ _ (isinclii2 _ _) _ _ p).
+         apply no.  exact (negf _ _ (maponpaths _ _ (ii2 _ _) _ _) e).
+Defined. 
 
 Definition recomplinv (X:UU)(x:X)(is: isisolated X x): X -> coprod (complement X x) unit:=
-fun x':X => match (is x') with
-ii1 e => ii2 _ _ tt|
-ii2 phi => ii1 _ _ (complementpair _ _ x' phi)
-end.
-
-
+    fun x':X => match (is x') with
+        yes e => ii2 _ _ tt|
+        no  phi => ii1 _ _ (complementpair _ _ x' phi)
+    end.
 
 Theorem isweqrecompl (X:UU)(x:X)(is:isisolated X x): isweq _ _ (recompl X x).
-Proof. intros. set (f:= recompl X x). set (g:= recomplinv X x is). unfold recomplinv in g. simpl in g. 
-
-assert (efg: forall x':X, paths _ (f (g x')) x'). intro.   induction (is x').   induction x0. unfold f. unfold g. simpl. unfold recompl. simpl.  induction (is x').  simpl. apply idpath. induction (y (idpath _ x')).  unfold f. unfold g. simpl. unfold recompl. simpl.  induction (is x').  induction (y x0). simpl. apply idpath. 
-
-
-assert (egf: forall u: coprod  (complement X x) unit, paths _ (g (f u)) u). unfold isisolated in is. intro. destruct (is (f u)). destruct u as [ c | u].    simpl. destruct c as [ t x0 ]. simpl in p. destruct (x0 p). 
-
-destruct u.   
-assert (e1: paths _  (g (f (ii2 (complement X x) unit tt))) (g x)). apply (maponpaths _ _ g _ _ p). 
-assert (e2: paths _ (g x) (ii2 (complement X x) unit tt)). unfold g.  destruct (is x).   apply idpath.  destruct (e (idpath _ x)). apply (pathscomp0 _ _ _ _ e1 e2). destruct u.  simpl. destruct c as [ t x0 ].  simpl. unfold isisolated in is.  unfold g.  destruct (is t). destruct (x0 p). simpl in g. 
- unfold f. unfold recompl. simpl in e. 
-assert (ee: paths _ e0 x0). apply (proofirrelevance _ (isapropneg (paths _ t x))). induction ee.  apply idpath. 
-unfold f. unfold g. simpl. induction u. induction (is x).  apply idpath. induction (y (idpath _ x)).
-apply (gradth _ _ f g egf efg). Defined.
-
+Proof.
+  intros.
+  set (f:= recompl X x).
+  set (g:= recomplinv X x is).
+  unfold recomplinv in g.
+  simpl in g.
+  assert (efg: forall x':X, paths _ (f (g x')) x').
+    intro.
+    induction (is x') as [|y].
+      induction x0.
+      unfold f.
+      unfold g.
+      simpl.
+      unfold recompl.
+      simpl.
+      induction (is x') as [|y].
+        simpl.
+        apply idpath.
+      induction (y (idpath _ x')).
+    unfold f.
+    unfold g.
+    simpl.
+    unfold recompl.
+    simpl.
+    induction (is x').
+      induction (y x0).
+    simpl.
+    apply idpath.
+  assert (egf: forall u: coprod  (complement X x) unit, paths _ (g (f u)) u).
+    unfold isisolated in is.
+    intro.
+    destruct (is (f u)).
+      destruct u as [ c | u].
+        simpl.
+        destruct c as [ t x0 ].
+        simpl in p.
+        destruct (x0 p).
+      destruct u.
+      assert (e1: paths _  (g (f (ii2 (complement X x) unit tt))) (g x)).
+        apply (maponpaths _ _ g _ _ p).
+      assert (e2: paths _ (g x) (ii2 (complement X x) unit tt)).
+        unfold g.
+        destruct (is x).
+          apply idpath.
+        destruct (n (idpath _ x)).
+      apply (pathscomp0 _ _ _ _ e1 e2).
+    destruct u.
+      simpl.
+      destruct c as [ t x0 ].
+      simpl.
+      unfold isisolated in is.
+      unfold g.
+      destruct (is t).
+        destruct (x0 p).
+      simpl in g.
+      unfold f.
+      unfold recompl.
+      simpl in n.
+      assert (ee: paths _ n0 x0).
+        apply (proofirrelevance _ (isapropneg (paths _ t x))).
+      induction ee.
+      apply idpath.
+    unfold f.
+    unfold g.
+    simpl.
+    induction u.
+    induction (is x).
+      apply idpath.
+    induction (n0 (idpath _ x)).
+  apply (gradth _ _ f g egf efg).
+Defined.
 
 Lemma isolatedtoisolated (X:UU)(Y:UU)(f:X -> Y)(is1:isweq _ _ f)(x:X)(is2: isisolated _ x): isisolated _ (f x).
-Proof.  intros. unfold isisolated. intro. rename x' into y.  set (g:=invmap _ _ f is1). set (x':= g y). induction (is2 x').  apply (ii1 _ _ (pathsinv0 _ _ _ (pathsweq1' _ _ f is1 x y (pathsinv0 _ _ _ x0)))). 
+Proof.  intros. unfold isisolated. intro. rename x' into y.  set (g:=invmap _ _ f is1). set (x':= g y). induction (is2 x').  apply (yes _ (pathsinv0 _ _ _ (pathsweq1' _ _ f is1 x y (pathsinv0 _ _ _ x0)))). 
 assert (phi: paths _ y (f x)  -> empty). 
-assert (psi: (paths _ (g y) x -> empty) -> (paths _ y (f x) -> empty)). intros X0 X1.  apply (X0  (pathsinv0 _ _ _ (pathsweq1 _ _ f is1 x y (pathsinv0 _ _ _ X1)))). apply (psi y0). apply (ii2 _ _ phi). Defined.
-
-
-
-
+assert (psi: (paths _ (g y) x -> empty) -> (paths _ y (f x) -> empty)). intro. intro.  apply (X0  (pathsinv0 _ _ _ (pathsweq1 _ _ f is1 x y (pathsinv0 _ _ _ X1)))). apply (psi n). apply (no _ phi). Defined.
 
 (* End of the file uu0.v *)
 

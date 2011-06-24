@@ -2,27 +2,29 @@
 M=Main_Library
 P=Proof_of_Extensionality
 COQFLAGS = -opt -q
+VFILES :=								\
+	$M/Generalities/uu0.v						\
+	$M/Generalities/uu1.v						\
+	$M/Generalities/uu1uu0.v					\
+	$P/univ01.v							\
+	$M/hlevel1/hProp.v						\
+	$M/hlevel2/finite_sets.v					\
+	$M/hlevel1/hProp_up.v						\
+	$M/hlevel1/hProp_r.v						\
+	$M/hlevel1/hProp_r_up.v						\
+	$M/hlevel2/hSet_r.v						\
+	$M/hlevel2/hSet_r_up.v						\
+	$M/hlevel2/set_quotients_r_up.v					\
+	$M/hlevel2/set_quotients_constr2_r_up.v 		
+VOFILES := $(VFILES:.v=.vo)
 MADE_FILES = 
 %.glob %.vo: %.v
 	@ echo "make: Entering directory \`$(dir $*)'"
 	cd $(dir $*) && coqc $(COQFLAGS) $(notdir $*.v)
 	@ echo "make: Leaving directory \`$(dir $*)'"
-all:								\
-	$M/Generalities/uu0.vo					\
-	$M/Generalities/uu1.vo					\
-	$M/Generalities/uu1uu0.vo				\
-	$P/univ01.vo						\
-	$M/hlevel1/hProp.vo					\
-	$M/hlevel2/finite_sets.vo				\
-	$M/hlevel1/hProp_up.vo					\
-	$M/hlevel1/hProp_r.vo					\
-	$M/hlevel1/hProp_r_up.vo				\
-	$M/hlevel2/hSet_r.vo					\
-	$M/hlevel2/hSet_r_up.vo					\
-	$M/hlevel2/set_quotients_r_up.vo			\
-	$M/hlevel2/set_quotients_constr2_r_up.vo		\
-	make-doc
-
+all: TAGS $(VOFILES) make-doc
+TAGS : $(VFILES)
+	etags --language=none $^
 Makefile.depends:
 	find . -name \*.v |\
 	   >$@ xargs coqdep \
