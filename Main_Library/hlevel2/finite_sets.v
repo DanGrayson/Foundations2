@@ -173,7 +173,7 @@ Lemma is0leb0 (n:nat) : paths _ (leb n 0) true -> paths _ n 0.
 Proof.  intro. destruct n. intro.   apply idpath.  intro X. apply (initmap _ (nopathsfalsetotrue X)). Defined. 
 
 Lemma lebsnchoice0 (x n:nat): paths _ (leb x (S n)) true -> (neg (paths _ x (S n))) -> paths _ (leb x n) true.
-Proof. intro. induction x.  intros. apply idpath.  intro. destruct n.  intros X X0.  simpl in X.  destruct x.  apply (initmap _ (X0 (idpath _ _))). simpl in X.  apply (initmap _ (nopathsfalsetotrue X)). intros X X0. simpl in X.  set (a:= IHx n X (negf _ _ (maponpaths _ _ S _ _) X0)).  assumption.  Defined. 
+Proof. intro. induction x.  intros. apply idpath.  intro. destruct n.  intros X X0.  simpl in X.  destruct x.  apply (initmap _ (X0 (idpath _ _))). simpl in X.  apply (initmap _ (nopathsfalsetotrue X)). intros X X0. simpl in X.  set (a:= IHx n X (negf (maponpaths _ _ S _ _) X0)).  assumption.  Defined. 
 
 Lemma lebsnchoice (x n:nat) : paths _ (leb x (S n)) true -> coprod (paths _ (leb x n) true) (paths _ x (S n)).
 Proof.

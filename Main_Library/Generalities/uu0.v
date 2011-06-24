@@ -214,18 +214,18 @@ Definition adjev2 (X Y:UU): (((X -> Y) -> Y) ->Y) -> (X -> Y)  := fun phi x => p
 
 Definition neg (X:UU):= X -> empty.
 
-Definition negf (X:UU)(Y:UU)(f:X -> Y): (neg Y) -> (neg X):= fun phi:Y -> empty => fun x:X => phi (f x).
+Definition negf {X Y:UU}(f:X -> Y): (neg Y) -> (neg X):= fun phi:Y -> empty => fun x:X => phi (f x).
 
 Definition dneg (X:UU):= neg (neg X).
 
-Definition dnegf (X:UU)(Y:UU)(f:X->Y): (dneg X) -> (dneg Y):= negf _ _ (negf _ _ f).
+Definition dnegf (X:UU)(Y:UU)(f:X->Y): (dneg X) -> (dneg Y):= negf (negf f).
 
 Definition todneg (X:UU): X -> (dneg X):= adjev X empty. 
 
-Definition dnegnegtoneg (X:UU): dneg (neg X) -> neg X := negf _ _  (todneg X).
+Definition dnegnegtoneg (X:UU): dneg (neg X) -> neg X := negf  (todneg X).
 
 Lemma dneganddnegl1 (X:UU)(Y:UU): dneg X -> dneg Y -> (X -> neg Y) -> empty.
-Proof. intros X Y xx yy f. apply xx. apply (negf _ _ f).  exact yy. Defined.
+Proof. intros X Y xx yy f. apply xx. apply (negf f).  exact yy. Defined.
 
 Definition dneganddnegimpldneg (X:UU)(Y:UU)(dx: dneg X)(dy:dneg Y): dneg (dirprod X Y):= ddualand X Y empty dx dy. 
 
@@ -2485,7 +2485,7 @@ apply (isofhlevelweqb 1 _ _ (todneg X) X0 (isapropdneg X)). Defined.
 
 Theorem isaninvpropneg (X:UU): isaninvprop (neg X).
 Proof. intros. 
-set (f:= todneg (neg X)). set (g:= negf _ _ (todneg X)). set (is1:= isapropneg X). set (is2:= isapropneg (dneg X)). apply (isweqimplimpl _ _ f g is1 is2).  Defined.
+set (f:= todneg (neg X)). set (g:= negf (todneg X)). set (is1:= isapropneg X). set (is2:= isapropneg (dneg X)). apply (isweqimplimpl _ _ f g is1 is2).  Defined.
 
 
 Theorem isapropisdec (X:UU): isaprop X -> isaprop (decidable X).
@@ -2991,16 +2991,16 @@ end.
 
 Definition maponcomplementsincl (X:UU)(Y:UU)(f:X -> Y)(is: isofhlevelf 1 _ _ f)(x:X): complement X x -> complement Y (f x):= fun x0':_ =>
 match x0' with
-tpair x' neqx => tpair _ _ (f x') (negf _ _ (invmaponpathsincl _ _ _ is x' x) neqx)
+tpair x' neqx => tpair _ _ (f x') (negf (invmaponpathsincl _ _ _ is x' x) neqx)
 end.
 
 Definition maponcomplementsweq (X Y:UU)(f:X -> Y)(is: isweq _ _ f)(x:X):= maponcomplementsincl _ _ f (isofhlevelfweq 1 _ _ f is) x.
 
 
 Theorem isweqmaponcomplements (X Y:UU)(f:X -> Y)(is: isweq _ _ f)(x:X): isweq _ _ (maponcomplementsweq _ _ f is x).
-Proof. intros.  set (is1:= isofhlevelfweq 1 _ _ f is).   set (map1:= totalfun X (fun x':X => neg (paths _ x' x)) (fun x':X => neg (paths _ (f x') (f x))) (fun x':X => negf _ _ (invmaponpathsincl _ _ _ is1 x' x))). set (map2:= fpmap _ _ f (fun y:Y => neg (paths _ y (f x)))). 
-assert (is2: forall x':X, isweq  _ _ (negf _ _ (invmaponpathsincl _ _ _ is1 x' x))). intro. 
-set (invimpll:= (negf _ _ (maponpaths _ _ f x' x))). apply (isweqimplimpl _ _ (negf _ _ (invmaponpathsincl _ _ _ is1 x' x)) (negf _ _ (maponpaths _ _ f x' x)) (isapropneg _) (isapropneg _)). 
+Proof. intros.  set (is1:= isofhlevelfweq 1 _ _ f is).   set (map1:= totalfun X (fun x':X => neg (paths _ x' x)) (fun x':X => neg (paths _ (f x') (f x))) (fun x':X => negf (invmaponpathsincl _ _ _ is1 x' x))). set (map2:= fpmap _ _ f (fun y:Y => neg (paths _ y (f x)))). 
+assert (is2: forall x':X, isweq  _ _ (negf (invmaponpathsincl _ _ _ is1 x' x))). intro. 
+set (invimpll:= (negf (maponpaths _ _ f x' x))). apply (isweqimplimpl _ _ (negf (invmaponpathsincl _ _ _ is1 x' x)) (negf (maponpaths _ _ f x' x)) (isapropneg _) (isapropneg _)). 
 assert (is3: isweq _ _ map1). apply isweqfibtototal. assumption. 
 assert (is4: isweq _ _ map2). apply (isweqfpmap _ _ f  (fun y:Y => neg (paths _ y (f x))) is).
 assert (h: forall x0':_, paths _ (map2 (map1 x0')) (maponcomplementsweq _ _ f is x x0')). intro.  simpl. destruct x0'. simpl. apply idpath.
@@ -3016,37 +3016,34 @@ Definition weqoncomplements (X Y:UU)(x:X)(w: weq X Y): weq (complement X x) (com
 Definition tocompltoii1x (X Y:UU)(x:X): coprod (complement X x) Y -> complement (coprod X Y) (ii1 _ _ x).
 Proof. intros X Y x X0. destruct X0.  split with (ii1 _ _ (pr21 _ _ c)). 
 
-assert (e: neg(paths _ (pr21 _ _ c) x)). apply (pr22 _ _ c). apply (negf _ _ (invmaponpathsincl _ _ (ii1 _ _) (isinclii1 X Y) _ _) e). 
-split with (ii2 _ _ y). apply (negf _ _ (pathsinv0 _ _ _) (negpathsii1ii2 X Y x y)). Defined.
+assert (e: neg(paths _ (pr21 _ _ c) x)). apply (pr22 _ _ c). apply (negf (invmaponpathsincl _ _ (ii1 _ _) (isinclii1 X Y) _ _) e). 
+split with (ii2 _ _ y). apply (negf (pathsinv0 _ _ _) (negpathsii1ii2 X Y x y)). Defined.
 
 
 
 Definition fromcompltoii1x (X Y:UU)(x:X): complement (coprod X Y) (ii1 _ _ x) ->  coprod (complement X x) Y.
 Proof. intros X Y x X0. destruct X0 as [ t x0 ].  destruct t as [ x1 | y ]. 
-assert (ne: neg (paths _ x1 x)). apply (negf _ _ (maponpaths _ _ (ii1 _ _) _ _) x0). apply (ii1 _ _ (complementpair _ _ x1 ne)). apply (ii2 _ _ y). Defined. 
+assert (ne: neg (paths _ x1 x)). apply (negf (maponpaths _ _ (ii1 _ _) _ _) x0). apply (ii1 _ _ (complementpair _ _ x1 ne)). apply (ii2 _ _ y). Defined. 
 
 
 Theorem isweqtocompltoii1x (X Y:UU)(x:X): isweq _ _ (tocompltoii1x X Y x).
 Proof. intros. set (f:= tocompltoii1x X Y x). set (g:= fromcompltoii1x X Y x).
 assert (egf:forall nexy:_ , paths _ (g (f nexy)) nexy). intro. destruct nexy as [ c | y ]. destruct c as [ t x0 ]. simpl. 
-assert (e: paths _ (negf (paths X t x) (paths (coprod X Y) (ii1 X Y t) (ii1 X Y x))
+assert (e: paths _ (negf 
               (maponpaths X (coprod X Y) (ii1 X Y) t x)
-              (negf (paths (coprod X Y) (ii1 X Y t) (ii1 X Y x))
-                 (paths X t x)
+              (negf 
                  (invmaponpathsincl X (coprod X Y) 
                     (ii1 X Y) (isinclii1 X Y) t x) x0)) x0). apply (isapropneg (paths X t x) _ _). 
 apply (maponpaths _ _ (fun ee: neg(paths X t x) => ii1 _ _ (complementpair X x t ee)) _ _ e). 
 apply idpath.
 assert (efg: forall neii1x:_, paths _ (f (g neii1x)) neii1x). intro.  destruct neii1x as [ t x0 ]. destruct t as [ x1 | y ].  simpl. 
-assert (e: paths _  (negf (paths (coprod X Y) (ii1 X Y x1) (ii1 X Y x)) 
-           (paths X x1 x)
+assert (e: paths _  (negf 
            (invmaponpathsincl X (coprod X Y) (ii1 X Y) (isinclii1 X Y) x1 x)
-           (negf (paths X x1 x) (paths (coprod X Y) (ii1 X Y x1) (ii1 X Y x))
+           (negf 
               (maponpaths X (coprod X Y) (ii1 X Y) x1 x) x0)) x0). apply (isapropneg (paths _ _ _)  _ _).
 apply (maponpaths _ _ (fun ee: (neg (paths (coprod X Y) (ii1 X Y x1) (ii1 X Y x))) => (complementpair _ _ (ii1 X Y x1) ee)) _ _ e). 
 simpl. 
-assert (e: paths _ (negf (paths (coprod X Y) (ii2 X Y y) (ii1 X Y x))
-           (paths (coprod X Y) (ii1 X Y x) (ii2 X Y y))
+assert (e: paths _ (negf 
            (pathsinv0 (coprod X Y) (ii2 X Y y) (ii1 X Y x))
            (negpathsii1ii2 X Y x y)) x0). apply (isapropneg (paths _ _ _) _ _).
 apply (maponpaths  _ _ (fun ee: (neg (paths (coprod X Y) (ii2 X Y y) (ii1 X Y x))) => (complementpair _ _ (ii2 X Y y) ee)) _ _ e). 
@@ -3059,16 +3056,16 @@ apply (gradth _ _ f g egf efg). Defined.
 
 Definition tocompltoii2y (X Y:UU)(y:Y): coprod X (complement Y y) -> complement (coprod X Y) (ii2 _ _ y).
 Proof. intros X Y y X0. destruct X0 as [ x | c ]. 
-split with (ii1 _ _ x). apply (negf _ _ (pathsinv0 _ _ _) (negpathsii2ii1 X Y x y)). 
+split with (ii1 _ _ x). apply (negf (pathsinv0 _ _ _) (negpathsii2ii1 X Y x y)). 
 split with (ii2 _ _ (pr21 _ _ c)). 
-assert (e: neg(paths _ (pr21 _ _ c) y)). apply (pr22 _ _ c). apply (negf _ _ (invmaponpathsincl _ _ (ii2 _ _) (isinclii2 X Y) _ _) e). 
+assert (e: neg(paths _ (pr21 _ _ c) y)). apply (pr22 _ _ c). apply (negf (invmaponpathsincl _ _ (ii2 _ _) (isinclii2 X Y) _ _) e). 
 Defined.
 
 
 
 Definition fromcompltoii2y (X Y:UU)(y:Y): complement (coprod X Y) (ii2 _ _ y) ->  coprod X (complement Y y).
 Proof. intros X Y y X0. destruct X0 as [ t x ].  destruct t as [ x0 | y0 ]. apply (ii1 _ _ x0). 
-assert (ne: neg (paths _ y0 y)). apply (negf _ _ (maponpaths _ _ (ii2 _ _) _ _) x). apply (ii2 _ _ (complementpair _ _ y0 ne)). Defined. 
+assert (ne: neg (paths _ y0 y)). apply (negf (maponpaths _ _ (ii2 _ _) _ _) x). apply (ii2 _ _ (complementpair _ _ y0 ne)). Defined. 
 
 
 Theorem isweqtocompltoii2y (X Y:UU)(y:Y): isweq _ _ (tocompltoii2y X Y y).
@@ -3076,26 +3073,23 @@ Proof. intros. set (f:= tocompltoii2y X Y y). set (g:= fromcompltoii2y X Y y).
 assert (egf:forall nexy:_ , paths _ (g (f nexy)) nexy). intro. destruct nexy as [ x | c ]. 
 apply idpath.
 destruct c as [ t x ]. simpl. 
-assert (e: paths _ (negf (paths _ t y) (paths (coprod X Y) (ii2 X Y t) (ii2 X Y y))
+assert (e: paths _ (negf 
               (maponpaths _ (coprod X Y) (ii2 X Y) t y)
-              (negf (paths (coprod X Y) (ii2 X Y t) (ii2 X Y y))
-                 (paths _ t y)
+              (negf 
                  (invmaponpathsincl _ (coprod X Y) 
                     (ii2 X Y) (isinclii2 X Y) t y) x)) x). apply (isapropneg (paths _ t y) _ _). 
 apply (maponpaths _ _ (fun ee: neg(paths _ t y) => ii2 _ _ (complementpair _ y t ee)) _ _ e). 
 assert (efg: forall neii2x:_, paths _ (f (g neii2x)) neii2x). intro.  destruct neii2x as [ t x ]. destruct t as [ x0 | y0 ].  simpl. 
 
-assert (e: paths _ (negf (paths (coprod X Y) (ii1 X Y x0) (ii2 X Y y))
-           (paths (coprod X Y) (ii2 X Y y) (ii1 X Y x0))
+assert (e: paths _ (negf 
            (pathsinv0 (coprod X Y) (ii1 X Y x0) (ii2 X Y y))
            (negpathsii2ii1 X Y x0 y)) x). apply (isapropneg (paths _ _ _) _ _).
 apply (maponpaths  _ _ (fun ee: (neg (paths (coprod X Y) (ii1 X Y x0) (ii2 X Y y))) => (complementpair _ _ (ii1 X Y x0) ee)) _ _ e). 
 simpl.
 
-assert (e: paths _  (negf (paths (coprod X Y) (ii2 X Y y0) (ii2 X Y y)) 
-           _
+assert (e: paths _  (negf 
            (invmaponpathsincl _ (coprod X Y) _ (isinclii2 X Y) y0 y)
-           (negf (paths Y y0 y) (paths (coprod X Y) (ii2 X Y y0) (ii2 X Y y))
+           (negf 
               (maponpaths Y (coprod X Y) (ii2 X Y) y0 y) x)) x). apply (isapropneg (paths _ _ _)  _ _).
 apply (maponpaths _ _ (fun ee: (neg (paths (coprod X Y) (ii2 X Y y0) (ii2 X Y y))) => (complementpair _ _ (ii2 X Y y0) ee)) _ _ e). 
  
@@ -3201,7 +3195,7 @@ Proof. intros.  intro.
    destruct x'. 
       destruct (is x0) as [|e].  
             apply yes. apply maponpaths. assumption.
-            apply no. apply (negf _ _ (invmaponpathsincl _ _ (ii1 X Y) (isinclii1 X Y) _ _ ) e).
+            apply no. apply (negf (invmaponpathsincl _ _ (ii1 X Y) (isinclii1 X Y) _ _ ) e).
       apply no. apply negpathsii2ii1.
 Defined. 
 
@@ -3211,21 +3205,21 @@ Proof. intros.  intro.
        apply no. apply negpathsii1ii2.
        destruct (is y0) as [ | e].
           apply yes. apply maponpaths. assumption.
-          apply no.  exact (negf _ _ (invmaponpathsincl _ _ (ii2 X Y) (isinclii2 X Y) _ _ ) e).
+          apply no.  exact (negf (invmaponpathsincl _ _ (ii2 X Y) (isinclii2 X Y) _ _ ) e).
 Defined. 
 
 Lemma isolatedifisolatedii1 (X Y:UU)(x:X)(is: isisolated _ (ii1 X Y x)): isisolated _ x.
 Proof. intros. intro.  
    destruct (is (ii1 _ _ x')) as [ | e ].  
         apply yes.  exact (invmaponpathsincl _ _ _ (isinclii1 _ _) _ _ p).
-        apply no.   exact (negf _ _ (maponpaths _ _ (ii1 _ _) _ _) e).
+        apply no.   exact (negf (maponpaths _ _ (ii1 _ _) _ _) e).
 Defined. 
 
 Lemma isolatedifisolatedii2 (X Y:UU)(y:Y)(is: isisolated _ (ii2 X Y y)): isisolated _ y.
 Proof. intros. intro y'.
     destruct (is (ii2 _ _ y')) as [p|e].
          apply yes. exact (invmaponpathsincl _ _ _ (isinclii2 _ _) _ _ p).
-         apply no.  exact (negf _ _ (maponpaths _ _ (ii2 _ _) _ _) e).
+         apply no.  exact (negf (maponpaths _ _ (ii2 _ _) _ _) e).
 Defined. 
 
 Definition recomplinv (X:UU)(x:X)(is: isisolated X x): X -> coprod (complement X x) unit:=
