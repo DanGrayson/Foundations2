@@ -67,7 +67,7 @@ set (ImA:=  (total2 Y (fun y:_ => ishinh (hfiber A Y (fun a:A => f (pr21 _ _ a))
 assert (is3: isincl _ _ ((pr21 _ _): ImA -> Y)). apply isofhlevelfpr21. intro. apply (isapropishinh (hfiber A Y (fun a : A => f (pr21 X (fun x : X => A x) a)) x1)).  
 assert (is4: isweq _ _ (maponpaths _ _ ((pr21 _ _):ImA -> Y) x0 x') ). apply isweqonpathsincl. assumption. 
 apply (iscontrxifiscontry _ _ _ is4). simpl. destruct x0 as [ t x1 ]. destruct x' as [ t2 x2 ].    simpl. 
-assert (p1: (hfiber A Y (fun a : A => f (pr21 X (fun x : X => A x) a)) t) -> (hfiber A Y (fun a : A => f (pr21 X (fun x : X => A x) a)) t2) -> (paths t t2)). intros X0 X1.  destruct X0 as [ t3 x3 ]. destruct X1 as [ t4 x4 ]. assert (e1: R (pr21 _ _ t3) (pr21 _ _ t4)). apply x. apply (pr22 _ _ t3). apply (pr22 _ _ t4). assert (e2: paths (f (pr21 X (fun x : X => A x) t3)) (f (pr21 X (fun x : X => A x) t4))). apply is. apply e1. apply (pathscomp0 (pathscomp0 (pathsinv0 _ _ _ x3) e2) x4). 
+assert (p1: (hfiber A Y (fun a : A => f (pr21 X (fun x : X => A x) a)) t) -> (hfiber A Y (fun a : A => f (pr21 X (fun x : X => A x) a)) t2) -> (paths t t2)). intros X0 X1.  destruct X0 as [ t3 x3 ]. destruct X1 as [ t4 x4 ]. assert (e1: R (pr21 _ _ t3) (pr21 _ _ t4)). apply x. apply (pr22 _ _ t3). apply (pr22 _ _ t4). assert (e2: paths (f (pr21 X (fun x : X => A x) t3)) (f (pr21 X (fun x : X => A x) t4))). apply is. apply e1. apply (pathscomp0 (pathscomp0 (pathsinv0 _ _ x3) e2) x4). 
 assert (isi: ishinh (paths t t2)). apply (hinhfunct2 _ _ _ p1 x1 x2). 
 assert (cn: paths t t2). apply (hinhunivcor1 (hProppair _ ((uu1.pr22 _ _ Y) t t2)) isi). 
 apply (iscontraprop1 _ ((uu1.pr22 _ _ Y) t t2) cn). Defined. 
@@ -117,7 +117,7 @@ apply (invmaponpathsincl _ _ _ is2 _ _ e). Defined. (* Uses univalence for hProp
 
 Definition pathconnected (X:UU0):= fun (x x':X) =>  (ishinh_hprop (paths x x')).
 Definition isreflpathconnected (X:UU0): isrefl X (pathconnected X):= fun x:_ =>  (hinhpr _ (idpath x)).
-Definition issymmpathconnected (X:UU0): issymm _ (pathconnected X):= fun x x':_ => fun a:_ => ((hinhfunct _ _ (fun e:paths x x' => pathsinv0 _ _ _ e) a)). 
+Definition issymmpathconnected (X:UU0): issymm _ (pathconnected X):= fun x x':_ => fun a:_ => ((hinhfunct _ _ (fun e:paths x x' => pathsinv0 _ _ e) a)). 
 Definition istranspathconnected (X:UU0): istrans _ (pathconnected X):= fun x x' x'':_ => fun a:_ => fun b:_ =>  ((hinhfunct2 _ _ _ (fun e1: paths x x' => fun e2: paths x' x'' => pathscomp0 e1 e2)  a  b)).
 Definition iseqrelpathconnected (X:UU0): iseqrel _ (pathconnected X):= dirprodpair (isreflpathconnected  _ ) (dirprodpair (issymmpathconnected _ ) (istranspathconnected  _ )).
 

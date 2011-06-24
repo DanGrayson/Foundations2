@@ -195,7 +195,7 @@ Proof. intros m n isle X. destruct X as [ t x ].  split with t.  simpl. apply (i
  
 
 Lemma iscontrinitinterval0 : iscontr (initinterval O).
-Proof. split with (initintervalpair O O (isreflleb O)).  intro. destruct t as [ t x ].  assert (e: paths O t). apply (pathsinv0 _ _ _ (is0leb0 t x)).  destruct e. simpl.  apply (invmaponpathsincl _ _ _ (isinclinitintervaltonat O) (tpair nat (fun x0 : nat => paths (leb x0 O) true) O x)
+Proof. split with (initintervalpair O O (isreflleb O)).  intro. destruct t as [ t x ].  assert (e: paths O t). apply (pathsinv0 _ _ (is0leb0 t x)).  destruct e. simpl.  apply (invmaponpathsincl _ _ _ (isinclinitintervaltonat O) (tpair nat (fun x0 : nat => paths (leb x0 O) true) O x)
      (initintervalpair O O (idpath true)) (idpath O)). Defined. 
 
 
@@ -218,7 +218,7 @@ set (u:= coprodf _ _ _ _ (initintervaltonat n) (fun t:unit => t)).   assert (is:
 assert (egf: forall x:_, paths (g (f x)) x).  intro. 
 assert (egf0: paths (u (g (f x))) (u x)).  destruct x. simpl. destruct i as [ t x ]. destruct t.   simpl.  apply idpath. simpl. destruct (isdeceqnat n t).    simpl. induction p. apply (initmap _ (neglebsnn t x)).  simpl.  apply idpath.  destruct u0. destruct n.  apply idpath. simpl.  destruct (isdeceqnat n n) as [|e]. apply idpath.  apply (initmap _ (e (idpath _))). apply (invmaponpathsincl _ _ _ is _ _ egf0). 
 assert (efg: forall x:_, paths (f (g x)) x). intro. 
-assert (efg0: paths (initintervaltonat (S n) (f (g x))) (initintervaltonat (S n) x)).  destruct x as [ t x ]. simpl.  destruct t. apply idpath. destruct (isdeceqnat n t).  simpl. apply (pathsinv0 _ _ _ (maponpaths _ _ S _ _ p)).  simpl.  apply idpath.  apply  (invmaponpathsincl _ _ _ (isinclinitintervaltonat _)  _ _ efg0). 
+assert (efg0: paths (initintervaltonat (S n) (f (g x))) (initintervaltonat (S n) x)).  destruct x as [ t x ]. simpl.  destruct t. apply idpath. destruct (isdeceqnat n t).  simpl. apply (pathsinv0 _ _ (maponpaths _ _ S _ _ p)).  simpl.  apply idpath.  apply  (invmaponpathsincl _ _ _ (isinclinitintervaltonat _)  _ _ efg0). 
 apply (gradth _ _ _ _ egf efg). Defined.  
 
 
@@ -269,7 +269,7 @@ Proof.
       apply (dneganddnegimpldneg _ _ x x0).
     assert (is2: dneg (weq (stn t0) (stn t))).
       apply (dnegf _ _ (fun fg: dirprod (weq (stn t0) X) (weq (stn t) X) => weqcomp (pr21 _ _ fg) (weqinv (pr22 _ _ fg))) is1).
-    apply (initmap _ (dnegf _ _ (fun ee:_ => pathsinv0 _ _ _ (stnsweqtoeq t0 t ee)) is2 n)).
+    apply (initmap _ (dnegf _ _ (fun ee:_ => pathsinv0 _ _ (stnsweqtoeq t0 t ee)) is2 n)).
   apply (iscontraprop1inv _ is1).
 Defined.
 

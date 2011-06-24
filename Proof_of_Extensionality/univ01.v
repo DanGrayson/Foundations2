@@ -76,7 +76,7 @@ Lemma isweqtransportf10 (X:UU1)(P:X -> UU0)(x:X)(x':X)(e:uu1.paths x x'): isweq 
 Proof. intros. induction e.  apply idisweq. Defined.
 
 Lemma isweqtransportb10 (X:UU1)(P:X -> UU0)(x:X)(x':X)(e:uu1.paths x x'): isweq _ _ (uu1.transportb X P x x' e).
-Proof. intros. apply (isweqtransportf10 _ _ _ _ (uu1.pathsinv0 _ _ _ e)). Defined. 
+Proof. intros. apply (isweqtransportf10 _ _ _ _ (uu1.pathsinv0 _ _ e)). Defined. 
 
 
 
@@ -96,7 +96,7 @@ induction ee. apply l1. assumption. Defined.
 
 
 Corollary isweqweqtransportb (P:UU0 -> UU0)(R: forall (X X':UU0) (w: weq X X'), P X' -> P X)(r: forall X:UU0, forall p:P X, paths (R X X (idweq X) p) p): forall (X X':UU0)(w: weq X X'), isweq _ _ (fun p': P X' => R X X' w p').
-Proof. intros. assert (e:forall p':P X', paths (R X X' w p') (uu1.transportb UU0 P X X' (weqtopaths _ _ w) p')). apply weqtransportb. assumption. assert (ee :forall p':P X', paths  (uu1.transportb UU0 P X X' (weqtopaths _ _ w) p') (R X X' w p')). intro.  apply (pathsinv0 _ _ _ (e p')). clear e. 
+Proof. intros. assert (e:forall p':P X', paths (R X X' w p') (uu1.transportb UU0 P X X' (weqtopaths _ _ w) p')). apply weqtransportb. assumption. assert (ee :forall p':P X', paths  (uu1.transportb UU0 P X X' (weqtopaths _ _ w) p') (R X X' w p')). intro.  apply (pathsinv0 _ _ (e p')). clear e. 
 
 assert (is1:isweq _ _ (uu1.transportb UU0 P X X' (weqtopaths _ _ w))). apply isweqtransportb10.  
 apply (isweqhomot _ _ (uu1.transportb UU0 P X X' (weqtopaths X X' w)) (fun p' : P X' => R X X' w p') ee is1).  Defined. 
@@ -114,7 +114,7 @@ Theorem isweqcompwithweq (X X':UU0)(w: weq X X')(Y:UU0): isweq _ _ (fun f:X'->Y 
 Proof. intros. 
 set (P:= fun X0:UU0 => (X0 -> Y)). 
 set (R:= fun X0:UU0 => (fun X0':UU0 => (fun w1:X0 -> X0' =>  (fun  f:P X0'  => (fun x:X0 => f (w1 x)))))). 
-set (r:= fun X0:UU0 => (fun f:X0 -> Y => pathsinv0 _ _ _ (etacor X0 Y f))).
+set (r:= fun X0:UU0 => (fun f:X0 -> Y => pathsinv0 _ _ (etacor X0 Y f))).
 apply (isweqweqtransportb P R r X X' w). Defined.
 
 
