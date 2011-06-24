@@ -2,20 +2,20 @@
 M=Main_Library
 P=Proof_of_Extensionality
 COQFLAGS = -opt -q
+# in this list, put the prerequisites later, so TAGS is in the right order
 VFILES :=					\
-	$M/hlevel2/set_quotients_constr2_r_up.v	\
-	$M/hlevel2/set_quotients_r_up.v		\
-	$M/hlevel2/hSet_r_up.v			\
-	$M/hlevel2/hSet_r.v			\
-	$M/hlevel1/hProp_r_up.v			\
-	$M/hlevel1/hProp_r.v			\
-	$M/hlevel1/hProp_up.v			\
-	$M/hlevel2/finite_sets.v		\
-	$M/hlevel1/hProp.v			\
-	$P/univ01.v				\
+	$M/Generalities/uu0.v			\
 	$M/Generalities/uu1uu0.v		\
-	$M/Generalities/uu1.v			\
-	$M/Generalities/uu0.v
+	$P/univ01.v				\
+	$M/hlevel1/hProp.v			\
+	$M/hlevel2/finite_sets.v		\
+	$M/hlevel1/hProp_up.v			\
+	$M/hlevel1/hProp_r.v			\
+	$M/hlevel1/hProp_r_up.v			\
+	$M/hlevel2/hSet_r.v			\
+	$M/hlevel2/hSet_r_up.v			\
+	$M/hlevel2/set_quotients_r_up.v		\
+	$M/hlevel2/set_quotients_constr2_r_up.v
 VOFILES := $(VFILES:.v=.vo)
 MADE_FILES = 
 %.glob %.vo: %.v
@@ -43,6 +43,7 @@ make-doc:
 .PHONY : uu1
 uu1: $M/Generalities/uu1.v
 MADE_FILES += $M/Generalities/uu1.v
+VOFILES +=  $M/Generalities/uu1.vo
 $M/Generalities/uu1.v: $M/Generalities/uu0.v Makefile uu1.sed
 	rm -f $@
 	sed <$< >$@ -f uu1.sed
