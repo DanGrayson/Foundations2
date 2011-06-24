@@ -278,27 +278,27 @@ Definition pathscomp021  (T:UU) (a:T)(b:T) (c:T)(e11: paths a b)(e12: paths a b)
 Proof. intros. induction ee1.  apply idpath. Defined. 
 
 
-Definition maponpaths: forall T1:UU, forall T2:UU, forall f:T1 -> T2, forall t11:T1, forall t12:T1, paths t11 t12 -> paths (f t11) (f t12).
-Proof. intros T1 T2 f t11 t12 X.  induction X. apply idpath. Defined. 
+Definition maponpaths {X Y:UU} : forall f:X -> Y, forall x x':X, paths x x' -> paths (f x) (f x').
+Proof. intros X Y f x x' e.  induction e. apply idpath. Defined. 
 
-Lemma idtoid1: forall T1:UU, forall T2:UU, forall f:T1 -> T2, forall t1:T1, paths (maponpaths _ _ f t1 t1 (idpath t1)) (idpath (f t1)).
+Lemma idtoid1: forall T1:UU, forall T2:UU, forall f:T1 -> T2, forall t1:T1, paths (maponpaths f t1 t1 (idpath t1)) (idpath (f t1)).
 Proof. intros. unfold maponpaths. simpl. apply idpath. Defined. 
 
 
-Definition maponpathscomp0 (X:UU)(Y:UU)(f:X -> Y)(x1:X)(x2:X)(x3:X)(e1: paths x1 x2)(e2: paths x2 x3): paths (maponpaths _ _ f _ _ (pathscomp0 e1 e2)) (pathscomp0 (maponpaths _ _ f _ _ e1) (maponpaths _ _ f _ _ e2)).
+Definition maponpathscomp0 (X:UU)(Y:UU)(f:X -> Y)(x1:X)(x2:X)(x3:X)(e1: paths x1 x2)(e2: paths x2 x3): paths (maponpaths f _ _ (pathscomp0 e1 e2)) (pathscomp0 (maponpaths f _ _ e1) (maponpaths f _ _ e2)).
 Proof. intros.  induction e1. induction e2.  simpl. apply idpath. Defined. 
 
 Definition maponpaths2a (X:UU)(Y:UU)(Z:UU)(f1:X-> Y)(f2:X->Y)(g:Y -> Z): paths f1 f2 -> paths (fun x:X => (g (f1 x))) (fun x:X => (g (f2 x))).
-Proof. intros X Y Z f1 f2 g X0. set (int1:= (fun f: X-> Y => (fun x:X => (g (f x))))).  apply (maponpaths _ _ int1 _ _ X0). Defined.
+Proof. intros X Y Z f1 f2 g X0. set (int1:= (fun f: X-> Y => (fun x:X => (g (f x))))).  apply (maponpaths int1 _ _ X0). Defined.
 
 Definition maponpaths2b (X:UU)(Y:UU)(Z:UU)(f:X-> Y)(g1:Y->Z)(g2:Y -> Z): paths g1 g2 -> paths (fun x:X => (g1 (f x))) (fun x:X => (g2 (f x))).
-Proof. intros X Y Z f g1 g2 X0. set (int1:= (fun g: Y-> Z => (fun x:X => (g (f x))))).  apply (maponpaths _ _ int1 _ _ X0). Defined. 
+Proof. intros X Y Z f g1 g2 X0. set (int1:= (fun g: Y-> Z => (fun x:X => (g (f x))))).  apply (maponpaths int1 _ _ X0). Defined. 
 
 
-Lemma maponpathsidfun (X:UU)(x:X)(x':X)(e:paths x x'): paths (maponpaths _ _ (fun x:X => x) _ _ e) e. 
+Lemma maponpathsidfun (X:UU)(x:X)(x':X)(e:paths x x'): paths (maponpaths (fun x:X => x) _ _ e) e. 
 Proof. intros. simpl. induction e. apply (idtoid1 _ _ (fun x:X => x) x). Defined. 
 
-Lemma maponpathsfuncomp (X:UU)(Y:UU)(Z:UU)(f:X-> Y)(g:Y->Z)(x:X)(x':X)(e: paths x x'): paths (maponpaths _ _ g _ _ (maponpaths _ _ f _ _ e)) (maponpaths _ _ (fun x:X => (g (f x))) _ _ e).
+Lemma maponpathsfuncomp (X:UU)(Y:UU)(Z:UU)(f:X-> Y)(g:Y->Z)(x:X)(x':X)(e: paths x x'): paths (maponpaths g _ _ (maponpaths f _ _ e)) (maponpaths (fun x:X => (g (f x))) _ _ e).
 Proof. intros. induction e. unfold maponpaths.  simpl. apply idpath. Defined. 
 
 
@@ -308,8 +308,8 @@ Proof. intros. induction e. unfold maponpaths.  simpl. apply idpath. Defined.
 Definition maponpathshomidinv (X:UU)(f:X -> X)(h: forall x:X, paths (f x) x)(x:X)(x':X): paths (f x) (f x') -> paths x x' := (fun e: paths (f x) (f x') => pathscomp0 (pathsinv0 _ _ (h x)) (pathscomp0 e (h x'))).
 
 
-Lemma maponpathshomid1 (X:UU)(f:X -> X)(h: forall x:X, paths (f x) x)(x:X)(x':X)(e:paths x x'): paths (maponpaths _ _ f _ _ e) (pathscomp0 (h x) (pathscomp0 e (pathsinv0 _ _ (h x')))).
-Proof. intros. induction e. change (pathscomp0 (idpath x) (pathsinv0 _ _ (h x))) with (pathsinv0 _ _ (h x)). assert (ee: paths  (maponpaths X X f x x (idpath x)) (idpath (f x))). apply idtoid1. 
+Lemma maponpathshomid1 (X:UU)(f:X -> X)(h: forall x:X, paths (f x) x)(x:X)(x':X)(e:paths x x'): paths (maponpaths f _ _ e) (pathscomp0 (h x) (pathscomp0 e (pathsinv0 _ _ (h x')))).
+Proof. intros. induction e. change (pathscomp0 (idpath x) (pathsinv0 _ _ (h x))) with (pathsinv0 _ _ (h x)). assert (ee: paths  (maponpaths f x x (idpath x)) (idpath (f x))). apply idtoid1. 
 assert (eee: paths (idpath (f x)) (pathscomp0 (h x) (pathsinv0 _ _ (h x)))). apply (pathsinv0 _ _ (pathsinv0r1 _ _ _ (h x))). apply (pathscomp0 ee eee). Defined. 
 
 
@@ -317,15 +317,15 @@ Lemma maponpathshomid12 (X:UU)(x:X)(x':X)(fx:X)(fx':X)(e:paths fx fx')(hx:paths 
 Proof. intros. induction hx. induction hx'. induction e.  simpl. apply idpath. Defined. 
 
 
-Lemma maponpathshomid2 (X:UU)(f:X->X)(h: forall x:X, paths (f x) x)(x:X)(x':X)(e:paths (f x) (f x')): paths (maponpaths _ _ f _ _ (maponpathshomidinv _ f h _ _ e)) e.
-Proof.  intros. assert (ee: paths (pathscomp0 (h x) (pathscomp0 (pathscomp0 (pathsinv0 _ _ (h x)) (pathscomp0 e (h x'))) (pathsinv0 _ _ (h x')))) e). apply (maponpathshomid12 _ _ _ (f x) (f x') e (h x) (h x')). assert (eee: paths (maponpaths _ _ f _ _ (pathscomp0 (pathsinv0 _ _ (h x)) (pathscomp0 e (h x')))) (pathscomp0 (h x) (pathscomp0 (pathscomp0 (pathsinv0 _ _ (h x)) (pathscomp0 e (h x'))) (pathsinv0 _ _ (h x'))))). apply maponpathshomid1. apply (pathscomp0 eee ee). Defined. 
+Lemma maponpathshomid2 (X:UU)(f:X->X)(h: forall x:X, paths (f x) x)(x:X)(x':X)(e:paths (f x) (f x')): paths (maponpaths f _ _ (maponpathshomidinv _ f h _ _ e)) e.
+Proof.  intros. assert (ee: paths (pathscomp0 (h x) (pathscomp0 (pathscomp0 (pathsinv0 _ _ (h x)) (pathscomp0 e (h x'))) (pathsinv0 _ _ (h x')))) e). apply (maponpathshomid12 _ _ _ (f x) (f x') e (h x) (h x')). assert (eee: paths (maponpaths f _ _ (pathscomp0 (pathsinv0 _ _ (h x)) (pathscomp0 e (h x')))) (pathscomp0 (h x) (pathscomp0 (pathscomp0 (pathsinv0 _ _ (h x)) (pathscomp0 e (h x'))) (pathsinv0 _ _ (h x'))))). apply maponpathshomid1. apply (pathscomp0 eee ee). Defined. 
 
 
 (** Here we consider the behavior of maponpaths in the case of a projection p with a section s. *)
 
 
 Definition pathssec1 (X: UU)(Y:UU)(s:X-> Y)(p:Y->X)(eps: forall x:X, paths  (p (s x)) x): forall x:X, forall y:Y, paths (s x) y -> paths x (p y).
-Proof. intros X Y s p eps x y X0. set (e:= maponpaths _ _ p _ _ X0). apply (pathscomp0 (pathsinv0 _ _ (eps x)) e). Defined.
+Proof. intros X Y s p eps x y X0. set (e:= maponpaths p _ _ X0). apply (pathscomp0 (pathsinv0 _ _ (eps x)) e). Defined.
 
 
 Definition pathssec2 (X: UU)(Y:UU)(s:X-> Y)(p:Y->X)(eps: forall x:X, paths (p (s x)) x): forall x:X, forall x':X, paths (s x) (s x') -> paths x x'.
@@ -335,10 +335,10 @@ Definition pathssec2id (X: UU)(Y:UU)(s:X-> Y)(p:Y->X)(eps: forall x:X, paths (p 
 Proof. intros. unfold pathssec2. unfold pathssec1. simpl. assert (e: paths (pathscomp0 (pathsinv0 _ _ (eps x)) (idpath (p (s x)))) (pathsinv0 _ _ (eps x))). apply pathscomp0rid. assert (ee: paths 
 (pathscomp0 (pathscomp0 (pathsinv0 _ _ (eps x)) (idpath (p (s x)))) (eps x)) 
 (pathscomp0 (pathsinv0 _ _ (eps x)) (eps x))). 
-apply (maponpaths _ _ (fun e0: _ => pathscomp0 e0  (eps x)) _ _ e). assert (eee: paths (pathscomp0 (pathsinv0 _ _ (eps x)) (eps x)) (idpath x)).  apply (pathsinv0l1 _ _ _ (eps x)). apply (pathscomp0 ee eee). Defined. 
+apply (maponpaths (fun e0: _ => pathscomp0 e0  (eps x)) _ _ e). assert (eee: paths (pathscomp0 (pathsinv0 _ _ (eps x)) (eps x)) (idpath x)).  apply (pathsinv0l1 _ _ _ (eps x)). apply (pathscomp0 ee eee). Defined. 
 
 
-Definition pathssec3 (X: UU)(Y:UU)(s:X-> Y)(p:Y->X)(eps: forall x:X, paths (p (s x)) x): forall x:X, forall x':X, forall e: paths x x', paths  (pathssec2 _ _ s p eps _ _ (maponpaths _ _ s _ _ e)) e.
+Definition pathssec3 (X: UU)(Y:UU)(s:X-> Y)(p:Y->X)(eps: forall x:X, paths (p (s x)) x): forall x:X, forall x':X, forall e: paths x x', paths  (pathssec2 _ _ s p eps _ _ (maponpaths s _ _ e)) e.
 Proof. intros. induction e.  simpl. unfold pathssec2. unfold pathssec1.  simpl. apply pathssec2id.  Defined. 
 
 
@@ -367,7 +367,7 @@ Definition constr1 (X:UU)(P:X -> UU)(x:X)(x':X)(e:paths x x'):
                         forall  p: P x, paths (tpair _ _ x p) (tpair _ _ x' (f p)))
                       (fun ee: 
                         forall  p: P x, paths (tpair _ _ x p) (tpair _ _ x' (f p)) =>
-                        forall pp: P x, paths (maponpaths _ _ (pr21 _ _) _ _ (ee pp)) e
+                        forall pp: P x, paths (maponpaths (pr21 _ _) _ _ (ee pp)) e
                       )
                     )
                   ). 
@@ -384,7 +384,7 @@ Proof. intros. unfold transportf. unfold constr1.  simpl. apply idpath. Defined.
 Definition transportb (X:UU)(P:X -> UU)(x:X)(x':X)(e:paths x x'): P x' -> P x := transportf _ P x' x (pathsinv0 _ _ e).
 
 
-Lemma functtransportf (X:UU)(Y:UU)(f:X->Y)(P:Y->UU)(x:X)(x':X)(e: paths x x')(p: P (f x)): paths (transportf _ (fun x:X => P (f x)) x x' e p) (transportf _ P (f x) (f x') (maponpaths _ _ f _ _ e) p).
+Lemma functtransportf (X:UU)(Y:UU)(f:X->Y)(P:Y->UU)(x:X)(x':X)(e: paths x x')(p: P (f x)): paths (transportf _ (fun x:X => P (f x)) x x' e p) (transportf _ P (f x) (f x') (maponpaths f _ _ e) p).
 Proof.  intros.  induction e. apply idpath. Defined.   
 
 
@@ -406,7 +406,7 @@ Proof.
   destruct isc as [x0 nh].
   split with (f x0).
   intro y.
-  exact (pathscomp0 (efg y) (maponpaths _ _ f _ _ (nh (g y)))).
+  exact (pathscomp0 (efg y) (maponpaths f _ _ (nh (g y)))).
 Defined. 
 
 Lemma contrl1' (X Y:UU)(f:X -> Y)(g: Y -> X) : (forall y, paths (f(g y)) y) -> iscontr X -> iscontr Y.
@@ -460,17 +460,17 @@ Definition hfiberpair  (X:UU)(Y:UU)(f:X -> Y)(y:Y) (x:X) (e: paths (f x) y): hfi
   intros. apply tpair with x, e.  Defined.
 
 Lemma hfibertriangle1 (X Y:UU)(f:X -> Y)(y:Y)(xe1 xe2: hfiber _ _ f y)(e: paths xe1 xe2)
-           : paths (pr22 _ _ xe1) (pathscomp0 (maponpaths _ _ f _ _ (maponpaths _ _ (pr21 _ _ ) _ _ e)) (pr22 _ _ xe2)).
+           : paths (pr22 _ _ xe1) (pathscomp0 (maponpaths f _ _ (maponpaths (pr21 _ _ ) _ _ e)) (pr22 _ _ xe2)).
 Proof. intros. destruct e.  simpl. apply idpath. Defined. 
 
 Lemma hfibertriangle2 (X Y:UU)(f:X -> Y)(y:Y)
         (xe1 xe2: hfiber _ _ f y)
         (ee: paths (pr21 _ _ xe1) (pr21 _ _ xe2))
-        (eee: paths (pr22 _ _ xe1) (pathscomp0 (maponpaths _ _ f _ _ ee) (pr22 _ _ xe2)))
+        (eee: paths (pr22 _ _ xe1) (pathscomp0 (maponpaths f _ _ ee) (pr22 _ _ xe2)))
         : paths xe1 xe2.
 Proof. intros. destruct xe1 as [ t e1 ]. destruct xe2.
        simpl in eee. simpl in ee. destruct ee. simpl in eee.
-       apply (maponpaths _ _ (fun e: paths (f t) y => hfiberpair _ _ f y t e) _ _ eee). Defined. 
+       apply (maponpaths (fun e: paths (f t) y => hfiberpair _ _ f y t e) _ _ eee). Defined. 
 
 Definition constr3 (X:UU)(Y:UU)(f:X -> Y)(y:Y) (x:X) (e1 e2: paths (f x) y) (ee: paths  e1 e2)
                 : paths (hfiberpair _ _ _ _ x e1) (hfiberpair _ _ _ _ x e2).
@@ -523,18 +523,18 @@ Proof. intros. unfold invmap. simpl. unfold isweq in  is1. apply (pr22 _ _  (pr2
 
 Definition weqgf0  (X Y:UU) (f:X -> Y) (is: isweq _ _ f)(x:X): paths x (invmap _ _ f is (f x)).
 Proof. intros. unfold isweq in is.  set (isfx:= is (f x)). set (pr21fx:= pr21 X (fun x':X => paths (f x') (f x))).
-set (xe1:= (hfiberpair _ _ f (f x) x (idpath (f x)))). apply  (maponpaths _ _ pr21fx _ _ (pr22 _ _ isfx xe1)). Defined.
+set (xe1:= (hfiberpair _ _ f (f x) x (idpath (f x)))). apply  (maponpaths pr21fx _ _ (pr22 _ _ isfx xe1)). Defined.
 
 Definition weqgf (X Y:UU) (f:X -> Y) (is: isweq _ _ f)(x:X): paths (invmap _ _ f is (f x)) x := pathsinv0 _ _ (weqgf0 _ _ f is x).
 
 Lemma diaglemma2 (X Y:UU)(f:X -> Y)(x x':X)
         (e1: paths x x')
         (e2: paths (f x') (f x))
-        (ee: paths (idpath (f x)) (pathscomp0 (maponpaths _ _ f _ _ e1) e2))
-        : paths (maponpaths _ _ f _ _ (pathsinv0 _ _ e1)) e2.
+        (ee: paths (idpath (f x)) (pathscomp0 (maponpaths f _ _ e1) e2))
+        : paths (maponpaths f _ _ (pathsinv0 _ _ e1)) e2.
 Proof. intros.  induction e1. simpl. simpl in ee. assumption. Defined. 
 
-Definition weqfgf (X Y:UU)       (f:X->Y) (is: isweq _ _ f) (x:X) : paths  (maponpaths _ _ f _ _ (weqgf _ _ f is x)) (weqfg _ _ f is (f x)).
+Definition weqfgf (X Y:UU)       (f:X->Y) (is: isweq _ _ f) (x:X) : paths  (maponpaths f _ _ (weqgf _ _ f is x)) (weqfg _ _ f is (f x)).
 Proof. intros. 
         set (xe1 := hfiberpair _ _ f (f x) x (idpath _)).
         apply diaglemma2, (hfibertriangle1 _ _ f (f x) xe1).
@@ -555,22 +555,22 @@ Definition pathsweq1 (X Y:UU)(f:X-> Y)(is1: isweq _ _ f)
 
 Definition pathsweq1' (X Y:UU)(f:X -> Y)(is1: isweq _ _ f)
         :  forall x:X, forall y:Y, paths x (invmap _ _ f is1 y) -> paths (f x) y
-        := fun (x:X) (y:Y) e => pathscomp0 (maponpaths _ _ f _ _ e) (weqfg _ _ f is1 y).
+        := fun (x:X) (y:Y) e => pathscomp0 (maponpaths f _ _ e) (weqfg _ _ f is1 y).
 
 Definition pathsweq3 (X Y:UU)(f:X-> Y)(is1: isweq _ _ f)
-        :  forall x:X, forall x':X, forall e: paths x x', paths  (pathsweq2 _ _ f is1 _ _ (maponpaths _ _ f _ _ e)) e
+        :  forall x:X, forall x':X, forall e: paths x x', paths  (pathsweq2 _ _ f is1 _ _ (maponpaths f _ _ e)) e
         := pathssec3 X Y f  (invmap _ _ f is1) (weqgf _ _ f is1).
 
 Definition compose {X Y Z:UU} (g:Y->Z) (f:X->Y) := fun x => g (f x).
 
 Definition pathsweq4 (X Y:UU)(f:X-> Y)(is1: isweq _ _ f)(x x':X)(e: paths (f x) (f x'))
-        :  paths (maponpaths _ _ f _ _ (pathsweq2 _ _ f is1 _ _ e)) e.  
+        :  paths (maponpaths f _ _ (pathsweq2 _ _ f is1 _ _ e)) e.  
 Proof. intros.
         set (g  := invmap _ _ f is1).
         set (gf := compose g f).
-        set (mapf := maponpaths _ _ f).
-        set (mapg := maponpaths _ _ g).
-        set (mapgf := maponpaths _ _ gf).
+        set (mapf := maponpaths f).
+        set (mapg := maponpaths g).
+        set (mapgf := maponpaths gf).
         set (ee := mapg _ _ e).
         set (eee:= maponpathshomidinv _  gf (weqgf _ _ f is1) _ _ ee).
         assert (e1: paths (mapf _ _ eee) e).
@@ -587,11 +587,11 @@ Proof. intros.
         set (fstar := mapf x x').
         set (r := pathsweq2 _ _ f is1 x x').
         assert (e4: paths (fstar (r e)) (fstar (r (fstar eee)))).
-          apply (pathsinv0 _ _ (maponpaths _ _ (fun e0 => (fstar (r e0))) _ _ e1)).
+          apply (pathsinv0 _ _ (maponpaths (fun e0 => (fstar (r e0))) _ _ e1)).
         assert (X0 : paths  (r (fstar eee)) eee).
           apply (pathsweq3 _ _ f is1).
         assert (e6: paths (fstar (r (fstar eee))) (fstar eee)).
-          apply (maponpaths _ _ fstar _ _ X0).
+          apply (maponpaths fstar _ _ X0).
         exact (pathscomp0 (pathscomp0 e4 e6) e1).
         Defined. 
 
@@ -641,7 +641,7 @@ Lemma unitl3: forall e:paths tt tt, paths e (idpath tt).
 Proof. intros.
 assert (e0: paths (unitl0 (idpath tt)) (unitl0 e)). eapply connectedcoconustot.
 assert (e1:paths (unitl1 (unitl0 (idpath tt)))
-    (unitl1 (unitl0 e))).   apply (maponpaths (coconustot unit tt) (paths tt tt) unitl1 (unitl0 (idpath tt)) (unitl0 e)  e0).    
+    (unitl1 (unitl0 e))).   apply (maponpaths unitl1 (unitl0 (idpath tt)) (unitl0 e)  e0).    
 assert (e2:  paths (unitl1 (unitl0 e)) e). eapply unitl2.
 assert (e3: paths  (unitl1 (unitl0 (idpath tt))) (idpath tt)). eapply unitl2.
  induction e1. clear e0. induction e2. assumption.  Defined. 
@@ -683,7 +683,7 @@ Proof. intros X Y Z f g z X0. destruct X0 as [ t x ]. apply (hfiberpair _ _ g z 
 Lemma constr2 (X:UU)(Y:UU)(f:X -> Y)(g: Y-> X)(efg: forall y:Y, paths (f(g y)) y) (z: X): forall z0: (hfiber _ _ g z), total2 (hfiber _ _ (fun x:X => g(f x)) z) (fun z':_ => paths z0 (hfibersgftog _ _ _ f g z z')). 
 Proof. intros.  destruct z0 as [ y e ]. 
 
-assert (eint: paths y (f z)).  assert (e0: paths (f(g y)) y). apply efg. assert (e1: paths (f(g y)) (f z)). apply (maponpaths _ _  f _ _ e). induction e1.  apply pathsinv0. assumption. 
+assert (eint: paths y (f z)).  assert (e0: paths (f(g y)) y). apply efg. assert (e1: paths (f(g y)) (f z)). apply (maponpaths  f _ _ e). induction e1.  apply pathsinv0. assumption. 
 
 set (int1:=constr1 Y (fun y:Y => paths (g y) z) y (f z) eint). destruct int1 as [ t x ].
 set (int2:=hfiberpair _ _ (fun x0 : X => g (f x0)) z z (t e)).   split with int2.  apply x.  Defined. 
@@ -752,8 +752,8 @@ apply pathsinv0. assumption. Defined.
 Corollary isweqcontr2 (X:UU)(Y:UU)(f:X -> Y)(is1: isweq _ _ f): iscontr X -> iscontr Y.
 Proof. intros. apply (iscontrxifiscontry _ _ (invmap _ _ f is1) (isweqinvmap _ _ f is1)). assumption. Defined.
 
-Corollary isweqmaponpaths (X:UU)(Y:UU)(f:X->Y)(is:isweq _ _ f)(x:X)(x':X): isweq _ _ (maponpaths _ _ f x x').
-Proof. intros. apply (gradth _ _ (maponpaths _ _ f x x') (pathsweq2 _ _ f is x x') (pathsweq3 _ _ f is x x')  (pathsweq4 _ _ f is x x')). Defined.  
+Corollary isweqmaponpaths (X:UU)(Y:UU)(f:X->Y)(is:isweq _ _ f)(x:X)(x':X): isweq _ _ (maponpaths f x x').
+Proof. intros. apply (gradth _ _ (maponpaths f x x') (pathsweq2 _ _ f is x x') (pathsweq3 _ _ f is x x')  (pathsweq4 _ _ f is x x')). Defined.  
 
 
 Corollary isweqpathsinv0 (X:UU)(x x':X): isweq _ _ (pathsinv0 x x').
@@ -843,7 +843,7 @@ Proof.
   assert (isweq _ _ invf).
    apply isweqinvmap.
   assert (int1: paths (g y) (gf (invf y))).
-   apply (maponpaths _ _ g _ _ (pathsinv0 _ _ (weqfg _ _ f isf y))).
+   apply (maponpaths g _ _ (pathsinv0 _ _ (weqfg _ _ f isf y))).
   assert (paths (gf (invgf (g y))) (gf (invf y))).
    assert (paths (gf (invgf (g y))) (g y)).
     apply (weqfg _ _ gf isgf).
@@ -883,7 +883,7 @@ Proof.
     unfold invgf.
     intro.
     assert (int1: paths (invf (invg (g (f x))))  (invf (f x))).
-      apply (maponpaths _ _ invf _ _ (weqgf _ _ g isg (f x))).
+      apply (maponpaths invf _ _ (weqgf _ _ g isg (f x))).
     assert (int2: paths (invf (f x)) x).
       apply weqgf.
     exact (pathscomp0 int1 int2).
@@ -892,7 +892,7 @@ Proof.
     unfold invgf.
     intro.
     assert (int1: paths (g (f (invf (invg z)))) (g (invg z))).
-      apply (maponpaths _ _ g _ _ (weqfg _ _ f isf (invg z))).
+      apply (maponpaths g _ _ (weqfg _ _ f isf (invg z))).
     assert (int2: paths (g (invg z)) z).
       apply (weqfg _ _ g isg z).
     exact (pathscomp0 int1 int2).
@@ -934,12 +934,12 @@ Definition isfibseq (X Y Z:UU)(f:X -> Y)(g:Y->Z)(z:Z)(ez: forall x:X, paths (g (
 Definition diff1invezmap (X Y Z:UU)(f:X -> Y)(g:Y->Z)(z:Z)(ez: forall x:X, paths (g (f x)) z)(y:Y) : hfiber _ _ f y -> paths (g y) z :=  
 fun xe: hfiber _ _ f y =>
 match xe with
-tpair x e => pathscomp0 (maponpaths _ _ g _ _ (pathsinv0 _ _ e)) (ez x)
+tpair x e => pathscomp0 (maponpaths g _ _ (pathsinv0 _ _ e)) (ez x)
 end.
 
 
 
-Lemma diaglemma1 (Y Z:UU)(g:Y -> Z)(y y':Y)(z:Z)(phi: paths y' y)(ee: paths (g y) z)(ee': paths (g y') z) (e1: paths ee' (pathscomp0 (maponpaths _ _ g _ _ phi) ee)): paths (pathscomp0 (maponpaths _ _ g _ _ (pathsinv0 _ _ phi)) ee') ee.
+Lemma diaglemma1 (Y Z:UU)(g:Y -> Z)(y y':Y)(z:Z)(phi: paths y' y)(ee: paths (g y) z)(ee': paths (g y') z) (e1: paths ee' (pathscomp0 (maponpaths g _ _ phi) ee)): paths (pathscomp0 (maponpaths g _ _ (pathsinv0 _ _ phi)) ee') ee.
 Proof. intros. induction phi. simpl. simpl in e1. assumption. Defined.
 
 
@@ -954,21 +954,21 @@ Proof.
    set (invezm:= invmap _ _ (ezmap _ _ _ f g z ez) is).
    set (pr21y:= pr21 Y (fun y:Y => paths (g y) z)).
    set (gg:= fun ee:paths (g y) z => 
-        hfiberpair _ _ f y (invezm (hfiberpair _ _ g z y ee)) (maponpaths _ _ pr21y _ _ (weqfg _ _ ezm is (hfiberpair _ _ g z y ee)))). 
+        hfiberpair _ _ f y (invezm (hfiberpair _ _ g z y ee)) (maponpaths pr21y _ _ (weqfg _ _ ezm is (hfiberpair _ _ g z y ee)))). 
 
    assert (efg: forall ee:paths (g y) z, paths (ff (gg ee)) ee).
       intro.
       assert (e1: 
         paths 
           (pr22 _ _ (ezm (invezm (hfiberpair _ _ g z y ee))))
-          (pathscomp0 (maponpaths _ _ g _ _ (maponpaths _ _ pr21y _ _ (weqfg _ _ ezm is (hfiberpair _ _ g z y ee)))) ee)
+          (pathscomp0 (maponpaths g _ _ (maponpaths pr21y _ _ (weqfg _ _ ezm is (hfiberpair _ _ g z y ee)))) ee)
       ).
          apply (hfibertriangle1 _ _ g z _ _ (weqfg _ _ ezm is (hfiberpair _ _ g z y ee))).
       apply (
         diaglemma1 _ _ g y
         (f (invezm (hfiberpair _ _ g z y ee))) 
         z
-        (maponpaths _ _ pr21y _ _ (weqfg _ _ ezm is (hfiberpair _ _ g z y ee)))
+        (maponpaths pr21y _ _ (weqfg _ _ ezm is (hfiberpair _ _ g z y ee)))
         ee
         (pr22 _ _ (ezm (invezm (hfiberpair _ _ g z y ee))))
         e1). 
@@ -976,24 +976,24 @@ Proof.
    assert (egf: forall yee: hfiber _ _ f y, paths (gg (ff yee)) yee). 
       intro.  destruct yee as [x e]. induction e. simpl.
       set (e:=weqgf _ _ ezm is x).
-      assert (ee: paths (pr22 _ _ (gg (ez x))) (maponpaths _ _ f _ _ (weqgf _ _ ezm is x))).
-         assert (e2: paths (pr22 _ _ (gg (ez x))) (maponpaths _ _ pr21y _ _ (maponpaths _ _ ezm _ _ (weqgf _ _ ezm is x)))).
-            assert (e3: paths (pr22 _ _ (gg (ez x))) (maponpaths _ _ pr21y _ _ (weqfg _ _ ezm is (ezm x)))). 
+      assert (ee: paths (pr22 _ _ (gg (ez x))) (maponpaths f _ _ (weqgf _ _ ezm is x))).
+         assert (e2: paths (pr22 _ _ (gg (ez x))) (maponpaths pr21y _ _ (maponpaths ezm _ _ (weqgf _ _ ezm is x)))).
+            assert (e3: paths (pr22 _ _ (gg (ez x))) (maponpaths pr21y _ _ (weqfg _ _ ezm is (ezm x)))). 
                 simpl. apply idpath.
             assert (e4: 
               paths
-              (maponpaths _ _ pr21y _ _ (weqfg _ _ ezm is (ezm x)))
-              (maponpaths _ _ pr21y _ _ (maponpaths _ _ ezm _ _ (weqgf _ _ ezm is x)))
+              (maponpaths pr21y _ _ (weqfg _ _ ezm is (ezm x)))
+              (maponpaths pr21y _ _ (maponpaths ezm _ _ (weqgf _ _ ezm is x)))
             ). 
-               assert (e5: paths (weqfg _ _ ezm is (ezm x))  (maponpaths _ _ ezm _ _ (weqgf _ _ ezm is x))). 
+               assert (e5: paths (weqfg _ _ ezm is (ezm x))  (maponpaths ezm _ _ (weqgf _ _ ezm is x))). 
                    apply (pathsinv0 _ _ (weqfgf _ _ ezm is x)).
-               apply (maponpaths _ _ (fun e:_ => maponpaths _ _ pr21y _ _ e) _ _ e5).  
+               apply (maponpaths (fun e:_ => maponpaths pr21y _ _ e) _ _ e5).  
             exact e4.
-         assert (e6: paths (maponpaths _ _ pr21y _ _ (maponpaths _ _ ezm _ _ (weqgf _ _ ezm is x))) (maponpaths _ _ f _ _ (weqgf _ _ ezm is x))). 
+         assert (e6: paths (maponpaths pr21y _ _ (maponpaths ezm _ _ (weqgf _ _ ezm is x))) (maponpaths f _ _ (weqgf _ _ ezm is x))). 
             apply (maponpathsfuncomp _ _ _ ezm pr21y _ _ (weqgf _ _ ezm is x)).
          apply (pathscomp0 e2 e6). 
-      assert (eee: paths (pr22 _ _ (gg (ez x))) (pathscomp0 (maponpaths _ _ f _ _ (weqgf _ _ ezm is x)) (idpath (f x)))). 
-         apply (pathscomp0 ee (pathsinv0 _ _ (pathscomp0rid _ _ _ (maponpaths _ _ f _ _ (weqgf _ _ ezm is x))))). 
+      assert (eee: paths (pr22 _ _ (gg (ez x))) (pathscomp0 (maponpaths f _ _ (weqgf _ _ ezm is x)) (idpath (f x)))). 
+         apply (pathscomp0 ee (pathsinv0 _ _ (pathscomp0rid _ _ _ (maponpaths f _ _ (weqgf _ _ ezm is x))))). 
       apply (hfibertriangle2 _ _ f (f x) (gg (ez x)) (hfiberpair _ _ f (f x) x (idpath (f x))) e eee). 
    apply (gradth _ _ ff gg egf efg).
 Defined.
@@ -1019,7 +1019,7 @@ Proof. intros.  set (inv:= diff1invezmap _ _ _ f g z ez y). set (map1:= diff1ezm
 
 assert (e0: forall xe: hfiber _ _ f y, paths (ezmap _ _ _ f g z ez (pr21 _ _ xe)) (map2 (inv xe))). intro.  destruct xe as [ t x ]. simpl. unfold map2.   unfold ezmap. simpl. induction x.  simpl.  apply idpath.  
 assert (e1: paths (inv (map1 e)) e). apply (weqgf _ _ map1 (isfibseqdiff1 _ _ _ f g z ez is y) e).
-assert (e2: paths (map2 (inv (map1 e))) (map2 e)). apply (maponpaths _ _ map2 _ _ e1).
+assert (e2: paths (map2 (inv (map1 e))) (map2 e)). apply (maponpaths map2 _ _ e1).
 assert (e3: paths  (ezmap _ _ _ f g z ez (pr21 _ _ (map1 e)))  (map2 (inv (map1 e)))). apply (e0 (map1 e)).
 assert (e4: paths  (ezmap _ _ _ f g z ez (pr21 _ _ (map1 e))) (map2 e)).  apply (pathscomp0 e3 e2). 
 apply (pathsweq1 _ _ (ezmap _ _ _ f g z ez) is (pr21 _ _ (map1 e)) (map2 e)). assumption. Defined. 
@@ -1040,7 +1040,7 @@ Definition diff2ez (X Y Z:UU)(f:X -> Y)(g:Y->Z)(z:Z)(ez: forall x:X, paths (g (f
 
 
 
-Theorem fibseqhomot2  (X Y Z:UU)(f:X -> Y)(g:Y->Z)(z:Z)(ez: forall x:X, paths (g (f x)) z)(is: isfibseq _ _ _ f g z ez)(y:Y)(x:X): forall e: paths (f x) y, paths (diff2f _ _ _ f g z ez is y x e) (pathscomp0 (maponpaths _ _ g _ _ (pathsinv0 _ _ e)) (ez x)).
+Theorem fibseqhomot2  (X Y Z:UU)(f:X -> Y)(g:Y->Z)(z:Z)(ez: forall x:X, paths (g (f x)) z)(is: isfibseq _ _ _ f g z ez)(y:Y)(x:X): forall e: paths (f x) y, paths (diff2f _ _ _ f g z ez is y x e) (pathscomp0 (maponpaths g _ _ (pathsinv0 _ _ e)) (ez x)).
 Proof. intros.  
 assert (e1: paths (diff2f _ _ _ f g z ez is y x e) (invmap _ _ (diff1ezmap _ _ _ f g z ez is y) (isfibseqdiff1 _ _ _ f g z ez is y) (tpair _ _ x e))). apply (fibseqhomot1).
 assert (e2: forall xe:_ , paths  (invmap _ _ (diff1ezmap _ _ _ f g z ez is y) (isfibseqdiff1 _ _ _ f g z ez is y) xe) (diff1invezmap _ _ _ f g z ez y xe)). apply (invinv _ _ (diff1invezmap _ _ _ f g z ez y) (isweqdiff1invezmap _ _ _ f g z ez is y)). set (e3:= e2 (tpair _ _ x e)).   apply (pathscomp0 e1 e3). Defined.
@@ -1064,7 +1064,7 @@ Proof. intros.  apply (isfibseqdiff1 _ _ _ (d1f _ _ f y) f y  (fun xe: _ => pr22
 
 Definition d3f (X Y:UU)(f:X -> Y)(y:Y)(x:X)(xe': hfiber _ _ f y): paths (pr21 _ _ xe') x -> paths (f x) y:= diff2f _ _ _ (d1f _ _ f y) f y (fun xe: _ => pr22 _ _ xe) (isfibseq1 _ _ f y) x xe'. 
 
-Lemma d3fhomot  (X Y:UU)(f:X -> Y)(y:Y)(x:X)(xe': hfiber _ _ f y)(e: paths (pr21 _ _ xe') x) : paths (d3f _ _ f y x xe' e) (pathscomp0 (maponpaths _ _ f _ _ (pathsinv0 _ _ e)) (pr22 _ _ xe')).
+Lemma d3fhomot  (X Y:UU)(f:X -> Y)(y:Y)(x:X)(xe': hfiber _ _ f y)(e: paths (pr21 _ _ xe') x) : paths (d3f _ _ f y x xe' e) (pathscomp0 (maponpaths f _ _ (pathsinv0 _ _ e)) (pr22 _ _ xe')).
 Proof. intros. apply fibseqhomot2. Defined.
 
 
@@ -1079,7 +1079,7 @@ Definition d4f (X Y:UU)(f:X -> Y)(y:Y)(x:X)(xe': hfiber _ _ f y)(e:paths (f x) y
 
  
 
-Lemma d4fhomot  (X Y:UU)(f:X -> Y)(y:Y)(x:X)(xe': hfiber _ _ f y)(e: paths (f x) y)(ee: paths (hfiberpair _ _ f y x e) xe') : paths (d4f _ _ f y x xe' e ee) (maponpaths _ _ (pr21 _ _) _ _ (pathsinv0 _ _ ee)).
+Lemma d4fhomot  (X Y:UU)(f:X -> Y)(y:Y)(x:X)(xe': hfiber _ _ f y)(e: paths (f x) y)(ee: paths (hfiberpair _ _ f y x e) xe') : paths (d4f _ _ f y x xe' e ee) (maponpaths (pr21 _ _) _ _ (pathsinv0 _ _ ee)).
 Proof. intros. 
 assert (e1: paths 
     (diff2f (paths (f x) y) (hfiber X Y f y) X (d2f X Y f y x)
@@ -1087,15 +1087,15 @@ assert (e1: paths
        (fun xe : paths (f x) y => idpath (d1f X Y f y (d2f X Y f y x xe)))
        (isfibseq2 X Y f y x) xe' e ee)
     (pathscomp0
-       (maponpaths (hfiber X Y f y) X (d1f X Y f y) xe' 
+       (maponpaths (d1f X Y f y) xe' 
           (d2f X Y f y x e)
           (pathsinv0 _ _ ee))
        (idpath (d1f X Y f y (d2f X Y f y x e))))). apply (fibseqhomot2 _ _ _ (d2f _ _ f y x) (d1f _ _ f y) x (fun xe: _ => idpath _) (isfibseq2 _ _ f y x) xe' e ee).  
 assert (e2: paths (pathscomp0
-            (maponpaths (hfiber X Y f y) X (d1f X Y f y) xe'
+            (maponpaths (d1f X Y f y) xe'
                (d2f X Y f y x e)
                (pathsinv0 _ _ ee))
-            (idpath (d1f X Y f y (d2f X Y f y x e)))) (maponpaths (total2 X (fun pointover : X => paths (f pointover) y)) X
+            (idpath (d1f X Y f y (d2f X Y f y x e)))) (maponpaths
         (pr21 X (fun pointover : X => paths (f pointover) y)) xe'
         (hfiberpair X Y f y x e)
         (pathsinv0 _ _ ee))). apply pathscomp0rid.
@@ -1182,13 +1182,13 @@ Let e:=pr22 _ _ ye.
 
 
 Definition hfibersinvezmap : hfiber _ _ (hfibersgftog _ _ _ f g z) ye ->  hfiber _ _ f y.
-Proof. intro X0. destruct X0 as [ t e0 ].  destruct t as [ x e'].   set (prg:= (fun z: (hfiber Y Z g z) => pr21 _ _ z)). set (int:= hfiberpair _ _ f y  x (maponpaths _ _ prg _ _ e0)). assumption. Defined.  
+Proof. intro X0. destruct X0 as [ t e0 ].  destruct t as [ x e'].   set (prg:= (fun z: (hfiber Y Z g z) => pr21 _ _ z)). set (int:= hfiberpair _ _ f y  x (maponpaths prg _ _ e0)). assumption. Defined.  
 
 
-Definition hfiberpath1 (y1:Y)(e1: paths (g y1) z)(y2:Y)(e21:paths y2 y1): paths (hfiberpair _ _  g z y2 (pathscomp0 (maponpaths _ _ g _ _ e21) e1)) (hfiberpair _ _ g z y1 e1).
+Definition hfiberpath1 (y1:Y)(e1: paths (g y1) z)(y2:Y)(e21:paths y2 y1): paths (hfiberpair _ _  g z y2 (pathscomp0 (maponpaths g _ _ e21) e1)) (hfiberpair _ _ g z y1 e1).
 Proof. intros.  induction e21. simpl. apply idpath. Defined.  
 
-Definition hfiberpath11 (y1:Y)(e1: paths (g y1) z)(y2:Y)(e21:paths y2 y1): paths (maponpaths _ _ (fun u: hfiber _ _ g z => pr21 _ _ u) _ _ (hfiberpath1 y1 e1 y2 e21)) e21.
+Definition hfiberpath11 (y1:Y)(e1: paths (g y1) z)(y2:Y)(e21:paths y2 y1): paths (maponpaths (fun u: hfiber _ _ g z => pr21 _ _ u) _ _ (hfiberpath1 y1 e1 y2 e21)) e21.
 Proof. intros.  simpl. induction e21. simpl. apply idpath. Defined. 
 
 Definition gzx: UU := total2 (hfiber _ _ g z) (fun u: (hfiber _ _  g z) => (hfiber _ _ f (pr21 _ _ u))). 
@@ -1199,7 +1199,7 @@ Definition gzxmap3: hfiber _ _ f y -> hfiber _ _ (fun t: gzx => pr21 _ _ t) ye.
 Proof. intro X0.  set (int1:= tpair _  (fun u: (hfiber _ _  g z) => (hfiber _ _ f (pr21 _ _ u))) ye X0). split with int1. simpl. apply idpath. Defined.
 
 Definition gzxmap4: hfiber _ _ (fun t: gzx  => pr21 _ _ t) ye -> hfiber _ _ f y.
-Proof. intro X0. destruct X0 as [ t e4 ].  destruct t as [ t x ].  destruct x as [ x e2 ]. destruct t as [ y' e1 ].  simpl in e4. simpl in x. set (ee0:= maponpaths _ _ (fun z: hfiber _ _ g z => pr21 _ _ z) _ _ e4).  set (ee:= pathscomp0 e2 ee0). simpl in ee. apply (hfiberpair _ _ f y x ee). Defined.
+Proof. intro X0. destruct X0 as [ t e4 ].  destruct t as [ t x ].  destruct x as [ x e2 ]. destruct t as [ y' e1 ].  simpl in e4. simpl in x. set (ee0:= maponpaths (fun z: hfiber _ _ g z => pr21 _ _ z) _ _ e4).  set (ee:= pathscomp0 e2 ee0). simpl in ee. apply (hfiberpair _ _ f y x ee). Defined.
  
 
 
@@ -1208,7 +1208,7 @@ Proof. intro X0. destruct X0 as [t e0].  destruct t as [x e']. set (int1:= tpair
 
 
 Definition gzxmap2 : hfiber _ _ (fun t: gzx => pr21 _ _ t) ye ->  hfiber _ _ (hfibersgftog _ _ _ f g z) ye.
-Proof. intro X0. destruct X0 as [ t e4 ]. destruct t as [ t x0 ]. destruct x0 as [ x e2]. destruct t as [ y' e1 ].  simpl in e4. set (int1:= hfiberpair _ _ (fun x0 : X => g (f x0)) z x (pathscomp0 (maponpaths _ _ g _ _ e2) e1)).  split with int1. simpl. assert (e5: paths  (hfiberpair Y Z g z (f x) (pathscomp0 (maponpaths Y Z g (f x) y' e2) e1)) (tpair Y (fun pointover : Y => paths (g pointover) z) y' e1)). apply hfiberpath1. apply (pathscomp0 e5 e4). Defined. 
+Proof. intro X0. destruct X0 as [ t e4 ]. destruct t as [ t x0 ]. destruct x0 as [ x e2]. destruct t as [ y' e1 ].  simpl in e4. set (int1:= hfiberpair _ _ (fun x0 : X => g (f x0)) z x (pathscomp0 (maponpaths g _ _ e2) e1)).  split with int1. simpl. assert (e5: paths  (hfiberpair Y Z g z (f x) (pathscomp0 (maponpaths g (f x) y' e2) e1)) (tpair Y (fun pointover : Y => paths (g pointover) z) y' e1)). apply hfiberpath1. apply (pathscomp0 e5 e4). Defined. 
 
 
 
@@ -1216,69 +1216,69 @@ Proof. intro X0. destruct X0 as [ t e4 ]. destruct t as [ t x0 ]. destruct x0 as
 
 Definition gzxhom412  (t: hfiber _ _ (fun t: gzx => pr21 _ _ t) ye): paths (gzxmap4  (gzxmap1 (gzxmap2  t))) (gzxmap4 t).
 Proof. intros.  destruct t as [ t e4 ]. destruct t as [ t x0 ]. destruct t as [ y' e1 ]. destruct x0 as [ x e2 ]. simpl. simpl in x. 
-assert (int1: paths (maponpaths (hfiber Y Z g z) Y
+assert (int1: paths (maponpaths
   (fun z0 : hfiber Y Z g z =>
     pr21 Y (fun pointover : Y => paths (g pointover) z) z0)
   (tpair Y (fun pointover : Y => paths (g pointover) z) 
     (f x)
-    (pathscomp0 (maponpaths Y Z g (f x) y' e2) e1)) ye
+    (pathscomp0 (maponpaths g (f x) y' e2) e1)) ye
   (pathscomp0 (hfiberpath1 y' e1 (f x) e2) e4))
-(pathscomp0 (maponpaths _ _  (fun z0 : hfiber Y Z g z =>
-  pr21 Y (fun pointover : Y => paths (g pointover) z) z0) _ _ (hfiberpath1 y' e1 (f x) e2)) (maponpaths _ _  (fun z0 : hfiber Y Z g z =>
+(pathscomp0 (maponpaths  (fun z0 : hfiber Y Z g z =>
+  pr21 Y (fun pointover : Y => paths (g pointover) z) z0) _ _ (hfiberpath1 y' e1 (f x) e2)) (maponpaths  (fun z0 : hfiber Y Z g z =>
     pr21 Y (fun pointover : Y => paths (g pointover) z) z0) _ _ e4))).
 apply maponpathscomp0. simpl in int1. assert (int2: paths  (pathscomp0
-              (maponpaths (hfiber Y Z g z) Y
+              (maponpaths
                  (fun z0 : hfiber Y Z g z =>
                   pr21 Y (fun pointover : Y => paths (g pointover) z) z0)
                  (hfiberpair Y Z g z (f x)
-                    (pathscomp0 (maponpaths Y Z g (f x) y' e2) e1))
+                    (pathscomp0 (maponpaths g (f x) y' e2) e1))
                  (hfiberpair Y Z g z y' e1)
                  (hfiberpath1 y' e1 (f x) e2))
-              (maponpaths (hfiber Y Z g z) Y
+              (maponpaths
                  (fun z0 : hfiber Y Z g z =>
                   pr21 Y (fun pointover : Y => paths (g pointover) z) z0)
                  (tpair Y (fun pointover : Y => paths (g pointover) z) y'
                     e1) ye e4))
 
         (pathscomp0 e2
-           (maponpaths (hfiber Y Z g z) Y
+           (maponpaths
               (fun z0 : hfiber Y Z g z =>
                pr21 Y (fun pointover : Y => paths (g pointover) z) z0)
               (tpair Y (fun pointover : Y => paths (g pointover) z) y' e1)
               ye e4))).
 
-assert (int3: paths (maponpaths (hfiber Y Z g z) Y
+assert (int3: paths (maponpaths
            (fun z0 : hfiber Y Z g z =>
             pr21 Y (fun pointover : Y => paths (g pointover) z) z0)
            (hfiberpair Y Z g z (f x)
-              (pathscomp0 (maponpaths Y Z g (f x) y' e2)
+              (pathscomp0 (maponpaths g (f x) y' e2)
                  e1)) (hfiberpair Y Z g z y' e1)
            (hfiberpath1 y' e1 (f x) e2)) e2).  simpl.
 apply (hfiberpath11 y' e1 (f x) e2). simpl in int3. 
 apply pathscomp021.  assumption. 
 
-assert (int5: paths (maponpaths (hfiber Y Z g z) Y
+assert (int5: paths (maponpaths
            (fun z0 : hfiber Y Z g z =>
             pr21 Y (fun pointover : Y => paths (g pointover) z) z0)
            (tpair Y (fun pointover : Y => paths (g pointover) z) 
               (f x)
-              (pathscomp0 (maponpaths Y Z g (f x) y' e2)
+              (pathscomp0 (maponpaths g (f x) y' e2)
                  e1)) ye
            (pathscomp0 (hfiberpath1 y' e1 (f x) e2) e4))
 
 (pathscomp0 e2
-           (maponpaths (hfiber Y Z g z) Y
+           (maponpaths
               (fun z0 : hfiber Y Z g z =>
                pr21 Y (fun pointover : Y => paths (g pointover) z) z0)
               (tpair Y (fun pointover : Y => paths (g pointover) z) y' e1)
               ye e4))). simpl. apply (pathscomp0 int1 int2). 
 
-simpl in int5. apply (maponpaths _ _ (fun eee: paths (f x) y => hfiberpair _ _ f y x eee) _ _ int5). Defined. 
+simpl in int5. apply (maponpaths (fun eee: paths (f x) y => hfiberpair _ _ f y x eee) _ _ int5). Defined. 
 
 
 Lemma isweqgzxmap4l1  (u: hfiber _ _ f y):
  paths (gzxmap4  (fibmap1 _ (fun v: (hfiber _ _  g z) => (hfiber _ _ f (pr21 _ _ v))) ye u)) u.  
-Proof. intros. destruct u as [ t x ].   simpl. destruct ye.  assert (int: paths (pathscomp0 x (idpath y)) x). apply pathscomp0rid.   apply (maponpaths _ _ (fun ee: (paths (f t) y) => hfiberpair _ _ f y t ee) _ _ int).  Defined. 
+Proof. intros. destruct u as [ t x ].   simpl. destruct ye.  assert (int: paths (pathscomp0 x (idpath y)) x). apply pathscomp0rid.   apply (maponpaths (fun ee: (paths (f t) y) => hfiberpair _ _ f y t ee) _ _ int).  Defined. 
 
 Lemma  isweqgzxmap4 : isweq _ _ gzxmap4.
 Proof. intros. set (h:=fibmap1 _ (fun ye: (hfiber _ _  g z) => (hfiber _ _ f (pr21 _ _ ye))) ye). simpl in h. assert (int1: isweq _ _ h). apply (isweqfibmap1  _ (fun ye: (hfiber _ _  g z) => (hfiber _ _ f (pr21 _ _ ye))) ye).  apply (isweql3 _ _  h gzxmap4 (isweqgzxmap4l1) int1). Defined. 
@@ -1334,10 +1334,10 @@ Definition hfibersez (X Y Z:UU)(f:X -> Y)(g: Y -> Z)(z:Z)(ye: hfiber _ _ g z)(xe
 
 (** There are the follwing alternative definitions of hfibersftogf and hfibseqez:
 
-[ Definition hfibersftogf (X Y Z:UU)(f:X -> Y)(g: Y -> Z)(z:Z)(ye: hfiber _ _ g z): hfiber _ _ f (pr21 _ _ ye) -> hfiber _ _ (fun x:X => g (f x)) z:= fun xe:_ => hfiberpair _ _ (fun x:X => g (f x)) z (pr21 _ _ xe) (pathscomp0 (maponpaths _ _ g _ _ (pr22 _ _ xe)) (pr22 _ _ ye)). ]
+[ Definition hfibersftogf (X Y Z:UU)(f:X -> Y)(g: Y -> Z)(z:Z)(ye: hfiber _ _ g z): hfiber _ _ f (pr21 _ _ ye) -> hfiber _ _ (fun x:X => g (f x)) z:= fun xe:_ => hfiberpair _ _ (fun x:X => g (f x)) z (pr21 _ _ xe) (pathscomp0 (maponpaths g _ _ (pr22 _ _ xe)) (pr22 _ _ ye)). ]
 
 
-[ Definition hfibersez (X Y Z:UU)(f:X -> Y)(g: Y -> Z)(z:Z)(ye: hfiber _ _ g z)(xe: hfiber _ _ f (pr21 _ _ ye)): paths (hfibersgftog _ _ _ f g z (hfibersftogf _ _ _ f g z ye xe)) ye := hfibertriangle2 _ _ g z (hfibersgftog _ _ _ f g z (hfibersftogf _ _ _ f g z ye xe)) ye (pr22 _ _ xe) (idpath (pathscomp0 (maponpaths _ _ g _ _ (pr22 _ _ xe)) (pr22 _ _ ye))). ]
+[ Definition hfibersez (X Y Z:UU)(f:X -> Y)(g: Y -> Z)(z:Z)(ye: hfiber _ _ g z)(xe: hfiber _ _ f (pr21 _ _ ye)): paths (hfibersgftog _ _ _ f g z (hfibersftogf _ _ _ f g z ye xe)) ye := hfibertriangle2 _ _ g z (hfibersgftog _ _ _ f g z (hfibersftogf _ _ _ f g z ye xe)) ye (pr22 _ _ xe) (idpath (pathscomp0 (maponpaths g _ _ (pr22 _ _ xe)) (pr22 _ _ ye))). ]
 
 However I do not know whether the are equivalent to the ones given below or whether one can prove that the resulting pre-fibration sequence is a fibration sequence. *)
 
@@ -1590,8 +1590,8 @@ end.
 
 Theorem isweqcoprodf (X Y:UU)(X' Y':UU)(f: X -> X')(g: Y-> Y')(isf:isweq _ _ f)(isg: isweq _ _ g): isweq _ _ (coprodf _ _ _ _ f g).
 Proof. intros. set (finv:= invmap _ _ f isf). set (ginv:= invmap _ _ g isg). set (ff:=coprodf _ _ _ _ f g). set (gg:=coprodf _ _ _ _ finv ginv). 
-assert (egf: forall xy: coprod X Y, paths (gg (ff xy)) xy). intro. destruct xy. simpl. apply (maponpaths _ _ (ii1 X Y) _ _ (weqgf _ _ _ isf x)).     apply (maponpaths _ _ (ii2 X Y) _ _ (weqgf _ _ _ isg y)).
-assert (efg: forall xy': coprod X' Y', paths (ff (gg xy')) xy'). intro. destruct xy'. simpl.  apply (maponpaths _ _ (ii1 X' Y') _ _ (weqfg _ _ _ isf x)).     apply (maponpaths _ _ (ii2 X' Y') _ _ (weqfg _ _ _ isg y)). 
+assert (egf: forall xy: coprod X Y, paths (gg (ff xy)) xy). intro. destruct xy. simpl. apply (maponpaths (ii1 X Y) _ _ (weqgf _ _ _ isf x)).     apply (maponpaths (ii2 X Y) _ _ (weqgf _ _ _ isg y)).
+assert (efg: forall xy': coprod X' Y', paths (ff (gg xy')) xy'). intro. destruct xy'. simpl.  apply (maponpaths (ii1 X' Y') _ _ (weqfg _ _ _ isf x)).     apply (maponpaths (ii2 X' Y') _ _ (weqfg _ _ _ isg y)). 
 apply (gradth _ _ ff gg egf efg). Defined. 
 
 
@@ -1693,8 +1693,8 @@ Axiom funextfunax : forall (X Y:UU)(f g:X->Y),  (forall x:X, paths (f x) (g x)) 
 
 Lemma isweqlcompwithweq (X X':UU)(w: weq X X')(Y:UU): isweq (X' -> Y) (X -> Y) (fun a:X'->Y => (fun x:X => a (w x))).
 Proof. intros. set (f:= (fun a:X'->Y => (fun x:X => a (w x)))). set (g := fun b:X-> Y => fun x':X' => b (weqinv w x')). 
-set (egf:= (fun a:X'->Y => funextfunax X' Y (fun x':X' => (g (f a)) x') a (fun x': X' =>  maponpaths _ _ a _ _ (weqfg _ _ _ (pr22 _ _ w) x')))).
-set (efg:= (fun a:X->Y => funextfunax X Y (fun x:X => (f (g a)) x) a (fun x: X =>  maponpaths _ _ a _ _ (weqgf _ _ _ (pr22 _ _ w) x)))). 
+set (egf:= (fun a:X'->Y => funextfunax X' Y (fun x':X' => (g (f a)) x') a (fun x': X' =>  maponpaths a _ _ (weqfg _ _ _ (pr22 _ _ w) x')))).
+set (efg:= (fun a:X->Y => funextfunax X Y (fun x:X => (f (g a)) x) a (fun x: X =>  maponpaths a _ _ (weqgf _ _ _ (pr22 _ _ w) x)))). 
 apply (gradth _ _ f g egf efg). Defined.
 
 Lemma isweqrcompwithweq (Y Y':UU)(w: weq Y Y')(X:UU): isweq (X -> Y) (X -> Y') (fun a:X->Y => (fun x:X => w (a x))).
@@ -1910,7 +1910,7 @@ Lemma maponsec1l2 (X:UU)(P:X -> UU)(f:X-> X)(h: forall x:X, paths (f x) x)(s: fo
 Proof. intro. intro. intro. intro. intros.  
 
 set (map:= fun ff: total2 (X->X) (fun f0:X->X => forall x:X, paths (f0 x) x) => maponsec1l0 X P (pr21 _ _ ff) (pr22 _ _ ff) s x).
-assert (is1: iscontr (total2 (X->X) (fun f0:X->X => forall x:X, paths (f0 x) x))). apply funextweql1. assert (e: paths (tpair _  (fun f0:X->X => forall x:X, paths (f0 x) x) f h) (tpair _  (fun f0:X->X => forall x:X, paths (f0 x) x) (fun x0:X => x0) (fun x0:X => idpath x0))). apply contrl2.  assumption.  apply (maponpaths _ _ map _ _ e). Defined. 
+assert (is1: iscontr (total2 (X->X) (fun f0:X->X => forall x:X, paths (f0 x) x))). apply funextweql1. assert (e: paths (tpair _  (fun f0:X->X => forall x:X, paths (f0 x) x) f h) (tpair _  (fun f0:X->X => forall x:X, paths (f0 x) x) (fun x0:X => x0) (fun x0:X => idpath x0))). apply contrl2.  assumption.  apply (maponpaths map _ _ e). Defined. 
 
 
 Theorem isweqmaponsec1 (X:UU)(Y:UU)(P:Y -> UU)(f:X-> Y)(is:isweq _ _ f):isweq _ _ (maponsec1 _ _ P f).
@@ -1924,11 +1924,11 @@ set (invmapp := (fun sx: forall x:X, P (f x) => im2 (im1 sx))).
 
 assert (efg0: forall sx: (forall x:X, P (f x)), forall x:X, paths ((map (invmapp sx)) x) (sx x)).  intro. intro. unfold map. unfold invmapp. unfold im1. unfold im2. unfold maponsec1.  simpl. fold invf.  set (ee:=e2 x).  fold invf in ee.
 
-set (e3x:= fun x0:X => pathsweq2 _ _ f is (invf (f x0)) x0 (weqfg X Y f is (f x0))). set (e3:=e3x x). assert (e4: paths (weqfg X Y f is (f x)) (maponpaths _ _ f _ _ e3)). apply (pathsinv0 _ _ (pathsweq4 _ _ f is (invf (f x)) x _)).
+set (e3x:= fun x0:X => pathsweq2 _ _ f is (invf (f x0)) x0 (weqfg X Y f is (f x0))). set (e3:=e3x x). assert (e4: paths (weqfg X Y f is (f x)) (maponpaths f _ _ e3)). apply (pathsinv0 _ _ (pathsweq4 _ _ f is (invf (f x)) x _)).
 
-assert  (e5:paths (transportf Y P (f (invf (f x))) (f x) (weqfg X Y f is (f x)) (sx (invf (f x)))) (transportf Y P (f (invf (f x))) (f x) (maponpaths _ _ f _ _ e3) (sx (invf (f x))))). apply (maponpaths _ _ (fun e40:_ => (transportf Y P (f (invf (f x))) (f x) e40 (sx (invf (f x))))) _ _ e4).
+assert  (e5:paths (transportf Y P (f (invf (f x))) (f x) (weqfg X Y f is (f x)) (sx (invf (f x)))) (transportf Y P (f (invf (f x))) (f x) (maponpaths f _ _ e3) (sx (invf (f x))))). apply (maponpaths (fun e40:_ => (transportf Y P (f (invf (f x))) (f x) e40 (sx (invf (f x))))) _ _ e4).
 
-assert (e6: paths (transportf Y P (f (invf (f x))) (f x) (maponpaths X Y f (invf (f x)) x e3) (sx (invf (f x)))) (transportf X (fun x:X => P (f x)) _ _ e3 (sx (invf (f x))))). apply (pathsinv0 _ _ (functtransportf _ _ f P _ _ e3 (sx (invf (f x))))).
+assert (e6: paths (transportf Y P (f (invf (f x))) (f x) (maponpaths f (invf (f x)) x e3) (sx (invf (f x)))) (transportf X (fun x:X => P (f x)) _ _ e3 (sx (invf (f x))))). apply (pathsinv0 _ _ (functtransportf _ _ f P _ _ e3 (sx (invf (f x))))).
 
 set (ff:= fun x:X => invf (f x)).
 assert (e7: paths (transportf X (fun x : X => P (f x)) (invf (f x)) x e3 (sx (invf (f x)))) (sx x)). apply (maponsec1l2 _ (fun x:X => P (f x))ff e3x sx x).  apply (pathscomp0 (pathscomp0 e5 e6) e7).
@@ -1992,7 +1992,7 @@ Definition isaset (X:UU): UU := isofhlevel 2 X.
 
 Theorem hlevelretract (n:nat)(X Y:UU)(p:X -> Y)(s:Y ->X)(eps: forall y:Y, paths  (p (s y)) y): isofhlevel n X -> isofhlevel n Y.
 Proof. intro. induction n.  intros X Y p s eps X0. unfold isofhlevel.  apply (contrl1' _ _ p s eps X0). 
- unfold isofhlevel. intros X Y p s eps X0 x x'. unfold isofhlevel in X0. assert (is: isofhlevel n (paths (s x) (s x'))).  apply X0. set (s':= maponpaths _ _ s x x'). set (p':= pathssec2 _ _ s p eps x x'). set (eps':= pathssec3 _ _ s p eps x x').  simpl. apply (IHn _ _ p' s' eps' is). Defined. 
+ unfold isofhlevel. intros X Y p s eps X0 x x'. unfold isofhlevel in X0. assert (is: isofhlevel n (paths (s x) (s x'))).  apply X0. set (s':= maponpaths s x x'). set (p':= pathssec2 _ _ s p eps x x'). set (eps':= pathssec3 _ _ s p eps x x').  simpl. apply (IHn _ _ p' s' eps' is). Defined. 
 
 Corollary  isofhlevelweqf (n:nat)(X Y:UU)(f:X -> Y)(is: isweq _ _ f): isofhlevel n X -> isofhlevel n Y.
 Proof. intros.  apply (hlevelretract n _ _ f (invmap _ _ f is) (weqfg _ _ f is)). assumption. Defined. 
@@ -2163,7 +2163,7 @@ assert (is2: isofhlevelf (S n) _ _ (fun p: P x => (d1f _ _ pr21x x (f p)))). app
 
 Theorem isofhlevelfg (n:nat)(X Y Z:UU)(f:X -> Y)(g:Y-> Z): isweq _ _ f -> isofhlevelf n _ _ (fun x:X => g (f x)) -> isofhlevelf n _ _ g.
 Proof. intros n X Y Z f g X0 X1. set (gf:= fun x:X => g (f x)). set (finv:= invmap _ _ f X0). 
-assert (h:forall y:Y, paths (gf (finv y)) (g y)). intro. apply (maponpaths _ _ g _ _ (weqfg _ _ f X0 y)).  
+assert (h:forall y:Y, paths (gf (finv y)) (g y)). intro. apply (maponpaths g _ _ (weqfg _ _ f X0 y)).  
 assert (is: isofhlevelf n _ _ (fun y:Y => gf (finv y))). apply (isofhlevelfgf n _ _ _ finv gf (isofhlevelfweq n _ _ _ (isweqinvmap _ _ f X0)) X1).  apply (isofhlevelfhomot n _ _ _ _ h is).  Defined.
 
 
@@ -2175,32 +2175,32 @@ apply (isofhlevelfg n _ _ _ w f' is X1). Defined.
 
 
 
-Theorem isofhlevelfonpaths (n:nat)(X Y:UU)(f:X -> Y)(x x':X): isofhlevelf (S n) _ _ f -> isofhlevelf n _ _ (maponpaths _ _ f x x').
+Theorem isofhlevelfonpaths (n:nat)(X Y:UU)(f:X -> Y)(x x':X): isofhlevelf (S n) _ _ f -> isofhlevelf n _ _ (maponpaths f x x').
 Proof. intros n X Y f x x' X0. 
 set (y:= f x'). set (xe':= hfiberpair _ _ f y x' (idpath _)). 
 assert (is1: isofhlevelf n _ _ (d3f _ _ f y x xe')). unfold isofhlevelf. intro.  apply (isofhlevelweqf n _ _ _ (isfibseq4 _ _ f y x xe' y0) (X0 y (hfiberpair _ _ f y x y0) xe')). 
-assert (h: forall ee:paths x' x, paths (d3f _ _ f y x xe' ee) (maponpaths _ _ f _ _ (pathsinv0 _ _ ee))). intro.
-assert (e0: paths (pathscomp0 (maponpaths _ _ f _ _ (pathsinv0 _ _ ee)) (idpath _ ))  (maponpaths _ _ f _ _ (pathsinv0 _ _ ee)) ). induction ee.  simpl.  apply idpath. apply (pathscomp0 (d3fhomot _ _ f y x xe' ee) e0). apply (isofhlevelfhomot2 n _ _ _ _ _ (pathsinv0 x' x) h (isweqpathsinv0 _ _ _) is1) . Defined. 
+assert (h: forall ee:paths x' x, paths (d3f _ _ f y x xe' ee) (maponpaths f _ _ (pathsinv0 _ _ ee))). intro.
+assert (e0: paths (pathscomp0 (maponpaths f _ _ (pathsinv0 _ _ ee)) (idpath _ ))  (maponpaths f _ _ (pathsinv0 _ _ ee)) ). induction ee.  simpl.  apply idpath. apply (pathscomp0 (d3fhomot _ _ f y x xe' ee) e0). apply (isofhlevelfhomot2 n _ _ _ _ _ (pathsinv0 x' x) h (isweqpathsinv0 _ _ _) is1) . Defined. 
 
 
 
-Theorem isofhlevelfsn (n:nat)(X Y:UU)(f:X -> Y): (forall x x':X, isofhlevelf n _ _ (maponpaths _ _ f x x')) -> isofhlevelf (S n) _ _ f.
+Theorem isofhlevelfsn (n:nat)(X Y:UU)(f:X -> Y): (forall x x':X, isofhlevelf n _ _ (maponpaths f x x')) -> isofhlevelf (S n) _ _ f.
 Proof. intros n X Y f X0.  unfold isofhlevelf. intro.  simpl.  intros. destruct x as [ x e ]. destruct x' as [ x' e' ].  set (xe':= hfiberpair _ _ f y x' e').  set (xe:= hfiberpair _ _ f y x e). set (d3:= d3f _ _ f y x xe'). simpl in d3.  
 assert (is1: isofhlevelf n _ _ (d3f _ _ f y x xe')). 
-assert (h: forall ee: paths x' x, paths (pathscomp0 (maponpaths _ _ f _ _ (pathsinv0 _ _ ee)) e') (d3f _ _ f y x xe' ee)). intro. apply (pathsinv0 _ _ (d3fhomot _ _ f y x xe' ee)). 
-assert (is2: isofhlevelf n _ _ (fun ee: paths x' x => maponpaths _ _ f _ _ (pathsinv0 _ _ ee))).  apply (isofhlevelfgf n _ _ _ (fun ee:_ => pathsinv0 _ _ ee) (maponpaths _ _ f x x') (isofhlevelfweq n _ _ _ (isweqpathsinv0 _ _ _)) (X0 x x')). 
-assert (is3: isofhlevelf n _ _ (fun ee: paths x' x => pathscomp0 (maponpaths _ _ f _ _ (pathsinv0 _ _ ee)) e')). apply (isofhlevelfgf n _ _ _ _ _ is2 (isofhlevelfweq n _ _ _ (isweqpathscomp0r _ _ _ _ e'))). 
+assert (h: forall ee: paths x' x, paths (pathscomp0 (maponpaths f _ _ (pathsinv0 _ _ ee)) e') (d3f _ _ f y x xe' ee)). intro. apply (pathsinv0 _ _ (d3fhomot _ _ f y x xe' ee)). 
+assert (is2: isofhlevelf n _ _ (fun ee: paths x' x => maponpaths f _ _ (pathsinv0 _ _ ee))).  apply (isofhlevelfgf n _ _ _ (fun ee:_ => pathsinv0 _ _ ee) (maponpaths f x x') (isofhlevelfweq n _ _ _ (isweqpathsinv0 _ _ _)) (X0 x x')). 
+assert (is3: isofhlevelf n _ _ (fun ee: paths x' x => pathscomp0 (maponpaths f _ _ (pathsinv0 _ _ ee)) e')). apply (isofhlevelfgf n _ _ _ _ _ is2 (isofhlevelfweq n _ _ _ (isweqpathscomp0r _ _ _ _ e'))). 
 apply (isofhlevelfhomot n _ _ _ _ h is3). 
 apply (isofhlevelweqb n _ _ _ (isfibseq4 _ _ f y x xe' e) (is1 e)).  Defined.
 
 
-Theorem isofhlevelfssn (n:nat)(X Y:UU)(f:X -> Y): (forall x:X, isofhlevelf (S n) _ _ (maponpaths _ _ f x x)) -> isofhlevelf (S (S n)) _ _ f.
+Theorem isofhlevelfssn (n:nat)(X Y:UU)(f:X -> Y): (forall x:X, isofhlevelf (S n) _ _ (maponpaths f x x)) -> isofhlevelf (S (S n)) _ _ f.
 Proof.  intros n X Y f X0.  unfold isofhlevelf. intro.
 assert (forall xe0: hfiber _ _ f y, isofhlevel (S n) (paths xe0 xe0)). intro. destruct xe0 as [ x e ].  set (x':= x). set (e':=e).  set (xe':= hfiberpair _ _ f y x' e').  set (xe:= hfiberpair _ _ f y x e). set (d3:= d3f _ _ f y x xe'). simpl in d3.  
 assert (is1: isofhlevelf (S n) _ _ (d3f _ _ f y x xe')). 
-assert (h: forall ee: paths x' x, paths (pathscomp0 (maponpaths _ _ f _ _ (pathsinv0 _ _ ee)) e') (d3f _ _ f y x xe' ee)). intro. apply (pathsinv0 _ _ (d3fhomot _ _ f y x xe' ee)). 
-assert (is2: isofhlevelf (S n) _ _ (fun ee: paths x' x => maponpaths _ _ f _ _ (pathsinv0 _ _ ee))).  apply (isofhlevelfgf (S n) _ _ _ (fun ee:_ => pathsinv0 _ _ ee) (maponpaths _ _ f x x') (isofhlevelfweq (S n) _ _ _ (isweqpathsinv0 _ _ _)) (X0 x)). 
-assert (is3: isofhlevelf (S n) _ _ (fun ee: paths x' x => pathscomp0 (maponpaths _ _ f _ _ (pathsinv0 _ _ ee)) e')). apply (isofhlevelfgf (S n) _ _ _ _ _ is2 (isofhlevelfweq (S n) _ _ _ (isweqpathscomp0r _ _ _ _ e'))). 
+assert (h: forall ee: paths x' x, paths (pathscomp0 (maponpaths f _ _ (pathsinv0 _ _ ee)) e') (d3f _ _ f y x xe' ee)). intro. apply (pathsinv0 _ _ (d3fhomot _ _ f y x xe' ee)). 
+assert (is2: isofhlevelf (S n) _ _ (fun ee: paths x' x => maponpaths f _ _ (pathsinv0 _ _ ee))).  apply (isofhlevelfgf (S n) _ _ _ (fun ee:_ => pathsinv0 _ _ ee) (maponpaths f x x') (isofhlevelfweq (S n) _ _ _ (isweqpathsinv0 _ _ _)) (X0 x)). 
+assert (is3: isofhlevelf (S n) _ _ (fun ee: paths x' x => pathscomp0 (maponpaths f _ _ (pathsinv0 _ _ ee)) e')). apply (isofhlevelfgf (S n) _ _ _ _ _ is2 (isofhlevelfweq (S n) _ _ _ (isweqpathscomp0r _ _ _ _ e'))). 
 apply (isofhlevelfhomot (S n) _ _ _ _ h is3). 
 apply (isofhlevelweqb (S n) _ _ _ (isfibseq4 _ _ f y x xe' e) (is1 e)).  
 apply (isofhlevelssn).  assumption. Defined.
@@ -2320,7 +2320,7 @@ Proof.
  change (c x) with cx in cnewx.  
  induction cx.  
   assert (e: paths cnewx (ii1 _ _ (idpath x))).
-   apply (maponpaths _ _ (ii1 (paths x x) (neg (P x))) _ _ (pathsinv0l1 _ _ _ x0)).
+   apply (maponpaths (ii1 (paths x x) (neg (P x))) _ _ (pathsinv0l1 _ _ _ x0)).
   assert (egf: forall p, paths (g (f p)) p).
    intro.
    simpl in g.
@@ -2333,12 +2333,12 @@ Proof.
           | ii2 phi => initmap (P x) (phi p)
           end).
    assert (ee: paths (ff (cnewx)) (ff (ii1 (paths x x) (neg (P x)) (idpath x)))).
-    apply (maponpaths _ _ ff _ _ e).
+    apply (maponpaths ff _ _ e).
    assert (eee: paths  (ff (ii1 (paths x x) (neg (P x)) (idpath x))) p).
     apply idpath.
    fold (ff (cnew x)).
    assert (e2: paths (ff (cnew x)) (ff (cnewx))).
-    apply (maponpaths _ _ ff _ _ e1).
+    apply (maponpaths ff _ _ e1).
    apply (pathscomp0 (pathscomp0 e2 ee) eee).
   apply (gradth _ _ f g egf efg).
  unfold isweq.
@@ -2507,7 +2507,7 @@ Lemma iscontrhfiberofincl (X:UU)(Y:UU)(f:X -> Y): isincl _ _ f -> (forall x:X, i
 Proof. intros X Y f X0 x. unfold isofhlevelf in X0. set (isy:= X0 (f x)).  apply (iscontraprop1 _ isy (hfiberpair _ _ f (f x) x (idpath (f x)))). Defined.
 
 
-Lemma isweqonpathsincl (X:UU)(Y:UU)(f:X -> Y) : (isincl _ _ f) -> forall (x x':X), isweq _ _ (maponpaths _ _ f x x').
+Lemma isweqonpathsincl (X:UU)(Y:UU)(f:X -> Y) : (isincl _ _ f) -> forall (x x':X), isweq _ _ (maponpaths f x x').
 Proof. intros X Y f is x x'. apply (isofhlevelfonpaths O _ _ f x x' is). Defined.
 
 Definition invmaponpathsincl (X Y:UU)(f:X -> Y) : (isincl _ _ f) -> forall (x x':X), paths (f x) (f x') -> paths x x'. 
@@ -2515,7 +2515,7 @@ Proof. intros X Y f is x x'.
  exact (invmap _ _ _ (isweqonpathsincl _ _ f is x x')).
  Defined.
 
-Lemma isinclweqonpaths (X Y:UU)(f:X -> Y): (forall x x':X, isweq _ _ (maponpaths _ _ f x x')) -> isincl _ _ f.
+Lemma isinclweqonpaths (X Y:UU)(f:X -> Y): (forall x x':X, isweq _ _ (maponpaths f x x')) -> isincl _ _ f.
 Proof. intros X Y f X0.  apply (isofhlevelfsn O _ _ f X0). Defined.
 
 Definition isofhlevelsourceofincl (n:nat)(X Y:UU)(f:X -> Y)(is: isincl _ _ f): isofhlevel (S n) Y -> isofhlevel (S n) X:= isofhlevelinfibseq (S n) _ _ f (isofhlevelfsnincl n _ _ f is).
@@ -2685,7 +2685,7 @@ Proof. apply (isasetifdeceq _ isdeceqbool). Defined.
 
 
 Lemma noneql1 (X Y: UU)(f:X -> Y)(x x':X): (paths (f x) (f x') -> empty) -> (paths x x' -> empty).
-Proof. intros X Y f x x' X0 X1. apply (X0 (maponpaths _ _ f _ _ X1)). Defined.  
+Proof. intros X Y f x x' X0 X1. apply (X0 (maponpaths f _ _ X1)). Defined.  
 
 Theorem nopathsOtoSx: forall x:nat, neg (paths O (S x)).
 Proof. intro. 
@@ -2903,10 +2903,10 @@ Proof. intros X Y X' Y' f g x' X0. destruct X0 as [ t x ].  destruct t. set (e:=
 
 
 Theorem weqhfibercoprodf1 (X Y X' Y':UU)(f: X -> X')(g:Y -> Y')(x':X'): weq (hfiber _ _ f x') (hfiber _ _ (coprodf _ _ _ _ f g) (ii1 _ _ x')).
-Proof. intros.  set (ff:= fun xe: hfiber _ _ f x' => match xe with tpair x e => hfiberpair _ _ (coprodf _ _ _ _ f g) _ (ii1 X Y x) (maponpaths _ _ (ii1 X' Y') (f x) x' e) end). split with ff. set (gg:= fromhfibercoprodf1 _ _ _ _ f g x').
+Proof. intros.  set (ff:= fun xe: hfiber _ _ f x' => match xe with tpair x e => hfiberpair _ _ (coprodf _ _ _ _ f g) _ (ii1 X Y x) (maponpaths (ii1 X' Y') (f x) x' e) end). split with ff. set (gg:= fromhfibercoprodf1 _ _ _ _ f g x').
 assert (egf: forall a:_, paths (gg (ff a)) a).  intro. destruct a as [ t x ].  simpl.  destruct x.  simpl. apply idpath. 
 assert (efg: forall a:_, paths (ff (gg a)) a). intro. destruct a as [ t x ]. destruct t.  simpl in x. 
-assert (eee: total2 (paths (f x0) x') (fun e:_ => paths (maponpaths _ _ (ii1 X' Y') _ _ e) x)). split with (invmaponpathsincl _ _ _ (isinclii1 X' Y') _ _ x).  apply (weqfg _ _ _ (isweqonpathsincl _ _ _ (isinclii1 X' Y') _ _ ) x).   destruct eee as [ t x1 ]. destruct x1. destruct t. apply idpath. 
+assert (eee: total2 (paths (f x0) x') (fun e:_ => paths (maponpaths (ii1 X' Y') _ _ e) x)). split with (invmaponpathsincl _ _ _ (isinclii1 X' Y') _ _ x).  apply (weqfg _ _ _ (isweqonpathsincl _ _ _ (isinclii1 X' Y') _ _ ) x).   destruct eee as [ t x1 ]. destruct x1. destruct t. apply idpath. 
 simpl in x. apply (initmap _ (negpathsii2ii1 _ _ _ _  x)). 
 apply (gradth _ _ _ _ egf efg). Defined.
 
@@ -2922,10 +2922,10 @@ Proof. intros X Y X' Y' f g y' X0. destruct X0 as [ t x ].  destruct t. apply (i
 
 
 Theorem weqhfibercoprodf2 (X Y X' Y':UU)(f: X -> X')(g:Y -> Y')(y':Y'): weq (hfiber _ _ g y') (hfiber _ _ (coprodf _ _ _ _ f g) (ii2 _ _ y')).
-Proof. intros.  set (ff:= fun xe: hfiber _ _ g y' => match xe with tpair y e => hfiberpair _ _ (coprodf _ _ _ _ f g) _ (ii2 X Y y) (maponpaths _ _ (ii2 X' Y') (g y) y' e) end). split with ff. set (gg:= fromhfibercoprodf2 _ _ _ _ f g y').
+Proof. intros.  set (ff:= fun xe: hfiber _ _ g y' => match xe with tpair y e => hfiberpair _ _ (coprodf _ _ _ _ f g) _ (ii2 X Y y) (maponpaths (ii2 X' Y') (g y) y' e) end). split with ff. set (gg:= fromhfibercoprodf2 _ _ _ _ f g y').
 assert (egf: forall a:_, paths (gg (ff a)) a).  intro. destruct a as [ t x ].  simpl.  destruct x.  simpl. apply idpath. 
 assert (efg: forall a:_, paths (ff (gg a)) a). intro. destruct a as [ t x ]. destruct t.  simpl in x. apply (initmap _ (negpathsii1ii2 _ _ _ _  x)). 
-simpl in x. assert (eee: total2 (paths (g y) y') (fun e:_ => paths (maponpaths _ _ (ii2 X' Y') _ _ e) x)). split with (invmaponpathsincl _ _ _ (isinclii2 X' Y') _ _ x).  apply (weqfg _ _ _ (isweqonpathsincl _ _ _ (isinclii2 X' Y') _ _ ) x).   destruct eee as [ t x0 ]. destruct x0. destruct t. apply idpath. 
+simpl in x. assert (eee: total2 (paths (g y) y') (fun e:_ => paths (maponpaths (ii2 X' Y') _ _ e) x)). split with (invmaponpathsincl _ _ _ (isinclii2 X' Y') _ _ x).  apply (weqfg _ _ _ (isweqonpathsincl _ _ _ (isinclii2 X' Y') _ _ ) x).   destruct eee as [ t x0 ]. destruct x0. destruct t. apply idpath. 
 apply (gradth _ _ _ _ egf efg). Defined.
 
  
@@ -2989,7 +2989,7 @@ Definition maponcomplementsweq (X Y:UU)(f:X -> Y)(is: isweq _ _ f)(x:X):= maponc
 Theorem isweqmaponcomplements (X Y:UU)(f:X -> Y)(is: isweq _ _ f)(x:X): isweq _ _ (maponcomplementsweq _ _ f is x).
 Proof. intros.  set (is1:= isofhlevelfweq 1 _ _ f is).   set (map1:= totalfun X (fun x':X => neg (paths x' x)) (fun x':X => neg (paths (f x') (f x))) (fun x':X => negf (invmaponpathsincl _ _ _ is1 x' x))). set (map2:= fpmap _ _ f (fun y:Y => neg (paths y (f x)))). 
 assert (is2: forall x':X, isweq  _ _ (negf (invmaponpathsincl _ _ _ is1 x' x))). intro. 
-set (invimpll:= (negf (maponpaths _ _ f x' x))). apply (isweqimplimpl _ _ (negf (invmaponpathsincl _ _ _ is1 x' x)) (negf (maponpaths _ _ f x' x)) (isapropneg _) (isapropneg _)). 
+set (invimpll:= (negf (maponpaths f x' x))). apply (isweqimplimpl _ _ (negf (invmaponpathsincl _ _ _ is1 x' x)) (negf (maponpaths f x' x)) (isapropneg _) (isapropneg _)). 
 assert (is3: isweq _ _ map1). apply isweqfibtototal. assumption. 
 assert (is4: isweq _ _ map2). apply (isweqfpmap _ _ f  (fun y:Y => neg (paths y (f x))) is).
 assert (h: forall x0':_, paths (map2 (map1 x0')) (maponcomplementsweq _ _ f is x x0')). intro.  simpl. destruct x0'. simpl. apply idpath.
@@ -3012,30 +3012,30 @@ split with (ii2 _ _ y). apply (negf (pathsinv0 _ _) (negpathsii1ii2 X Y x y)). D
 
 Definition fromcompltoii1x (X Y:UU)(x:X): complement (coprod X Y) (ii1 _ _ x) ->  coprod (complement X x) Y.
 Proof. intros X Y x X0. destruct X0 as [ t x0 ].  destruct t as [ x1 | y ]. 
-assert (ne: neg (paths x1 x)). apply (negf (maponpaths _ _ (ii1 _ _) _ _) x0). apply (ii1 _ _ (complementpair _ _ x1 ne)). apply (ii2 _ _ y). Defined. 
+assert (ne: neg (paths x1 x)). apply (negf (maponpaths (ii1 _ _) _ _) x0). apply (ii1 _ _ (complementpair _ _ x1 ne)). apply (ii2 _ _ y). Defined. 
 
 
 Theorem isweqtocompltoii1x (X Y:UU)(x:X): isweq _ _ (tocompltoii1x X Y x).
 Proof. intros. set (f:= tocompltoii1x X Y x). set (g:= fromcompltoii1x X Y x).
 assert (egf:forall nexy:_ , paths (g (f nexy)) nexy). intro. destruct nexy as [ c | y ]. destruct c as [ t x0 ]. simpl. 
 assert (e: paths (negf 
-              (maponpaths X (coprod X Y) (ii1 X Y) t x)
+              (maponpaths (ii1 X Y) t x)
               (negf 
                  (invmaponpathsincl X (coprod X Y) 
                     (ii1 X Y) (isinclii1 X Y) t x) x0)) x0). apply (isapropneg (paths t x) _ _). 
-apply (maponpaths _ _ (fun ee: neg(paths t x) => ii1 _ _ (complementpair X x t ee)) _ _ e). 
+apply (maponpaths (fun ee: neg(paths t x) => ii1 _ _ (complementpair X x t ee)) _ _ e). 
 apply idpath.
 assert (efg: forall neii1x:_, paths (f (g neii1x)) neii1x). intro.  destruct neii1x as [ t x0 ]. destruct t as [ x1 | y ].  simpl. 
 assert (e: paths  (negf 
            (invmaponpathsincl X (coprod X Y) (ii1 X Y) (isinclii1 X Y) x1 x)
            (negf 
-              (maponpaths X (coprod X Y) (ii1 X Y) x1 x) x0)) x0). apply (isapropneg (paths _ _)  _ _).
-apply (maponpaths _ _ (fun ee: (neg (paths (ii1 X Y x1) (ii1 X Y x))) => (complementpair _ _ (ii1 X Y x1) ee)) _ _ e). 
+              (maponpaths (ii1 X Y) x1 x) x0)) x0). apply (isapropneg (paths _ _)  _ _).
+apply (maponpaths (fun ee: (neg (paths (ii1 X Y x1) (ii1 X Y x))) => (complementpair _ _ (ii1 X Y x1) ee)) _ _ e). 
 simpl. 
 assert (e: paths (negf 
            (pathsinv0 (ii2 X Y y) (ii1 X Y x))
            (negpathsii1ii2 X Y x y)) x0). apply (isapropneg (paths _ _) _ _).
-apply (maponpaths  _ _ (fun ee: (neg (paths (ii2 X Y y) (ii1 X Y x))) => (complementpair _ _ (ii2 X Y y) ee)) _ _ e). 
+apply (maponpaths (fun ee: (neg (paths (ii2 X Y y) (ii1 X Y x))) => (complementpair _ _ (ii2 X Y y) ee)) _ _ e). 
 apply (gradth _ _ f g egf efg). Defined.
 
 
@@ -3054,7 +3054,7 @@ Defined.
 
 Definition fromcompltoii2y (X Y:UU)(y:Y): complement (coprod X Y) (ii2 _ _ y) ->  coprod X (complement Y y).
 Proof. intros X Y y X0. destruct X0 as [ t x ].  destruct t as [ x0 | y0 ]. apply (ii1 _ _ x0). 
-assert (ne: neg (paths y0 y)). apply (negf (maponpaths _ _ (ii2 _ _) _ _) x). apply (ii2 _ _ (complementpair _ _ y0 ne)). Defined. 
+assert (ne: neg (paths y0 y)). apply (negf (maponpaths (ii2 _ _) _ _) x). apply (ii2 _ _ (complementpair _ _ y0 ne)). Defined. 
 
 
 Theorem isweqtocompltoii2y (X Y:UU)(y:Y): isweq _ _ (tocompltoii2y X Y y).
@@ -3063,24 +3063,24 @@ assert (egf:forall nexy:_ , paths (g (f nexy)) nexy). intro. destruct nexy as [ 
 apply idpath.
 destruct c as [ t x ]. simpl. 
 assert (e: paths (negf 
-              (maponpaths _ (coprod X Y) (ii2 X Y) t y)
+              (maponpaths (ii2 X Y) t y)
               (negf 
                  (invmaponpathsincl _ (coprod X Y) 
                     (ii2 X Y) (isinclii2 X Y) t y) x)) x). apply (isapropneg (paths t y) _ _). 
-apply (maponpaths _ _ (fun ee: neg(paths t y) => ii2 _ _ (complementpair _ y t ee)) _ _ e). 
+apply (maponpaths (fun ee: neg(paths t y) => ii2 _ _ (complementpair _ y t ee)) _ _ e). 
 assert (efg: forall neii2x:_, paths (f (g neii2x)) neii2x). intro.  destruct neii2x as [ t x ]. destruct t as [ x0 | y0 ].  simpl. 
 
 assert (e: paths (negf 
            (pathsinv0 (ii1 X Y x0) (ii2 X Y y))
            (negpathsii2ii1 X Y x0 y)) x). apply (isapropneg (paths _ _) _ _).
-apply (maponpaths  _ _ (fun ee: (neg (paths (ii1 X Y x0) (ii2 X Y y))) => (complementpair _ _ (ii1 X Y x0) ee)) _ _ e). 
+apply (maponpaths (fun ee: (neg (paths (ii1 X Y x0) (ii2 X Y y))) => (complementpair _ _ (ii1 X Y x0) ee)) _ _ e). 
 simpl.
 
 assert (e: paths  (negf 
            (invmaponpathsincl _ (coprod X Y) _ (isinclii2 X Y) y0 y)
            (negf 
-              (maponpaths Y (coprod X Y) (ii2 X Y) y0 y) x)) x). apply (isapropneg (paths _ _)  _ _).
-apply (maponpaths _ _ (fun ee: (neg (paths (ii2 X Y y0) (ii2 X Y y))) => (complementpair _ _ (ii2 X Y y0) ee)) _ _ e). 
+              (maponpaths (ii2 X Y) y0 y) x)) x). apply (isapropneg (paths _ _)  _ _).
+apply (maponpaths (fun ee: (neg (paths (ii2 X Y y0) (ii2 X Y y))) => (complementpair _ _ (ii2 X Y y0) ee)) _ _ e). 
  
 apply (gradth _ _ f g egf efg). Defined.
 
@@ -3147,7 +3147,7 @@ Definition locsplitsecissec  (X Y:UU)(f:X->Y)(ls: locsplit _ _ f)(u:dnegimage _ 
 Proof. intros.  set (p:= xtodnegimage _ _ f). set (s:= locsplitsec _ _ f ls).  
 assert (paths (pr21 _ _ (p (s u))) (pr21 _ _ u)). unfold p. unfold xtodnegimage. unfold s. unfold locsplitsec. simpl. induction u. set (lst:= ls t). induction lst.  simpl. apply (pr22 _ _ x0). induction (x y).  
 assert (is: isofhlevelf 1 _ _ (dnegimageincl _ _ f)). apply (isofhlevelfpr21 1 _ _ (fun y:Y => isapropdneg (hfiber _ _ f y))).  
-assert (isw: isweq _ _ (maponpaths _ _ (dnegimageincl _ _ f) (p (s u)) u)). apply (isofhlevelfonpaths O _ _ _ _ _ is). 
+assert (isw: isweq _ _ (maponpaths (dnegimageincl _ _ f) (p (s u)) u)). apply (isofhlevelfonpaths O _ _ _ _ _ is). 
 apply (invmap _ _ _ isw X0). Defined.
 
 
@@ -3201,14 +3201,14 @@ Lemma isolatedifisolatedii1 (X Y:UU)(x:X)(is: isisolated _ (ii1 X Y x)): isisola
 Proof. intros. intro.  
    destruct (is (ii1 _ _ x')) as [ | e ].  
         apply yes.  exact (invmaponpathsincl _ _ _ (isinclii1 _ _) _ _ p).
-        apply no.   exact (negf (maponpaths _ _ (ii1 _ _) _ _) e).
+        apply no.   exact (negf (maponpaths (ii1 _ _) _ _) e).
 Defined. 
 
 Lemma isolatedifisolatedii2 (X Y:UU)(y:Y)(is: isisolated _ (ii2 X Y y)): isisolated _ y.
 Proof. intros. intro y'.
     destruct (is (ii2 _ _ y')) as [p|e].
          apply yes. exact (invmaponpathsincl _ _ _ (isinclii2 _ _) _ _ p).
-         apply no.  exact (negf (maponpaths _ _ (ii2 _ _) _ _) e).
+         apply no.  exact (negf (maponpaths (ii2 _ _) _ _) e).
 Defined. 
 
 Definition recomplinv (X:UU)(x:X)(is: isisolated X x): X -> coprod (complement X x) unit:=
@@ -3257,7 +3257,7 @@ Proof.
         destruct (x0 p).
       destruct u.
       assert (e1: paths  (g (f (ii2 (complement X x) unit tt))) (g x)).
-        apply (maponpaths _ _ g _ _ p).
+        apply (maponpaths g _ _ p).
       assert (e2: paths (g x) (ii2 (complement X x) unit tt)).
         unfold g.
         destruct (is x).

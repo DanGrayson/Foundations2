@@ -65,7 +65,7 @@ Lemma isapropimeqclass  (X:UU0)(R: hrel X)(Y:hSet)(f:X -> Y)(is:forall x1 x2 : X
 Proof. intros.  destruct C as [ t x ]. destruct x as [ t0 x ]. destruct x as [ t1 x ]. rename t into A.
 set (ImA:=  (total2 Y (fun y:_ => ishinh (hfiber A Y (fun a:A => f (pr21 _ _ a)) y)))). unfold isaprop.  intros.  simpl. intros.   
 assert (is3: isincl _ _ ((pr21 _ _): ImA -> Y)). apply isofhlevelfpr21. intro. apply (isapropishinh (hfiber A Y (fun a : A => f (pr21 X (fun x : X => A x) a)) x1)).  
-assert (is4: isweq _ _ (maponpaths _ _ ((pr21 _ _):ImA -> Y) x0 x') ). apply isweqonpathsincl. assumption. 
+assert (is4: isweq _ _ (maponpaths ((pr21 _ _):ImA -> Y) x0 x') ). apply isweqonpathsincl. assumption. 
 apply (iscontrxifiscontry _ _ _ is4). simpl. destruct x0 as [ t x1 ]. destruct x' as [ t2 x2 ].    simpl. 
 assert (p1: (hfiber A Y (fun a : A => f (pr21 X (fun x : X => A x) a)) t) -> (hfiber A Y (fun a : A => f (pr21 X (fun x : X => A x) a)) t2) -> (paths t t2)). intros X0 X1.  destruct X0 as [ t3 x3 ]. destruct X1 as [ t4 x4 ]. assert (e1: R (pr21 _ _ t3) (pr21 _ _ t4)). apply x. apply (pr22 _ _ t3). apply (pr22 _ _ t4). assert (e2: paths (f (pr21 X (fun x : X => A x) t3)) (f (pr21 X (fun x : X => A x) t4))). apply is. apply e1. apply (pathscomp0 (pathscomp0 (pathsinv0 _ _ x3) e2) x4). 
 assert (isi: ishinh (paths t t2)). apply (hinhfunct2 _ _ _ p1 x1 x2). 
@@ -88,7 +88,7 @@ set (ImA:= total2 Y (fun y:_ => ishinh (hfiber A Y (fun a:A => f (pr21 _ _ a)) y
 set (fA:= (fun a:A => tpair _ _  (f (pr21 _ _ a)) (hinhpr _ (hfiberpair A Y (fun a:A => f (pr21 _ _ a)) (f (pr21 _ _ a)) a (idpath _ )))):A -> ImA).  
 set (is2:=(isapropimeqclass X R Y f is C):isaprop ImA). change (setquotuniv X R Y f is C) with (pr21 _ _ (hinhuniv _ (hProppair ImA is2) fA (pr21 _ _ (pr22 _ _ C)))). change (f x) with (pr21 _ _ (fA (carrierpair _ _ x inC))). 
 
-assert (e: paths (fA (carrierpair _ _ x inC)) (hinhuniv _ (hProppair ImA is2) fA (pr21 _ _ (pr22 _ _ C)))).  apply isapropimeqclass. assumption.  apply (maponpaths _ _ (pr21 _ _) _ _ e). Defined. 
+assert (e: paths (fA (carrierpair _ _ x inC)) (hinhuniv _ (hProppair ImA is2) fA (pr21 _ _ (pr22 _ _ C)))).  apply isapropimeqclass. assumption.  apply (maponpaths (pr21 _ _) _ _ e). Defined. 
 
 
 Theorem setquotunivcomm  (X:UU0)(R: hrel X)(is0:iseqrel X R)(Y:hSet)(f:X -> Y)(is:forall x1 x2 : X, (R x1 x2) -> paths (f x1) (f x2)) : forall x:X, paths (f x) (setquotuniv X R Y f is (setquoteqrelpr X R is0  x)).

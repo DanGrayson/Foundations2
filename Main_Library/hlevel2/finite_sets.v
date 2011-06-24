@@ -85,7 +85,7 @@ apply (twooutof3c _ _ _ _ _ (twooutof3c _ _ _ _ _ is1 is2) is3). Defined.
 Theorem stnsweqtoeq (n n':nat): (weq (stn n) (stn n')) -> paths n n'.
 Proof. intro. induction n. intro. induction n'.  intros. apply idpath. intro X. apply (initmap _ (stnsnegl2  n' X)).  
  intro. induction n'. intro X. set (int:= isdeceqnat O (S n)).  destruct int.  assumption. apply (initmap _ (stnsnegl1 n X)).  intro X. 
-set (e:= IHn n' (stnsposl2 n n' X)). apply (maponpaths _ _ S _ _ e). Defined. 
+set (e:= IHn n' (stnsposl2 n n' X)). apply (maponpaths S _ _ e). Defined. 
 
 Corollary stnsdnegweqtoeq (n n':nat): dneg (weq (stn n) (stn n')) -> paths n n'.
 Proof. intros n n' X. apply (eqfromdnegeq nat isdeceqnat _ _  (dnegf _ _ (stnsweqtoeq n n') X)). Defined. 
@@ -173,7 +173,7 @@ Lemma is0leb0 (n:nat) : paths (leb n 0) true -> paths n 0.
 Proof.  intro. destruct n. intro.   apply idpath.  intro X. apply (initmap _ (nopathsfalsetotrue X)). Defined. 
 
 Lemma lebsnchoice0 (x n:nat): paths (leb x (S n)) true -> (neg (paths x (S n))) -> paths (leb x n) true.
-Proof. intro. induction x.  intros. apply idpath.  intro. destruct n.  intros X X0.  simpl in X.  destruct x.  apply (initmap _ (X0 (idpath _))). simpl in X.  apply (initmap _ (nopathsfalsetotrue X)). intros X X0. simpl in X.  set (a:= IHx n X (negf (maponpaths _ _ S _ _) X0)).  assumption.  Defined. 
+Proof. intro. induction x.  intros. apply idpath.  intro. destruct n.  intros X X0.  simpl in X.  destruct x.  apply (initmap _ (X0 (idpath _))). simpl in X.  apply (initmap _ (nopathsfalsetotrue X)). intros X X0. simpl in X.  set (a:= IHx n X (negf (maponpaths S _ _) X0)).  assumption.  Defined. 
 
 Lemma lebsnchoice (x n:nat) : paths (leb x (S n)) true -> coprod (paths (leb x n) true) (paths x (S n)).
 Proof.
@@ -218,7 +218,7 @@ set (u:= coprodf _ _ _ _ (initintervaltonat n) (fun t:unit => t)).   assert (is:
 assert (egf: forall x:_, paths (g (f x)) x).  intro. 
 assert (egf0: paths (u (g (f x))) (u x)).  destruct x. simpl. destruct i as [ t x ]. destruct t.   simpl.  apply idpath. simpl. destruct (isdeceqnat n t).    simpl. induction p. apply (initmap _ (neglebsnn t x)).  simpl.  apply idpath.  destruct u0. destruct n.  apply idpath. simpl.  destruct (isdeceqnat n n) as [|e]. apply idpath.  apply (initmap _ (e (idpath _))). apply (invmaponpathsincl _ _ _ is _ _ egf0). 
 assert (efg: forall x:_, paths (f (g x)) x). intro. 
-assert (efg0: paths (initintervaltonat (S n) (f (g x))) (initintervaltonat (S n) x)).  destruct x as [ t x ]. simpl.  destruct t. apply idpath. destruct (isdeceqnat n t).  simpl. apply (pathsinv0 _ _ (maponpaths _ _ S _ _ p)).  simpl.  apply idpath.  apply  (invmaponpathsincl _ _ _ (isinclinitintervaltonat _)  _ _ efg0). 
+assert (efg0: paths (initintervaltonat (S n) (f (g x))) (initintervaltonat (S n) x)).  destruct x as [ t x ]. simpl.  destruct t. apply idpath. destruct (isdeceqnat n t).  simpl. apply (pathsinv0 _ _ (maponpaths S _ _ p)).  simpl.  apply idpath.  apply  (invmaponpathsincl _ _ _ (isinclinitintervaltonat _)  _ _ efg0). 
 apply (gradth _ _ _ _ egf efg). Defined.  
 
 

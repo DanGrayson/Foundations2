@@ -43,11 +43,11 @@ Proof. intros. apply (uu1.proofirrelevance). apply (uu1.isapropweq P P' (uu1.pr2
 
 
 Theorem univfromtwoaxiomshProp (P P':hProp): uu1.isweq (uu1.paths P P') (uu1.weq P P') (eqweqmaphProp P P').
-Proof. intros. set (P1:= fun XY: uu1.dirprod hProp hProp => (match XY with uu1.tpair X Y =>  uu1.paths X Y end)). set (P2:= fun XY:  uu1.dirprod hProp hProp => match XY with  uu1.tpair X Y => uu1.weq X Y end). set (Z1:=  uu1.total2 _ P1). set (Z2:=  uu1.total2 _ P2). set (f:= ( uu1.totalfun _ _ _ (fun XY: uu1.dirprod hProp hProp => (match XY with  uu1.tpair X Y => eqweqmaphProp X Y end))): Z1 -> Z2). set (g:=  ( uu1.totalfun _ _ _ (fun XY: uu1.dirprod hProp hProp => (match XY with  uu1.tpair X Y => weqtopathshProp X Y end))): Z2 -> Z1). set (s1:= (fun X Y :hProp => fun w: uu1.weq X Y =>  uu1.tpair _ P2 ( uu1.dirprodpair X Y) w)). set (efg:= (fun a:_ => match a as a' return (uu1.paths (f (g a')) a') with  uu1.tpair ( uu1.tpair X Y) w => ( uu1.maponpaths _ _ (s1 X Y) _ _ (weqpathsweqhProp X Y w)) end)). 
+Proof. intros. set (P1:= fun XY: uu1.dirprod hProp hProp => (match XY with uu1.tpair X Y =>  uu1.paths X Y end)). set (P2:= fun XY:  uu1.dirprod hProp hProp => match XY with  uu1.tpair X Y => uu1.weq X Y end). set (Z1:=  uu1.total2 _ P1). set (Z2:=  uu1.total2 _ P2). set (f:= ( uu1.totalfun _ _ _ (fun XY: uu1.dirprod hProp hProp => (match XY with  uu1.tpair X Y => eqweqmaphProp X Y end))): Z1 -> Z2). set (g:=  ( uu1.totalfun _ _ _ (fun XY: uu1.dirprod hProp hProp => (match XY with  uu1.tpair X Y => weqtopathshProp X Y end))): Z2 -> Z1). set (s1:= (fun X Y :hProp => fun w: uu1.weq X Y =>  uu1.tpair _ P2 ( uu1.dirprodpair X Y) w)). set (efg:= (fun a:_ => match a as a' return (uu1.paths (f (g a')) a') with  uu1.tpair ( uu1.tpair X Y) w => ( uu1.maponpaths (s1 X Y) _ _ (weqpathsweqhProp X Y w)) end)). 
 
 set (h:= fun a1:Z1 => (uu1.pr21 _ _ ( uu1.pr21 _ _ a1))).
 assert (egf0: forall a1:Z1,  uu1.paths ( uu1.pr21 _ _ (g (f a1))) ( uu1.pr21 _ _ a1)). intro. apply  uu1.idpath.  
-assert (egf1: forall a1 a1':Z1,  uu1.paths ( uu1.pr21 _ _ a1') ( uu1.pr21 _ _ a1) -> uu1.paths a1' a1). intros.  set (X':=  uu1.maponpaths _ _ ( uu1.pr21 _ _ ) _ _ X). 
+assert (egf1: forall a1 a1':Z1,  uu1.paths ( uu1.pr21 _ _ a1') ( uu1.pr21 _ _ a1) -> uu1.paths a1' a1). intros.  set (X':=  uu1.maponpaths ( uu1.pr21 _ _ ) _ _ X). 
 assert (is:  uu1.isweq _ _ h).  apply ( uu1.isweqpr21pr21). apply ( uu1.pathsweq2 _ _ h is _ _ X').
 set (egf:= fun a1:_ => (egf1 _ _ (egf0 a1))). 
 set (is2:= uu1.gradth _ _ _ _ egf efg). 
