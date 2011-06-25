@@ -17,12 +17,13 @@ VFILES :=					\
 	$M/hlevel2/set_quotients_r_up.v		\
 	$M/hlevel2/set_quotients_constr2_r_up.v
 VOFILES := $(VFILES:.v=.vo)
+DOCFILES := doc/index.html
 MADE_FILES = 
 %.glob %.vo: %.v
 	@ echo "make: Entering directory \`$(dir $*)'"
 	cd $(dir $*) && coqc $(COQFLAGS) $(notdir $*.v)
 	@ echo "make: Leaving directory \`$(dir $*)'"
-all: TAGS $(VOFILES) make-doc
+all: TAGS $(VOFILES) $(DOCFILES)
 COQDEFS := -r "/^[[:space:]]*\(Inductive\|Record\|Definition\|Theorem\|Notation\|Fixpoint\|Lemma\)[[:space:]]+['[:alnum:]]+/"
 TAGS : $(VFILES)
 	etags --language=none $(COQDEFS) $^
@@ -36,7 +37,7 @@ Makefile.depends:
 include Makefile.depends
 
 MADE_FILES += doc
-make-doc:
+$(DOCFILES): $(VFILES)
 	mkdir -p doc
 	cd doc && ( find ../$M ../$P -name \*.v | xargs coqdoc -toc )
 
@@ -44,7 +45,7 @@ make-doc:
 uu1: $M/Generalities/uu1.v
 MADE_FILES += $M/Generalities/uu1.v
 VOFILES +=  $M/Generalities/uu1.vo
-$M/Generalities/uu1.v: $M/Generalities/uu0.v Makefile uu1.sed
+$M/Generalities/uu1.v: $M/Generalities/uu0.v uu1.sed
 	rm -f $@
 	sed <$< >$@ -f uu1.sed
 	chmod a-w $@
