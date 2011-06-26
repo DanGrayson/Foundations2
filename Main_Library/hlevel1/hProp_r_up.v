@@ -2,7 +2,7 @@
 
 This file contains the results on [ hProp ] requiring the univalence and the resizing axiom
 
-RA2 [ hProp : UU0 ] is valid. *)
+Axiom RA2: [ hProp : UU0 ] is valid. *)
 
 
 (** *** Preambule *)
