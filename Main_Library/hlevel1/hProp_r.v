@@ -2,7 +2,7 @@
 
 This is the addendum to the file hProp which contains results requiring the resizing axiom. At the moment one needs a Type in Type patch to compile it. The resizing axioms which we need here is as follows:
 
-RA1  if [ X : UU1 ] and [ uu1.isaprop X ] are valid then  [ X : UU0 ] is valid.   
+Axiom RA1:  if [ X : UU1 ] and [ uu1.isaprop X ] are valid then  [ X : UU0 ] is valid.   
  
 *)
 
