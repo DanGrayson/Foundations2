@@ -214,7 +214,7 @@ Definition adjev2 (X Y:UU): (((X -> Y) -> Y) ->Y) -> (X -> Y)  := fun phi x => p
 
 Definition neg (X:UU):= X -> empty.
 
-Definition negf {X Y:UU}(f:X -> Y): (neg Y) -> (neg X):= fun phi:Y -> empty => fun x:X => phi (f x).
+Definition negf {X Y:UU}(f:X -> Y): (neg Y) -> (neg X):= fun phi: neg Y => fun x:X => phi (f x).
 
 Definition dneg (X:UU):= neg (neg X).
 
@@ -255,8 +255,8 @@ Proof. intros T a b c e1 e2. induction e1.  assumption. Defined.
 Definition pathscomp0rid  (T:UU) (a:T)(b:T)(e1: paths a b): paths (pathscomp0 e1 (idpath b)) e1. 
 Proof. intros.  induction e1. simpl. apply idpath.  Defined. 
 
-Definition pathsinv0 {T:UU} (a:T) (b:T)(e: paths a b): paths b a.
-Proof. intros. induction e.  apply idpath. Defined. 
+Definition pathsinv0 {T:UU} (a:T) (b:T) : paths a b -> paths b a.
+Proof. intros T a b e. induction e.  apply idpath. Defined. 
 
 Definition pathsinv0l1 (X:UU)(a:X)(b:X)(e: paths a b): paths (pathscomp0 (pathsinv0 _ _ e) e) (idpath _).
 Proof. intros. induction e. simpl. apply idpath. Defined. 
@@ -294,8 +294,9 @@ Proof. intros X Y Z f1 f2 g X0. set (int1:= (fun f: X-> Y => (fun x:X => (g (f x
 Definition maponpaths2b (X:UU)(Y:UU)(Z:UU)(f:X-> Y)(g1:Y->Z)(g2:Y -> Z): paths g1 g2 -> paths (fun x:X => (g1 (f x))) (fun x:X => (g2 (f x))).
 Proof. intros X Y Z f g1 g2 X0. set (int1:= (fun g: Y-> Z => (fun x:X => (g (f x))))).  apply (maponpaths int1 _ _ X0). Defined. 
 
+Definition idfun (T:UU) := fun t:T => t.
 
-Lemma maponpathsidfun (X:UU)(x:X)(x':X)(e:paths x x'): paths (maponpaths (fun x:X => x) _ _ e) e. 
+Lemma maponpathsidfun (X:UU)(x:X)(x':X)(e:paths x x'): paths (maponpaths (idfun X) _ _ e) e. 
 Proof. intros. simpl. induction e. apply (idtoid1 _ _ (fun x:X => x) x). Defined. 
 
 Lemma maponpathsfuncomp (X:UU)(Y:UU)(Z:UU)(f:X-> Y)(g:Y->Z)(x:X)(x':X)(e: paths x x'): paths (maponpaths g _ _ (maponpaths f _ _ e)) (maponpaths (fun x:X => (g (f x))) _ _ e).
@@ -396,7 +397,7 @@ Proof.  intros.  induction e. apply idpath. Defined.
 
 
 
-Definition iscontr (T:UU) : UU := total2 _ (fun cntr => forall t:T, paths t cntr).
+Definition iscontr (T:UU) : UU := total2 T (fun cntr => forall t, paths t cntr).
 
 Definition iscontrpair (T:UU) cntr (e: forall t:T, paths t cntr) : iscontr T := tpair T (fun cntr => forall t, paths t cntr) cntr e. 
 
@@ -405,14 +406,12 @@ Proof.
   intros X Y f g efg isc.  
   destruct isc as [x0 nh].
   split with (f x0).
-  intro y.
-  exact (pathscomp0 (efg y) (maponpaths f _ _ (nh (g y)))).
+  exact (fun y => pathscomp0 (efg y) (maponpaths f _ _ (nh (g y)))).
 Defined. 
 
 Lemma contrl1' (X Y:UU)(f:X -> Y)(g: Y -> X) : (forall y, paths (f(g y)) y) -> iscontr X -> iscontr Y.
 Proof.
-  intros X Y f g efg nh.
-  exact (contrl1 X Y f g (fun y:Y => pathsinv0 _ _ (efg y)) nh).
+  exact (fun X Y f g efg nh => contrl1 X Y f g (fun y => pathsinv0 _ _ (efg y)) nh).
 Defined.
 
 Lemma contrl2 (X:UU) : iscontr X -> forall x x':X, paths x x'.
@@ -501,8 +500,6 @@ intros.
 assert (y0: hfiber T T (fun t : T => t) y). apply (tpair T (fun pointover:T => paths pointover y) y (idpath y)). 
 split with y0. intros.  
 destruct y0 as [x0 e0].    destruct t as [x1 e1].  destruct  e0.  destruct e1.  apply idpath. Defined. 
-
-Definition idfun (T:UU) := fun t:T => t.
 
 Definition weq (X Y:UU) : UU := total2 _ (fun f:X->Y => isweq X Y f) .
 Definition underlying_function (X Y : UU) := pr21 _ (fun f:X->Y => isweq _ _ f) : weq X Y -> (X -> Y).
@@ -600,8 +597,8 @@ Proof. intros.
 
 
 
-Lemma iscontrxifiscontry (X:UU)(Y:UU)(f:X -> Y)(is1: isweq _ _ f): iscontr Y -> iscontr X.
-Proof. intros X Y f is1 X0. apply (contrl1 _ _ (invmap _ _ f is1) f (weqgf0 _ _ f is1) X0).  Defined. 
+Lemma iscontrxifiscontry (X Y:UU)(f:X -> Y) : isweq _ _ f -> iscontr Y -> iscontr X.
+Proof. exact (fun X Y f is1 X0 => contrl1 _ _ (invmap _ _ f is1) f (weqgf0 _ _ f is1) X0).  Defined. 
 
 
 
@@ -804,8 +801,8 @@ Theorems showing that if any two of three functions f, g, gf are weak equivalenc
 
 
 
-Theorem twooutof3a (X Y Z:UU)(f:X->Y)(g:Y->Z)(isgf: isweq _ _ (compose g f))(isg: isweq _ _ g):isweq _ _ f.
-Proof. intros. 
+Theorem twooutof3a (X Y Z:UU)(f:X->Y)(g:Y->Z) : isweq _ _ (compose g f) -> isweq _ _ g -> isweq _ _ f.
+Proof. intros X Y Z f g isgf isg. 
   set (invg := invmap _ _ g isg).
   set (gf := (compose g f)).
   set (gf':= invmap _ _ gf isgf).
@@ -828,7 +825,7 @@ Proof.
   exact (twooutof3a _ _ _ f py (isweqcontrtounit X isx) (isweqcontrtounit Y isy)). 
 Defined. 
 
-Theorem twooutof3b (X Y Z:UU)(f:X->Y)(g:Y->Z) : (isweq _ _ f) -> (isweq _ _ (compose g f)) -> isweq _ _ g.
+Theorem twooutof3b (X Y Z:UU)(f:X->Y)(g:Y->Z) : isweq _ _ f -> isweq _ _ (compose g f) -> isweq _ _ g.
 Proof.
  intro. intro. intro. intro. intro. intros isf isgf.
  set (invf:= invmap _ _ f isf).
@@ -1145,10 +1142,10 @@ apply (gradth _ _  (fibmap2 T P t) (fibmap1 T P t) e2 e1). Defined.
 
 
 
-Corollary isweqpr21 (T:UU) (P:T -> UU) (is1: forall t:T, iscontr (P t)) : isweq _ _ (pr21 T P).
-Proof. intros. unfold isweq.  intro. set (isy:= is1 y). apply (iscontrxifiscontry _ _ (fibmap2 T P y) (isweqfibmap2 T P y)). assumption. Defined. 
-
-
+Corollary isweqpr21 (T:UU) (P:T -> UU) : (forall t:T, iscontr (P t)) -> isweq _ _ (pr21 T P).
+Proof.
+  exact (fun T P is y => (iscontrxifiscontry _ _ (fibmap2 _ P y) (isweqfibmap2 _ P y) (is y))).
+Defined.
 
 Corollary familyfibseq (T:UU)(P:T->UU)(t:T): isfibseq (P t) (total2 T P) T (fun p: P t => tpair _ _ t p) (pr21 T P) t (fun p: P t => idpath t).
 Proof. intros. unfold isfibseq. unfold ezmap.  apply isweqfibmap1. Defined.
@@ -1703,12 +1700,20 @@ set (egf:= (fun a:X->Y => funextfunax X Y (fun x:X => (g (f a)) x) a (fun x: X =
 set (efg:= (fun a':X->Y' => funextfunax X Y' (fun x:X => (f (g a')) x) a' (fun x: X =>  (weqfg _ _ _ (pr22 _ _ w) (a' x))))). 
 apply (gradth _ _ f g egf efg). Defined.
 
-
+(** Theorem saying that if each member of a family is contractible then the space of sections of the family is contractible. *)
 
 Theorem funcontr (X:UU)(P:X -> UU) : (forall x:X, iscontr (P x)) -> iscontr (forall x:X, P x).
-Proof. intros. set (T1 := forall x:X, P x). set (T2 := (hfiber (X -> total2 X P) (X -> X) (fun f:_ => fun x:_ => pr21 _ _ (f x)) (fun x:X => x))). assert (is1:isweq _ _ (pr21 X P)). apply isweqpr21. assumption.  set (w1:= weqpair (pr21 X P) is1).  
-assert (X1:iscontr T2).  apply (isweqrcompwithweq _ _ w1 X (fun x:X => x)). 
-apply (contrl1' _ _ _ _ (sectohfibertosec X P) X1). Defined. 
+Proof.
+  intros X P IS.
+  set (p := pr21 X P).
+  assert (is1: isweq _ _ p).
+    apply isweqpr21.
+    exact IS.
+  assert (X1: iscontr (hfiber _ _ (fun f x => p (f x)) (idfun X))).
+    set (w1 := weqpair p is1).
+    apply (isweqrcompwithweq _ _ w1 X (idfun X)).
+  apply (contrl1' _ _ _ _ (sectohfibertosec X P) X1).
+Defined. 
 
 Corollary funcontrtwice (X:UU)(P: X-> X -> UU)(is: forall (x x':X), iscontr (P x x')): iscontr (forall (x x':X), P x x').
 Proof. intros. 
@@ -2226,8 +2231,8 @@ Theorem impred (n:nat)(T:UU)(P:T -> UU): (forall t:T, isofhlevel n (P t)) -> iso
 Proof.
   intro.
   induction n.
-  intros T P X.
-  apply (funcontr T P X).
+    intros T P X.
+    apply (funcontr T P X).
   intros T P X.
   unfold isofhlevel in X.
   unfold isofhlevel.
@@ -2455,7 +2460,7 @@ Proof. intro. apply (isapropisofhlevel 1). Defined.
 
 
 
-Theorem isapropneg (X:UU): isaprop (X -> empty).
+Theorem isapropneg (X:UU): isaprop (neg X).
 Proof. intro. apply (impredfun 1 X empty isapropempty). Defined.
 
 Corollary isapropdneg (X:UU): isaprop (dneg X).
@@ -2494,7 +2499,7 @@ Proof.
 Theorem isaninv1 (X:UU): isdecprop X  -> isaninvprop X.
 Proof. unfold isaninvprop. intros X is.  set (is1:= pr21 _ _ is). set (is2:= pr22 _ _ is). simpl in is2. 
 assert (adjevinv: dneg X -> X). intro X0.  induction is2 as [ x | y ].  assumption. induction (X0 y). 
-assert (is3: isaprop (dneg X)). apply (isapropneg (X -> empty)). apply (isweqimplimpl _ _ (todneg X) adjevinv is1 is3). Defined. 
+assert (is3: isaprop (dneg X)). apply (isapropneg (neg X)). apply (isweqimplimpl _ _ (todneg X) adjevinv is1 is3). Defined. 
 
 
 
@@ -2666,7 +2671,7 @@ Definition curry (x:bool) : UU := match x with false => empty | true => unit end
 Theorem nopathstruetofalse: neg ( paths true false ).
 Proof. intro X. exact (transportf _ curry _ _ X tt).   Defined.
 
-Corollary nopathsfalsetotrue: paths false true -> empty.
+Corollary nopathsfalsetotrue: neg (paths false true).
 Proof. intro X. exact (transportb _ curry _ _ X tt). Defined. 
 
 Theorem isdeceqbool: isdeceq bool.
@@ -2684,7 +2689,7 @@ Theorem isasetbool: isaset bool.
 Proof. apply (isasetifdeceq _ isdeceqbool). Defined. 
 
 
-Lemma noneql1 (X Y: UU)(f:X -> Y)(x x':X): (paths (f x) (f x') -> empty) -> (paths x x' -> empty).
+Lemma noneql1 (X Y: UU)(f:X -> Y)(x x':X): neg (paths (f x) (f x')) -> neg (paths x x').
 Proof. intros X Y f x x' X0 X1. apply (X0 (maponpaths f _ _ X1)). Defined.  
 
 Theorem nopathsOtoSx: forall x:nat, neg (paths O (S x)).
@@ -2697,7 +2702,7 @@ Defined.
 Corollary nopathsSxtoO: forall x:nat, neg ( paths (S x) O ).
 Proof. intros x X. apply (nopathsOtoSx x (pathsinv0 _ _ X)). Defined. 
 
-Lemma noeqinjS: forall (x x':nat),  (paths x x' -> empty) -> (paths (S x) (S x') -> empty).
+Lemma noeqinjS: forall (x x':nat),  neg (paths x x') -> neg (paths (S x) (S x')).
 Proof. 
   set (f:= fun n:nat => match n with O => O| S m => m end). 
   intro. intro. intro X. apply (noneql1 _ _ f (S x) (S x') X). Defined. 
@@ -3292,8 +3297,8 @@ Defined.
 
 Lemma isolatedtoisolated (X:UU)(Y:UU)(f:X -> Y)(is1:isweq _ _ f)(x:X)(is2: isisolated _ x): isisolated _ (f x).
 Proof.  intros. unfold isisolated. intro. rename x' into y.  set (g:=invmap _ _ f is1). set (x':= g y). induction (is2 x').  apply (yes _ (pathsinv0 _ _ (pathsweq1' _ _ f is1 x y (pathsinv0 _ _ x0)))). 
-assert (phi: paths y (f x)  -> empty). 
-assert (psi: (paths (g y) x -> empty) -> (paths y (f x) -> empty)). intro. intro.  apply (X0  (pathsinv0 _ _ (pathsweq1 _ _ f is1 x y (pathsinv0 _ _ X1)))). apply (psi n). apply (no _ phi). Defined.
+assert (phi: neg (paths y (f x))). 
+assert (psi: neg (paths (g y) x) -> neg (paths y (f x))). intro. intro.  apply (X0  (pathsinv0 _ _ (pathsweq1 _ _ f is1 x y (pathsinv0 _ _ X1)))). apply (psi n). apply (no _ phi). Defined.
 
 (* End of the file uu0.v *)
 

@@ -95,7 +95,7 @@ Definition uu1hdisj (P Q : hProp) :=  ishinh (coprod P Q).
 
 
 Definition hneg (P: hProp) : hProp.
-Proof. intro. split with (P -> empty). apply impred. intro. apply isapropempty. Defined.
+Proof. intro. split with (neg P). apply impred. intro. apply isapropempty. Defined.
 Canonical Structure hneg.
 
 Definition himpl (P Q : hProp) : hProp.
