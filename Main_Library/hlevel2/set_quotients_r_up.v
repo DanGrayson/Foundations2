@@ -38,7 +38,7 @@ Definition setquottouu0 ( X : UU0 ) ( R : hrel X ) : setquot X R -> UU0 := fun a
 Coercion setquottouu0 : setquot >-> UU0.
 
 
-Theorem isasetseqtquot ( X : UU0 ) ( R : hrel X ) : isaset ( setquot X R ) .
+Theorem isasetsetquot ( X : UU0 ) ( R : hrel X ) : isaset ( setquot X R ) .
 Proof. intros.  apply (isasetsubset _ (hsubtypes X) (pr21 (hsubtypes X) (fun A:_=> iseqclass X R A)) (isasethsubtypes X)). apply isinclpr21.  intro.  apply isapropiseqclass.  Defined. 
 
 
