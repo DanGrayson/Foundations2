@@ -42,7 +42,7 @@ Theorem isasetsetquot ( X : UU0 ) ( R : hrel X ) : isaset ( setquot X R ) .
 Proof. intros.  apply (isasetsubset _ (hsubtypes X) (pr21 (hsubtypes X) (fun A:_=> iseqclass X R A)) (isasethsubtypes X)). apply isinclpr21.  intro.  apply isapropiseqclass.  Defined. 
 
 
-Theorem setquoteqrelpr (X:UU0)(R: hrel X)(is:iseqrel _ R): X -> setquot X R.
+Theorem setquoteqrelpr (X:UU0)(R: hrel X) : iseqrel _ R -> X -> setquot X R.
 Proof. intros X R is X0. set (rax:= pr21 _ _ is). set (sax:= pr21 _ _ (pr22 _ _ is)). set (tax:= pr22 _ _ (pr22 _ _ is)). split with (fun x:X =>R X0 x). split with (hinhpr _ (tpair _ _ X0 (rax X0))).  
 assert (a1: (forall x1 x2 : X, R x1 x2 -> R X0 x1 -> R X0 x2)). intros x1 x2 X1 X2.  apply (tax X0 x1 x2 X2 X1). split with a1.
 assert (a2: (forall x1 x2 : X, R X0 x1 -> R X0 x2 -> R x1 x2)). intros x1 x2 X1 X2. apply (tax x1 X0 x2 (sax X0 x1 X1) X2). 
@@ -73,8 +73,8 @@ assert (cn: paths t t2). apply (hinhunivcor1 (hProppair _ ((uu1.pr22 _ _ Y) t t2
 apply (iscontraprop1 _ ((uu1.pr22 _ _ Y) t t2) cn). Defined. 
 
 
-Theorem setquotuniv  (X:UU0)(R: hrel X)(Y:hSet)(f:X -> Y)(is:forall x1 x2 : X, (R x1 x2) -> paths (f x1) (f x2))(C:setquot X R): Y.
-Proof. intros. set (A:= pr21 _ _ C).
+Theorem setquotuniv  (X:UU0)(R: hrel X)(Y:hSet)(f:X -> Y) : (forall x1 x2 : X, (R x1 x2) -> paths (f x1) (f x2)) -> setquot X R -> Y.
+Proof. intros X R Y f is C. set (A:= pr21 _ _ C).
 set (ImA:= total2 Y (fun y:_ => ishinh (hfiber A Y (fun a:A => f (pr21 _ _ a)) y))).
 set (fA:= (fun a:A => tpair _ _  (f (pr21 _ _ a)) (hinhpr _ (hfiberpair A Y (fun a:A => f (pr21 _ _ a)) (f (pr21 _ _ a)) a (idpath _ )))):A -> ImA).  
 set (is2:=(isapropimeqclass X R Y f is C):isaprop ImA).  
