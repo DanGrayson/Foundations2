@@ -30,7 +30,7 @@ Require Export hSet_r_up.
 (** ** Setquotient defined in terms of equivalence classes *)
 
 
-Definition setquot (X:UU0)(R : hrel X):= total2 (hsubtypes X) (fun A:_=> iseqclass X R A).
+Definition setquot (X:UU0)(R : hrel X):= total2 (hsubtypes X) (fun A => iseqclass X R A).
 Definition setquotpair ( X : UU0 ) ( R : hrel X ) := tpair  (hsubtypes X) (fun A:_=> iseqclass X R A).
 
 

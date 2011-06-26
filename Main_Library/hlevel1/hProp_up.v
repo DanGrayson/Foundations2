@@ -36,22 +36,46 @@ Axiom uahp : forall P P':hProp,  (P -> P') -> (P' -> P) -> uu1.paths P P'.
 Definition eqweqmaphProp (P P':hProp) : uu1.paths P P' -> uu1.weq P P'.
 Proof. intros. destruct  X. apply uu1.idweq.  Defined.
 
-Definition  weqtopathshProp (P P':hProp)(w: uu1.weq P P'): uu1.paths P P' := uahp P P' w (uu1.weqinv w).
+Definition  weqtopathshProp (P P':hProp) : uu1.weq P P' -> uu1.paths P P' := fun w => uahp _ _ w (uu1.weqinv w).
 
 Definition weqpathsweqhProp (P P':hProp)(w: uu1.weq P P'): uu1.paths (eqweqmaphProp _ _ (weqtopathshProp _ _ w)) w.
 Proof. intros. apply (uu1.proofirrelevance). apply (uu1.isapropweq P P' (uu1.pr22 _ _ P')). Defined.
 
 
 Theorem univfromtwoaxiomshProp (P P':hProp): uu1.isweq (uu1.paths P P') (uu1.weq P P') (eqweqmaphProp P P').
-Proof. intros. set (P1:= fun XY: uu1.dirprod hProp hProp => (match XY with uu1.tpair X Y =>  uu1.paths X Y end)). set (P2:= fun XY:  uu1.dirprod hProp hProp => match XY with  uu1.tpair X Y => uu1.weq X Y end). set (Z1:=  uu1.total2 _ P1). set (Z2:=  uu1.total2 _ P2). set (f:= ( uu1.totalfun _ _ _ (fun XY: uu1.dirprod hProp hProp => (match XY with  uu1.tpair X Y => eqweqmaphProp X Y end))): Z1 -> Z2). set (g:=  ( uu1.totalfun _ _ _ (fun XY: uu1.dirprod hProp hProp => (match XY with  uu1.tpair X Y => weqtopathshProp X Y end))): Z2 -> Z1). set (s1:= (fun X Y :hProp => fun w: uu1.weq X Y =>  uu1.tpair _ P2 ( uu1.dirprodpair X Y) w)). set (efg:= (fun a:_ => match a as a' return (uu1.paths (f (g a')) a') with  uu1.tpair ( uu1.tpair X Y) w => ( uu1.maponpaths (s1 X Y) _ _ (weqpathsweqhProp X Y w)) end)). 
-
-set (h:= fun a1:Z1 => (uu1.pr21 _ _ ( uu1.pr21 _ _ a1))).
-assert (egf0: forall a1:Z1,  uu1.paths ( uu1.pr21 _ _ (g (f a1))) ( uu1.pr21 _ _ a1)). intro. apply  uu1.idpath.  
-assert (egf1: forall a1 a1':Z1,  uu1.paths ( uu1.pr21 _ _ a1') ( uu1.pr21 _ _ a1) -> uu1.paths a1' a1). intros.  set (X':=  uu1.maponpaths ( uu1.pr21 _ _ ) _ _ X). 
-assert (is:  uu1.isweq _ _ h).  apply ( uu1.isweqpr21pr21). apply ( uu1.pathsweq2 _ _ h is _ _ X').
-set (egf:= fun a1:_ => (egf1 _ _ (egf0 a1))). 
-set (is2:= uu1.gradth _ _ _ _ egf efg). 
-apply ( uu1.isweqtotaltofib _ P1 P2  (fun XY: uu1.dirprod hProp hProp => (match XY with  uu1.tpair X Y => eqweqmaphProp X Y end)) is2 ( uu1.dirprodpair P P')). Defined. 
+Proof.
+  intros P P'.
+  set (P1:= fun XY: uu1.dirprod hProp hProp => match XY with uu1.tpair X Y => uu1.paths X Y end).
+  set (P2:= fun XY: uu1.dirprod hProp hProp => match XY with uu1.tpair X Y => uu1.weq   X Y end).
+  set (Z1:= uu1.total2 _ P1).
+  set (Z2:= uu1.total2 _ P2).
+  set (f:= ( uu1.totalfun _ _ _ (fun XY: uu1.dirprod hProp hProp => match XY with uu1.tpair X Y =>   eqweqmaphProp X Y end)): Z1 -> Z2).
+  set (g:= ( uu1.totalfun _ _ _ (fun XY: uu1.dirprod hProp hProp => match XY with uu1.tpair X Y => weqtopathshProp X Y end)): Z2 -> Z1).
+  set (s1:= (fun X Y :hProp => fun w: uu1.weq X Y => uu1.tpair _ P2 ( uu1.dirprodpair X Y) w)).
+  set (efg:= (fun a:_ => 
+                match a as a'
+                  return (uu1.paths (f (g a')) a')
+                  with uu1.tpair (uu1.tpair X Y) w 
+                  => uu1.maponpaths _ _ _ (weqpathsweqhProp X Y w)
+                end)).
+  set (h:= fun a1:Z1 => uu1.pr21 _ _ ( uu1.pr21 _ _ a1)).
+  assert (egf0: forall a1:Z1, uu1.paths ( uu1.pr21 _ _ (g (f a1))) ( uu1.pr21 _ _ a1)).
+    intro a1.
+    apply  uu1.idpath.
+  assert (egf1: forall a1 a1':Z1, uu1.paths ( uu1.pr21 _ _ a1') ( uu1.pr21 _ _ a1) -> uu1.paths a1' a1).
+    intros a1 a1' X.
+      set (X':=  uu1.maponpaths ( uu1.pr21 _ _ ) _ _ X).
+      assert (is:  uu1.isweq _ _ h).
+      apply ( uu1.isweqpr21pr21).
+    apply ( uu1.pathsweq2 _ _ h is _ _ X').
+  set (egf:= fun a1:_ => egf1 _ _ (egf0 a1)).
+  set (is2:= uu1.gradth _ _ _ _ egf efg).
+  apply ( uu1.isweqtotaltofib
+            _ P1 P2 
+            (fun XY: uu1.dirprod hProp hProp => match XY with  uu1.tpair X Y => eqweqmaphProp X Y end)
+            is2 
+            ( uu1.dirprodpair P P')).
+Defined.  
 
 Corollary uu1isasethProp : uu1.isaset hProp.
 Proof. unfold isaset.  simpl. intro. intro. apply (uu1.isofhlevelweqb 1 _ _ _ (univfromtwoaxiomshProp x x') (uu1.isapropweq x x' (uu1.pr22 _ _ x'))). Defined.
