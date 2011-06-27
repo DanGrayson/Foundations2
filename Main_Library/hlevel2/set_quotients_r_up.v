@@ -94,8 +94,8 @@ assert (e: paths (fA (carrierpair _ _ x inC)) (hinhuniv _ (hProppair ImA is2) fA
 Theorem setquotunivcomm  (X:UU0)(R: hrel X)(is0:iseqrel X R)(Y:hSet)(f:X -> Y)(is:forall x1 x2 : X, (R x1 x2) -> paths (f x1) (f x2)) : forall x:X, paths (f x) (setquotuniv X R Y f is (setquoteqrelpr X R is0  x)).
 Proof. intros. set (C:= (setquoteqrelpr X R is0 x)). set (s:= pr21 _ _ C x).  simpl in s. set (inC:= (pr21 _ _ is0) x). apply setquotl1.  simpl. assumption.  Defined.
 
-Lemma iscompsetquoteqrelpr (X : UU0) (R : hrel X) (is: iseqrel _ R) ( x x' : X) (a: R x x') : paths (setquoteqrelpr _ R is x) (setquoteqrelpr _ R is x').
-Proof. intros. 
+Lemma iscompsetquoteqrelpr (X : UU0) (R : hrel X) (is: iseqrel _ R) ( x x' : X) : R x x' -> paths (setquoteqrelpr _ R is x) (setquoteqrelpr _ R is x').
+Proof. intros X R is x x' a.
 assert (e: uu1.paths  (pr21 _ _ (setquoteqrelpr _ R is x)) (pr21 _ _ (setquoteqrelpr _ R is x'))). simpl. apply uu1.funextsec.  intro.  
 set (is1:= pr21 _ _ (pr22 _ _ (pr22 _ _ (setquoteqrelpr _ R is t)))). simpl in is1. 
 set (r1:= pr21 _ _ (pr22 _ _ is)). unfold issymm in r1. 
