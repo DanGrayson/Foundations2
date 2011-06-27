@@ -248,6 +248,9 @@ Definition dneganddnegimpldneg (X:UU)(Y:UU)(dx: dneg X)(dy:dneg Y): dneg (dirpro
 
 Inductive paths {T:UU}(t:T): T -> UU := idpath: paths t t.
 
+(* another plausible definition, with a slightly different induction principle:
+Inductive paths {T:UU}: T -> T -> UU := idpath: forall t:T, paths t t.
+*)
 
 Definition pathscomp0 {T:UU} {a b c:T} : paths a b -> paths b c -> paths a c.
 Proof. intros T a b c e1 e2. induction e1.  assumption. Defined.
