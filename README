@@ -1,3 +1,5 @@
+[ This fork of Voevodsky's Univalent Foundations git repository is what I'm using for experimentation and for learning coq.  People might find some aspects useful, such as the Makefile, which produces everything automatically and quickly, including a TAGS file usable by emacs.  -- Dan Grayson ]
+
 This is the current version (as of May 17, 2011) of the mathematical library for the proof assistant Coq based on the univalent semantics for the calculus of inductive constructions. The most important new thing in this release is the construction of true set-quotients of types. This opens the way for multiple further developments from the definition of the type of real numbers, to true quotients in universal algebra to the definition of homotopy groups of types. 
 
 There are two sub-directories  ./Main Library and ./Proof of Extensionality . The best way to see in detail what the files in these subdirectories are about is to look at the tables of content (files toc.html ) produced by coqdoc. 
