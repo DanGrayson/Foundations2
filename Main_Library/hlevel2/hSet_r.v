@@ -107,7 +107,7 @@ Definition imagepair (X Y : UU0)(f: X -> Y) := tpair Y (fun y:Y => ishinh (hfibe
 Definition imageincl (X Y:UU0)(f:X -> Y): image _ _ f -> Y := pr21 _ _.
 
 Definition prtoimage (X Y : UU0) (F : X -> Y) : X -> image _ _ F.
-Proof. intros X Y F X0. apply (imagepair _ _ _ (F X0) (hinhpr _ (hfiberpair _ _ F (F X0) X0 (idpath _ )))). Defined. 
+Proof. intros X Y F X0. apply (imagepair _ _ _ (F X0) (hinhpr _ (hfiberpair _ _ F (F X0) X0 (idpath _ _ )))). Defined. 
 
 Definition issurjective (X Y:UU0)(f:X -> Y):= forall y:Y, ishinh (hfiber _ _ f y). 
 
@@ -123,8 +123,8 @@ Proof. intros. apply isofhlevelfpr21. intro. apply isapropishinh. Defined.
 
 Lemma issurjprtoimage (X Y : UU0) (F : X -> Y) : issurjective _ _ (prtoimage X Y F).
 Proof. intros. intro z.  set (f := prtoimage X Y F). set (g:= imageincl X Y F). set (gf:= fun x:_ => g ( f x )).
-assert (e: paths F gf). apply etacorrection .  
-assert (ff: hfiber _ _ gf (pr21 _ _ z) -> hfiber _ _ f z).  set (hz:= hfiberpair _ _ g (g z) z (idpath _ )).  set (u:= (hfibersftogf _ _ _ f g (g z) hz)). 
+assert (e: paths _ F gf). apply etacorrection .  
+assert (ff: hfiber _ _ gf (pr21 _ _ z) -> hfiber _ _ f z).  set (hz:= hfiberpair _ _ g (g z) z (idpath _ _ )).  set (u:= (hfibersftogf _ _ _ f g (g z) hz)). 
 assert (is : isweq _ _ u). apply samehfibers.  apply isinclimageincl.  apply weqinv.  split with u.  assumption.  
 assert (is2: ishinh (hfiber X Y gf (pr21 Y (fun y : Y => ishinh (hfiber X Y F y)) z))). destruct e.  apply (pr22 _ _ z). 
 apply (hinhfunct _ _ ff is2). Defined. 
@@ -137,22 +137,22 @@ apply (hinhfunct _ _ ff is2). Defined.
 Theorem surjectionisepitosets (X Y Z:UU0)(f:X -> Y)(g1 g2: Y -> Z) :
     issurjective _ _ f ->
     isaset Z ->
-    (forall x, paths (g1 (f x)) (g2 (f x))) -> 
-    (forall y, paths (g1 y) (g2 y)).
+    (forall x, paths _ (g1 (f x)) (g2 (f x))) -> 
+    (forall y, paths _ (g1 y) (g2 y)).
 Proof.
   intros X Y Z f g1 g2 issurjective_f isaset_Z eq_g1f_g2f y.
-  set (hprop_g1y_g2y:= hProppair (paths (g1 y) (g2 y)) (isaset_Z (g1 y) (g2 y))).
+  set (hprop_g1y_g2y:= hProppair (paths _ (g1 y) (g2 y)) (isaset_Z (g1 y) (g2 y))).
   unfold issurjective in issurjective_f.
-  assert (s1: hfiber X Y f y -> paths (g1 y) (g2 y)).
+  assert (s1: hfiber X Y f y -> paths _ (g1 y) (g2 y)).
     intro hfiber_fy.
     destruct hfiber_fy as [t x].
     induction x.
     apply (eq_g1f_g2f t).
-  assert (s2: ishinh (paths (g1 y) (g2 y))).
+  assert (s2: ishinh (paths _ (g1 y) (g2 y))).
     apply (hinhfunct _ _ s1 (issurjective_f y)).
   set (p_g1y_g2y:= isaset_Z (g1 y) (g2 y)).
   simpl in p_g1y_g2y.
-  apply (hinhuniv (paths (g1 y) (g2 y)) (hProppair _ p_g1y_g2y)).
+  apply (hinhuniv (paths _ (g1 y) (g2 y)) (hProppair _ p_g1y_g2y)).
     intro hfiber_fy.
     assumption.
   assumption.

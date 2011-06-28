@@ -22,7 +22,7 @@ Require Export hProp.
 
 (** *** Univalence axiom for hProp 
 
-We introduce here the weakest form of the univalence axiom - the univalence axiom for hProp which is equivalent to the second part of the extensionality axiom in Church simple type theory. Right now we have to use uu1. constructions in this section. Eventually, as resizing axioms will become available to push hProp into UU0 which will simplify things considerably. This axiom is easily shown to be equivalent to its version with [uu1.paths UU0 P P'] as a target and to [ weqtopathshProp ] (see below) as well as tothe version of [ weqtopathshProp ] with [ uu1.paths UU0 P P'] as a target. 
+We introduce here the weakest form of the univalence axiom - the univalence axiom for hProp which is equivalent to the second part of the extensionality axiom in Church simple type theory. Right now we have to use uu1. constructions in this section. Eventually, as resizing axioms will become available to push hProp into UU0 which will simplify things considerably. This axiom is easily shown to be equivalent to its version with [uu1.paths _ UU0 P P'] as a target and to [ weqtopathshProp ] (see below) as well as tothe version of [ weqtopathshProp ] with [ uu1.paths _ UU0 P P'] as a target. 
 
 The proof of theorem [ univfromtwoaxiomshProp ] is modeled on the proof of [ univfromtwoaxioms ] from univ01.v 
 
@@ -30,22 +30,22 @@ The proof of theorem [ univfromtwoaxiomshProp ] is modeled on the proof of [ uni
 *)
 
 
-Axiom uahp : forall P P':hProp,  (P -> P') -> (P' -> P) -> uu1.paths P P'.
+Axiom uahp : forall P P':hProp,  (P -> P') -> (P' -> P) -> uu1.paths _ P P'.
 
 
-Definition eqweqmaphProp (P P':hProp) : uu1.paths P P' -> uu1.weq P P'.
+Definition eqweqmaphProp (P P':hProp) : uu1.paths _ P P' -> uu1.weq P P'.
 Proof. intros. destruct  X. apply uu1.idweq.  Defined.
 
-Definition  weqtopathshProp (P P':hProp) : uu1.weq P P' -> uu1.paths P P' := fun w => uahp _ _ w (uu1.weqinv w).
+Definition  weqtopathshProp (P P':hProp) : uu1.weq P P' -> uu1.paths _ P P' := fun w => uahp _ _ w (uu1.weqinv w).
 
-Definition weqpathsweqhProp (P P':hProp)(w: uu1.weq P P'): uu1.paths (eqweqmaphProp _ _ (weqtopathshProp _ _ w)) w.
+Definition weqpathsweqhProp (P P':hProp)(w: uu1.weq P P'): uu1.paths _ (eqweqmaphProp _ _ (weqtopathshProp _ _ w)) w.
 Proof. intros. apply (uu1.proofirrelevance). apply (uu1.isapropweq P P' (uu1.pr22 _ _ P')). Defined.
 
 
-Theorem univfromtwoaxiomshProp (P P':hProp): uu1.isweq (uu1.paths P P') (uu1.weq P P') (eqweqmaphProp P P').
+Theorem univfromtwoaxiomshProp (P P':hProp): uu1.isweq (uu1.paths _ P P') (uu1.weq P P') (eqweqmaphProp P P').
 Proof.
   intros P P'.
-  set (P1:= fun XY: uu1.dirprod hProp hProp => match XY with uu1.tpair X Y => uu1.paths X Y end).
+  set (P1:= fun XY: uu1.dirprod hProp hProp => match XY with uu1.tpair X Y => uu1.paths _ X Y end).
   set (P2:= fun XY: uu1.dirprod hProp hProp => match XY with uu1.tpair X Y => uu1.weq   X Y end).
   set (Z1:= uu1.total2 _ P1).
   set (Z2:= uu1.total2 _ P2).
@@ -54,15 +54,15 @@ Proof.
   set (s1:= (fun X Y :hProp => fun w: uu1.weq X Y => uu1.tpair _ P2 ( uu1.dirprodpair X Y) w)).
   set (efg:= (fun a:_ => 
                 match a as a'
-                  return (uu1.paths (f (g a')) a')
+                  return (uu1.paths _ (f (g a')) a')
                   with uu1.tpair (uu1.tpair X Y) w 
                   => uu1.maponpaths _ _ _ (weqpathsweqhProp X Y w)
                 end)).
   set (h:= fun a1:Z1 => uu1.pr21 _ _ ( uu1.pr21 _ _ a1)).
-  assert (egf0: forall a1:Z1, uu1.paths ( uu1.pr21 _ _ (g (f a1))) ( uu1.pr21 _ _ a1)).
+  assert (egf0: forall a1:Z1, uu1.paths _ ( uu1.pr21 _ _ (g (f a1))) ( uu1.pr21 _ _ a1)).
     intro a1.
     apply  uu1.idpath.
-  assert (egf1: forall a1 a1':Z1, uu1.paths ( uu1.pr21 _ _ a1') ( uu1.pr21 _ _ a1) -> uu1.paths a1' a1).
+  assert (egf1: forall a1 a1':Z1, uu1.paths _ ( uu1.pr21 _ _ a1') ( uu1.pr21 _ _ a1) -> uu1.paths _ a1' a1).
     intros a1 a1' X.
       set (X':=  uu1.maponpaths ( uu1.pr21 _ _ ) _ _ X).
       assert (is:  uu1.isweq _ _ h).

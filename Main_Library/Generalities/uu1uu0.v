@@ -32,23 +32,23 @@ Definition UU0inUU1:= j11 UU0.
 
 (** *** Some connections between uu0 and uu1 definitions. *)
 
-Theorem u1pathstou0paths : forall (X:UU0)(x x':X), uu1.paths x x' -> paths x x'.
+Theorem u1pathstou0paths : forall (X:UU0)(x x':X), uu1.paths _ x x' -> paths _ x x'.
 Proof.  intros.  destruct X0. apply idpath. Defined.
 
-Theorem u0pathstou1paths: forall (X:UU0)(x x':X), paths x x' -> uu1.paths x x'.
+Theorem u0pathstou1paths: forall (X:UU0)(x x':X), paths _ x x' -> uu1.paths _ x x'.
 Proof. intros X x x' X0. destruct X0. apply uu1.idpath. Defined. 
 
 Theorem iswequ1pathstou0paths (X:UU0)(x x':X): uu1.isweq _ _ (u1pathstou0paths _ x x').
 Proof. intros. set (f:=u1pathstou0paths _ x x'). set (g:= u0pathstou1paths _ x x').
-assert (egf: forall a:_,  uu1.paths (g (f a)) a). intros. destruct a. simpl.  apply uu1.idpath. 
-assert (efg: forall a:_, uu1.paths (f (g a)) a). intros. destruct a. simpl. apply uu1.idpath.
+assert (egf: forall a:_,  uu1.paths _ (g (f a)) a). intros. destruct a. simpl.  apply uu1.idpath. 
+assert (efg: forall a:_, uu1.paths _ (f (g a)) a). intros. destruct a. simpl. apply uu1.idpath.
 apply (uu1.gradth _ _ _ _ egf efg). Defined. 
 
 Coercion u1pathstou0paths: uu1.paths >-> paths.
 
 Theorem u1iscontrtou0iscontr (X:UU0): uu1.iscontr X -> iscontr X.
 Proof. intros. split with (uu1.pr21 _ _ X0). 
-intro.  set (s:=uu1.contrl2 X X0 t (uu1.pr21 X (fun cntr : X => forall t0 : X, uu1.paths t0 cntr) X0)). apply (u1pathstou0paths X t _ s). Defined.
+intro.  set (s:=uu1.contrl2 X X0 t (uu1.pr21 X (fun cntr : X => forall t0 : X, uu1.paths _ t0 cntr) X0)). apply (u1pathstou0paths X t _ s). Defined.
 
 Coercion  u1iscontrtou0iscontr: uu1.iscontr >-> iscontr.
 
@@ -70,7 +70,7 @@ Coercion  u1isofhleveltou0isofhlevel: uu1.isofhlevel >-> isofhlevel.
 
 Theorem u0isofhleveltou1isofhlevel  (n:nat)(X:UU0): isofhlevel n X -> uu1.isofhlevel n X.
 Proof. intro. induction n.  intro X0.  apply u0iscontrtou1iscontr. intro X. simpl. intros X0 x x'.  
-assert (s: uu1.isofhlevel n (paths x x')). apply (IHn _ (X0 x x')). apply (uu1.isofhlevelweqb n _ _ _ (iswequ1pathstou0paths _ x x') s). Defined.  
+assert (s: uu1.isofhlevel n (paths _ x x')). apply (IHn _ (X0 x x')). apply (uu1.isofhlevelweqb n _ _ _ (iswequ1pathstou0paths _ x x') s). Defined.  
 
 Coercion u0isofhleveltou1isofhlevel: isofhlevel >-> uu1.isofhlevel.
 
