@@ -65,9 +65,9 @@ Lemma isapropimeqclass  (X:UU0)(R: hrel X)(Y:hSet)(f:X -> Y)(is:forall x1 x2 : X
 Proof. intros.  destruct C as [ t x ]. destruct x as [ t0 x ]. destruct x as [ t1 x ]. rename t into A.
 set (ImA:=  (total2 Y (fun y:_ => ishinh (hfiber A Y (fun a:A => f (pr21 _ _ a)) y)))). unfold isaprop.  intros.  simpl. intros.   
 assert (is3: isincl _ _ ((pr21 _ _): ImA -> Y)). apply isofhlevelfpr21. intro. apply (isapropishinh (hfiber A Y (fun a : A => f (pr21 X (fun x : X => A x) a)) x1)).  
-assert (is4: isweq _ _ (maponpaths ((pr21 _ _):ImA -> Y) x0 x') ). apply isweqonpathsincl. assumption. 
+assert (is4: isweq _ _ (maponpaths _ _ ((pr21 _ _):ImA -> Y) x0 x') ). apply isweqonpathsincl. assumption. 
 apply (iscontrxifiscontry _ _ _ is4). simpl. destruct x0 as [ t x1 ]. destruct x' as [ t2 x2 ].    simpl. 
-assert (p1: (hfiber A Y (fun a : A => f (pr21 X (fun x : X => A x) a)) t) -> (hfiber A Y (fun a : A => f (pr21 X (fun x : X => A x) a)) t2) -> (paths _ t t2)). intros X0 X1.  destruct X0 as [ t3 x3 ]. destruct X1 as [ t4 x4 ]. assert (e1: R (pr21 _ _ t3) (pr21 _ _ t4)). apply x. apply (pr22 _ _ t3). apply (pr22 _ _ t4). assert (e2: paths _ (f (pr21 X (fun x : X => A x) t3)) (f (pr21 X (fun x : X => A x) t4))). apply is. apply e1. apply (pathscomp0 (pathscomp0 (pathsinv0 _ _ x3) e2) x4). 
+assert (p1: (hfiber A Y (fun a : A => f (pr21 X (fun x : X => A x) a)) t) -> (hfiber A Y (fun a : A => f (pr21 X (fun x : X => A x) a)) t2) -> (paths _ t t2)). intros X0 X1.  destruct X0 as [ t3 x3 ]. destruct X1 as [ t4 x4 ]. assert (e1: R (pr21 _ _ t3) (pr21 _ _ t4)). apply x. apply (pr22 _ _ t3). apply (pr22 _ _ t4). assert (e2: paths _ (f (pr21 X (fun x : X => A x) t3)) (f (pr21 X (fun x : X => A x) t4))). apply is. apply e1. apply (pathscomp0 _ _ _ _ (pathscomp0 _ _ _ _ (pathsinv0 _ _ x3) e2) x4). 
 assert (isi: ishinh (paths _ t t2)). apply (hinhfunct2 _ _ _ p1 x1 x2). 
 assert (cn: paths _ t t2). apply (hinhunivcor1 (hProppair _ ((uu1.pr22 _ _ Y) t t2)) isi). 
 apply (iscontraprop1 _ ((uu1.pr22 _ _ Y) t t2) cn). Defined. 
@@ -88,7 +88,7 @@ set (ImA:= total2 Y (fun y:_ => ishinh (hfiber A Y (fun a:A => f (pr21 _ _ a)) y
 set (fA:= (fun a:A => tpair _ _  (f (pr21 _ _ a)) (hinhpr _ (hfiberpair A Y (fun a:A => f (pr21 _ _ a)) (f (pr21 _ _ a)) a (idpath _ _ )))):A -> ImA).  
 set (is2:=(isapropimeqclass X R Y f is C):isaprop ImA). change (setquotuniv X R Y f is C) with (pr21 _ _ (hinhuniv _ (hProppair ImA is2) fA (pr21 _ _ (pr22 _ _ C)))). change (f x) with (pr21 _ _ (fA (carrierpair _ _ x inC))). 
 
-assert (e: paths _ (fA (carrierpair _ _ x inC)) (hinhuniv _ (hProppair ImA is2) fA (pr21 _ _ (pr22 _ _ C)))).  apply isapropimeqclass. assumption.  apply (maponpaths (pr21 _ _) _ _ e). Defined. 
+assert (e: paths _ (fA (carrierpair _ _ x inC)) (hinhuniv _ (hProppair ImA is2) fA (pr21 _ _ (pr22 _ _ C)))).  apply isapropimeqclass. assumption.  apply (maponpaths _ _ (pr21 _ _) _ _ e). Defined. 
 
 
 Theorem setquotunivcomm  (X:UU0)(R: hrel X)(is0:iseqrel X R)(Y:hSet)(f:X -> Y)(is:forall x1 x2 : X, (R x1 x2) -> paths _ (f x1) (f x2)) : forall x:X, paths _ (f x) (setquotuniv X R Y f is (setquoteqrelpr X R is0  x)).
@@ -118,7 +118,7 @@ apply (invmaponpathsincl _ _ _ is2 _ _ e). Defined. (* Uses univalence for hProp
 Definition pathconnected (X:UU0):= fun (x x':X) =>  (ishinh_hprop (paths _ x x')).
 Definition isreflpathconnected (X:UU0): isrefl X (pathconnected X):= fun x:_ =>  (hinhpr _ (idpath _ x)).
 Definition issymmpathconnected (X:UU0): issymm _ (pathconnected X):= fun x x':_ => fun a:_ => ((hinhfunct _ _ (fun e:paths _ x x' => pathsinv0 _ _ e) a)). 
-Definition istranspathconnected (X:UU0): istrans _ (pathconnected X):= fun x x' x'':_ => fun a:_ => fun b:_ =>  ((hinhfunct2 _ _ _ (fun e1: paths _ x x' => fun e2: paths _ x' x'' => pathscomp0 e1 e2)  a  b)).
+Definition istranspathconnected (X:UU0): istrans _ (pathconnected X):= fun x x' x'':_ => fun a:_ => fun b:_ =>  ((hinhfunct2 _ _ _ (fun e1: paths _ x x' => fun e2: paths _ x' x'' => pathscomp0 _ _ _ _ e1 e2)  a  b)).
 Definition iseqrelpathconnected (X:UU0): iseqrel _ (pathconnected X):= dirprodpair (isreflpathconnected  _ ) (dirprodpair (issymmpathconnected _ ) (istranspathconnected  _ )).
 
 Definition pi0 (X:UU0):= setquot X (pathconnected X). 
@@ -152,6 +152,6 @@ Definition pi0pr (X:UU0):= setquoteqrelpr X (pathconnected X) (iseqrelpathconnec
 
 (* 
  Local Variables: 
- compile-command: "make -C ../.. Main_Library/hlevel2/set_quotients_r_up.vo "
+ compile-command: "make -C ../.. Main_L ibrary/hlevel2/set_quotients_r_up.vo "
  End: 
  *)

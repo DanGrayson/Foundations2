@@ -57,7 +57,7 @@ Proof.
   set (s1:= (fun X Y :UU0 => fun w: weq X Y => uu1.tpair _ P2 (uu1.dirprodpair X Y) w)).
   set (efg:= (fun a => 
                 match a as a' return (uu1.paths _ (f (g a')) a')
-                  with uu1.tpair (uu1.tpair X Y) w => (uu1.maponpaths (s1 X Y) _ _ (weqpathsweq0 X Y w)) 
+                  with uu1.tpair (uu1.tpair X Y) w => (uu1.maponpaths _ _ (s1 X Y) _ _ (weqpathsweq0 X Y w)) 
                 end)).
   set (h:= fun a1:Z1 => (uu1.pr21 _ _ (uu1.pr21 _ _ a1))).
   assert (egf0: forall a1:Z1, uu1.paths _ (uu1.pr21 _ _ (g (f a1))) (uu1.pr21 _ _ a1)).
@@ -65,7 +65,7 @@ Proof.
   apply uu1.idpath.
   assert (egf1: forall a1 a1':Z1, uu1.paths _ (uu1.pr21 _ _ a1') (uu1.pr21 _ _ a1) -> uu1.paths _ a1' a1).
   intros.
-  set (X':= uu1.maponpaths (uu1.pr21 _ _ ) _ _ X).
+  set (X':= uu1.maponpaths _ _ (uu1.pr21 _ _ ) _ _ X).
   assert (is: uu1.isweq _ _ h).
   apply (uu1.isweqpr21pr21).
   apply (uu1.pathsweq2 _ _ h is _ _ X').
@@ -117,7 +117,7 @@ Proof.
   assert (ee:uu1.paths _ (R X X' v p') (R X X' w p')).
   set (R':= fun vis:weq X X' => R X X' vis p').
   assert (ee':uu1.paths _ (R' v) (R' w)).
-  apply (uu1.maponpaths R' _ _ e).
+  apply (uu1.maponpaths _ _ R' _ _ e).
   assumption.
   induction ee.
   apply l1.

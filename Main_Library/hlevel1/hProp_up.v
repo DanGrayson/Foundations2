@@ -56,7 +56,7 @@ Proof.
                 match a as a'
                   return (uu1.paths _ (f (g a')) a')
                   with uu1.tpair (uu1.tpair X Y) w 
-                  => uu1.maponpaths _ _ _ (weqpathsweqhProp X Y w)
+                  => uu1.maponpaths _ _ _ _ _ (weqpathsweqhProp X Y w)
                 end)).
   set (h:= fun a1:Z1 => uu1.pr21 _ _ ( uu1.pr21 _ _ a1)).
   assert (egf0: forall a1:Z1, uu1.paths _ ( uu1.pr21 _ _ (g (f a1))) ( uu1.pr21 _ _ a1)).
@@ -64,7 +64,7 @@ Proof.
     apply  uu1.idpath.
   assert (egf1: forall a1 a1':Z1, uu1.paths _ ( uu1.pr21 _ _ a1') ( uu1.pr21 _ _ a1) -> uu1.paths _ a1' a1).
     intros a1 a1' X.
-      set (X':=  uu1.maponpaths ( uu1.pr21 _ _ ) _ _ X).
+      set (X':=  uu1.maponpaths _ _ ( uu1.pr21 _ _ ) _ _ X).
       assert (is:  uu1.isweq _ _ h).
       apply ( uu1.isweqpr21pr21).
     apply ( uu1.pathsweq2 _ _ h is _ _ X').
