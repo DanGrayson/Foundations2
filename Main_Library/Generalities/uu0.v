@@ -725,6 +725,20 @@ Proof. intros.
         apply diaglemma2, (hfibertriangle1 _ _ f (f x) xe1).
         Defined.
 
+(* another induction principle for paths, building on paths_rect2w *)
+Lemma paths_rect2weq (X Y: UU)(f:X->Y)(is: isweq _ _ f)
+        (P : forall x x' : X, paths Y (f x) (f x') -> Type)
+      :  (forall x : X, P x x (idpath Y (f x)))
+      ->  forall (x x' : X) (q : paths Y (f x) (f x')), P x x' q.
+Proof.
+  intros.  
+  set (g := invmap _ _ f is).
+  set (b := weqgf _ _ f is).
+  set (c := weqfg _ _ f is).
+  set (bc := fun x => pathsinv0 _ _ (weqfgf _ _ f is x)).
+  apply (paths_rect2w _ _ f g b c bc).
+  assumption.
+Defined.
 
 Definition pathsweq2 (X Y:UU)(f:X-> Y)(is1: isweq _ _ f)
         :  forall x x':X, paths _ (f x) (f x') -> paths _ x x'
