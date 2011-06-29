@@ -214,6 +214,11 @@ Definition pathscomp021 (T:UU) (a:T)(b:T) (c:T)
         : paths _ (pathscomp0 _ _ _ _ e11 e2) (pathscomp0 _ _ _ _ e12 e2).
 Proof. intros. induction ee1.  apply idpath. Defined. 
 
+Definition pathscomp022 (T:UU) (a b c:T)
+          (e1: paths _ a b)(e21 e22:paths _ b c)(ee2:paths _ e21 e22)
+        : paths _ (pathscomp0 _ _ _ _ e1 e21) (pathscomp0 _ _ _ _ e1 e22).
+Proof. intros. induction ee2.  apply idpath. Defined. 
+
 Definition maponpaths (X Y:UU) : forall f:X -> Y, forall x x':X, paths _ x x' -> paths _ (f x) (f x').
 Proof. intros X Y f x x' e.  induction e. apply idpath. Defined. 
 
@@ -347,17 +352,38 @@ assert (eee: paths _ (idpath _ (f x)) (pathscomp0 _ _ _ _ (h x) (pathsinv0 _ _ (
 Lemma maponpathshomid12 (X:UU)(x:X)(x':X)(fx:X)(fx':X)(e:paths _ fx fx')(hx:paths _ fx x)(hx':paths _ fx' x'): paths _   (pathscomp0 _ _ _ _ (hx) (pathscomp0 _ _ _ _ (pathscomp0 _ _ _ _ (pathsinv0 _ _ (hx)) (pathscomp0 _ _ _ _ e (hx'))) (pathsinv0 _ _ (hx')))) e.
 Proof. intros. induction hx. induction hx'. induction e.  simpl. apply idpath. Defined. 
 
+Lemma pathscompfunc (T:UU) (a:T)(b:T)(c:T)
+          (p:paths _ a b)(p':paths _ a b)(pp':paths _ p p')
+          (q:paths _ b c)(q':paths _ b c)(qq':paths _ q q')
+        : paths _ (pathscomp0 _ _ _ _ p q) (pathscomp0 _ _ _ _ p' q').
+Proof. intros. induction pp'. induction qq'. apply idpath. Defined.
 
-(* an induction principle for paths over Y relative to a weq f : X -> Y *)
+Lemma pathsinvfunc (T:UU)(a b:T)
+                (p:paths _ a b)(p':paths _ a b)(pp':paths _ p p')
+              : paths _ (pathsinv0 _ _ p) (pathsinv0 _ _ p').
+Proof. intros. induction pp'. apply idpath. Defined.
+
+Lemma pathscompassociativity (T:UU)(a b c d:T)(e:paths T a b)(f:paths T b c)(g:paths T c d)
+      : paths _ (pathscomp0 _ _ _ _ e (pathscomp0 _ _ _ _ f g))
+                (pathscomp0 _ _ _ _ (pathscomp0 _ _ _ _ e f) g).
+Proof. intros. induction e. induction f. induction g. apply idpath. Defined.
+
+Lemma maponpathsinv (T U:UU)(f:T->U)(a b:T)(e:paths _ a b)
+                : paths _ (pathsinv0 _ _ (maponpaths _ _ f _ _ e))
+                          (maponpaths _ _ f _ _ (pathsinv0 _ _ e)).
+Proof. induction e. simpl. apply idpath. Defined.
+
+(* an induction principle for paths over Y relative to a weq f : X -> Y with a "good" homotopy inverse *)
 
 Lemma paths_rect2w (X Y: UU)(f:X->Y)(g:Y->X)
         (b: forall x:X, paths _ (g (f x)) x)
         (c: forall y:Y, paths _ (f (g y)) y)
+        (bc: forall x:X, paths _ (c (f x)) (maponpaths _ _ f _ _ (b x)))
         (P : forall x x' : X, paths Y (f x) (f x') -> Type) :
        (forall x : X, P x x (idpath Y (f x))) -> 
        forall (x x' : X) (q : paths Y (f x) (f x')), P x x' q.
 Proof.
-  intros X Y f g b c P p.
+  intros X Y f g b c bc P p.
   (* use g to transport the property P and then prove it *)
   assert( K : forall (y y' : Y)(q' : paths Y y y'), P (g y) (g y') (pathscomp0 _ _ _ _ (c y) (pathscomp0 _ _ _ _ q'(pathsinv0 _ _ (c y'))))).
     intros y y' q'.
@@ -373,10 +399,20 @@ Proof.
   intros x x' q.
   set (k := K (f x) (f x') q).
   clearbody k.
-
-Abort.
-
-
+  clear K.
+  (* the goal is now    P x x' q  *)
+  apply (transportpropertyofpathsf2r _ _ _ _ _ _ _ (pathsinv0 _ _ (b x'))).
+  apply (transportpropertyofpathsf1r _ _ _ _ _ _ _ (b x)).
+  apply (transportproperty _ (P (g (f x)) (g (f x'))) (pathscomp0 _ _ _ _ (c (f x)) (pathscomp0 _ _ _ _ q (pathsinv0 _ _ (c (f x')))))).
+  apply pathscompfunc.
+  apply bc.
+  apply pathscomp022.
+  apply (pathscomp0 _ _ (pathsinv0 _ _ (maponpaths _ _ f _ _ (b x')))).    
+  apply pathsinvfunc.  
+  apply bc.
+  apply maponpathsinv.
+  exact k.
+Defined.
 
 Lemma maponpathshomid2 (X:UU)(f:X->X)(h: forall x:X, paths _ (f x) x)(x:X)(x':X)(e:paths _ (f x) (f x'))
         : paths _ (maponpaths _ _ f _ _ (maponpathshomidinv _ f h _ _ e)) e.
