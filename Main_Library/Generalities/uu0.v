@@ -759,37 +759,21 @@ Definition pathsweq3 (X Y:UU)(f:X-> Y)(is1: isweq _ _ f)
 
 Definition compose {X Y Z:UU} (g:Y->Z) (f:X->Y) := fun x => g (f x).
 
+Lemma maponpathsfunc (X Y : UU) (f : X -> Y) (x x' : X) (e e':paths _ x x') (ee:paths _ e e')
+                : paths _ (maponpaths _ _ f _ _ e) (maponpaths _ _ f _ _ e').
+Proof. intros. induction ee. apply idpath. Defined.
+
 Definition pathsweq4 (X Y:UU)(f:X-> Y)(is1: isweq _ _ f)(x x':X)(e: paths _ (f x) (f x'))
         :  paths _ (maponpaths _ _ f _ _ (pathsweq2 _ _ f is1 _ _ e)) e.  
-Proof. intros.
-        set (g  := invmap _ _ f is1).
-        set (gf := compose g f).
-        set (mapf := maponpaths _ _ f).
-        set (mapg := maponpaths _ _ g).
-        set (mapgf := maponpaths _ _ gf).
-        set (ee := mapg _ _ e).
-        set (eee:= maponpathshomidinv _  gf (weqgf _ _ f is1) _ _ ee).
-        assert (e1: paths _ (mapf _ _ eee) e).
-          assert (e2: paths _ (mapg _ _ (mapf _ _ eee)) ee).
-            assert (e3: paths _ (mapg _ _ (mapf _ _ eee)) (mapgf _ _ eee)).
-              apply maponpathsfuncomp.
-            assert (e4: paths _ (mapgf _ _ eee) ee).
-              apply maponpathshomid2.
-            apply (pathscomp0 _ _ _ _ e3 e4). 
-          set (s:= mapg (f x) (f x')).
-          set (p:= pathssec2 _ _ g f (weqfg _ _ f is1) (f x) (f x')).
-          set (eps:= pathssec3 _ _ g f (weqfg _ _ f is1) (f x) (f x')).
-          apply (pathssec2 _ _ s p); assumption.
-        set (fstar := mapf x x').
-        set (r := pathsweq2 _ _ f is1 x x').
-        assert (e4: paths _ (fstar (r e)) (fstar (r (fstar eee)))).
-          apply (pathsinv0 _ _ (maponpaths _ _ (fun e0 => (fstar (r e0))) _ _ e1)).
-        assert (X0 : paths _  (r (fstar eee)) eee).
-          apply (pathsweq3 _ _ f is1).
-        assert (e6: paths _ (fstar (r (fstar eee))) (fstar eee)).
-          apply (maponpaths _ _ fstar _ _ X0).
-        exact (pathscomp0 _ _ _ _ (pathscomp0 _ _ _ _ e4 e6) e1).
-        Defined. 
+Proof.
+  intros X Y f is.
+  apply paths_rect2weq.
+  assumption.
+  intro x.
+  apply (pathscomp0 _ _ (maponpaths _ _ f _ _ (idpath _ x))).
+    apply maponpathsfunc, pathsweq2id.
+  apply idtoid1.
+Defined.
 
 (** *** Weak equivalences between contractible types (other implications are proved below). *)
 
