@@ -378,7 +378,7 @@ Proof. induction e. simpl. apply idpath. Defined.
 Lemma paths_rect2w (X Y: UU)(f:X->Y)(g:Y->X)
         (b: forall x:X, paths _ (g (f x)) x)
         (c: forall y:Y, paths _ (f (g y)) y)
-        (bc: forall x:X, paths _ (c (f x)) (maponpaths _ _ f _ _ (b x)))
+        (bc: forall x:X, paths _ (maponpaths _ _ f _ _ (b x)) (c (f x)))
         (P : forall x x' : X, paths Y (f x) (f x') -> Type) :
        (forall x : X, P x x (idpath Y (f x))) -> 
        forall (x x' : X) (q : paths Y (f x) (f x')), P x x' q.
@@ -405,10 +405,12 @@ Proof.
   apply (transportpropertyofpathsf1r _ _ _ _ _ _ _ (b x)).
   apply (transportproperty _ (P (g (f x)) (g (f x'))) (pathscomp0 _ _ _ _ (c (f x)) (pathscomp0 _ _ _ _ q (pathsinv0 _ _ (c (f x')))))).
   apply pathscompfunc.
+  apply pathsinv0.
   apply bc.
   apply pathscomp022.
   apply (pathscomp0 _ _ (pathsinv0 _ _ (maponpaths _ _ f _ _ (b x')))).    
   apply pathsinvfunc.  
+  apply pathsinv0.
   apply bc.
   apply maponpathsinv.
   exact k.
@@ -731,13 +733,8 @@ Lemma paths_rect2weq (X Y: UU)(f:X->Y)(is: isweq _ _ f)
       :  (forall x : X, P x x (idpath Y (f x)))
       ->  forall (x x' : X) (q : paths Y (f x) (f x')), P x x' q.
 Proof.
-  intros.  
-  set (g := invmap _ _ f is).
-  set (b := weqgf _ _ f is).
-  set (c := weqfg _ _ f is).
-  set (bc := fun x => pathsinv0 _ _ (weqfgf _ _ f is x)).
-  apply (paths_rect2w _ _ f g b c bc).
-  assumption.
+  intros X Y f is P p x x' q.
+  apply (paths_rect2w _ _ f (invmap _ _ _ is) (weqgf _ _ _ _) (weqfg _ _ _ _) (weqfgf _ _ _ _) _ p).
 Defined.
 
 Definition pathsweq2 (X Y:UU)(f:X-> Y)(is1: isweq _ _ f)
