@@ -466,7 +466,7 @@ Proof. intros. induction e.  simpl. unfold pathssec2. unfold pathssec1.  simpl. 
 
 
 
-(** ** Fibrations and paths _. *)
+(** ** Fibrations and paths. *)
 
 
 Definition tppr (T:UU)(P:T -> UU)(x: total2 T P): paths _ x (tpair _ _ (pr21 _ _ x) (pr22 _ _ x)).
