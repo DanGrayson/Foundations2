@@ -2104,13 +2104,15 @@ Defined.
 
 
 
-Corollary isweqmaponsec (X:UU)(P:X-> UU)(Q:X -> UU)(f: forall x:X, P x -> Q x)(isx: forall x:X, isweq _ _ (f x)): isweq _ _ (maponsec _ _ _ f). 
-Proof. intros. unfold isweq.  intro.
-assert (is1: iscontr (forall x:X, hfiber _ _ (f x) (y x))). assert (is2: forall x:X, iscontr (hfiber _ _ (f x) (y x))). unfold isweq in isx. intro. apply (isx x (y x)). apply funcontr. assumption. 
-apply (iscontrxifiscontry _ _ (hfibertoforall _ P Q f y) (isweqhfibertoforall _ P Q f y) is1). Defined. 
-
-
-
+Corollary isweqmaponsec (X:UU)(P Q:X->UU)(f: forall x:X, P x -> Q x) : (forall x:X, isweq _ _ (f x)) -> isweq _ _ (maponsec _ _ _ f). 
+Proof.
+  unfold isweq.
+  intros X P Q f isx q.
+  apply (iscontrxifiscontry _ _ _ (isweqhfibertoforall _ _ _ f q)).
+  apply funcontr.
+  intro.
+  apply isx.
+Defined. 
 
 
 (** ** The map between section spaces (dependent products) defined by the map between the bases [ f: Y -> X ]. *)
@@ -2131,64 +2133,37 @@ set (map:= fun ff: total2 (X->X) (fun f0:X->X => forall x:X, paths _ (f0 x) x) =
 assert (is1: iscontr (total2 (X->X) (fun f0:X->X => forall x:X, paths _ (f0 x) x))). apply funextweql1. assert (e: paths _ (tpair _  (fun f0:X->X => forall x:X, paths _ (f0 x) x) f h) (tpair _  (fun f0:X->X => forall x:X, paths _ (f0 x) x) (fun x0:X => x0) (fun x0:X => idpath _ x0))). apply contrl2.  assumption.  apply (maponpaths _ _ map _ _ e). Defined. 
 
 
-Theorem isweqmaponsec1 (X:UU)(Y:UU)(P:Y -> UU)(f:X-> Y)(is:isweq _ _ f):isweq _ _ (maponsec1 _ _ P f).
-Proof. intros.
- 
-set (map:= maponsec1 _ _ P f).
-set (invf:= invmap _ _ f is). set (e1:= weqfg _ _ f is). set (e2:= weqgf _ _ f is).
-set (im1:= fun sx: forall x:X, P (f x) => (fun y:Y => sx (invf y))).
-set (im2:= fun sy': forall y:Y, P (f (invf y)) => (fun y:Y => transportf _ _ _ _ (weqfg _ _ _ is y) (sy' y))).
-set (invmapp := (fun sx: forall x:X, P (f x) => im2 (im1 sx))). 
-
-assert (efg0: forall sx: (forall x:X, P (f x)), forall x:X, paths _ ((map (invmapp sx)) x) (sx x)).  intro. intro. unfold map. unfold invmapp. unfold im1. unfold im2. unfold maponsec1.  simpl. fold invf.  set (ee:=e2 x).  fold invf in ee.
-
-set (e3x:= fun x0:X => pathsweq2 _ _ f is (invf (f x0)) x0 (weqfg X Y f is (f x0))). set (e3:=e3x x). assert (e4: paths _ (weqfg X Y f is (f x)) (maponpaths _ _ f _ _ e3)). apply (pathsinv0 _ _ (pathsweq4 _ _ f is (invf (f x)) x _)).
-
-assert  (e5:paths _ (transportf Y P (f (invf (f x))) (f x) (weqfg X Y f is (f x)) (sx (invf (f x)))) (transportf Y P (f (invf (f x))) (f x) (maponpaths _ _ f _ _ e3) (sx (invf (f x))))). apply (maponpaths _ _ (fun e40:_ => (transportf Y P (f (invf (f x))) (f x) e40 (sx (invf (f x))))) _ _ e4).
-
-assert (e6: paths _ (transportf Y P (f (invf (f x))) (f x) (maponpaths _ _ f (invf (f x)) x e3) (sx (invf (f x)))) (transportf X (fun x:X => P (f x)) _ _ e3 (sx (invf (f x))))). apply (pathsinv0 _ _ (functtransportf _ _ f P _ _ e3 (sx (invf (f x))))).
-
-set (ff:= fun x:X => invf (f x)).
-assert (e7: paths _ (transportf X (fun x : X => P (f x)) (invf (f x)) x e3 (sx (invf (f x)))) (sx x)). apply (maponsec1l2 _ (fun x:X => P (f x))ff e3x sx x).  apply (pathscomp0 _ _ _ _ (pathscomp0 _ _ _ _ e5 e6) e7).
-
-assert (efg: forall sx: (forall x:X, P (f x)), paths _  (map (invmapp sx)) sx). intro. apply (funextsec _ _ _ _ (efg0 sx)).
-
-assert (egf0: forall sy: (forall y:Y, P y), forall y:Y, paths _ ((invmapp (map sy)) y) (sy y)). intros. unfold invmapp. unfold map.  unfold im1. unfold im2. unfold maponsec1. 
-
-set (ff:= fun y:Y => f (invf y)). fold invf. apply (maponsec1l2 Y P ff (weqfg X Y f is) sy y). 
-assert (egf: forall sy: (forall y:Y, P y), paths _  (invmapp (map sy)) sy). intro. apply (funextsec _ _ _ _ (egf0 sy)). 
-
-apply (gradth _ _ map invmapp egf efg). Defined. 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Theorem isweqmaponsec1 (X:UU)(Y:UU)(P:Y -> UU)(f:X-> Y) : isweq _ _ f -> isweq _ _ (maponsec1 _ _ P f).
+Proof.
+ intros X Y P f is.
+ set (map:= maponsec1 _ _ P f).
+ set (invf:= invmap _ _ f is).
+ set (e1:= weqfg _ _ f is).
+ set (e2:= weqgf _ _ f is).
+ set (im1:= fun sx: forall x:X, P (f x) => (fun y:Y => sx (invf y))).
+ set (im2:= fun sy': forall y:Y, P (f (invf y)) => (fun y:Y => transportf _ _ _ _ (weqfg _ _ _ is y) (sy' y))).
+ set (invmapp := fun sx: forall x:X, P (f x) => im2 (im1 sx)).
+ assert (efg0: forall sx: (forall x:X, P (f x)), forall x:X, paths _ ((map (invmapp sx)) x) (sx x)).
+  intros sx x.
+  simpl.
+  set (ee:=e2 x).
+  fold invf in ee.
+  set (e3x:= fun x0:X => pathsweq2 _ _ f is (invf (f x0)) x0 (weqfg X Y f is (f x0))).
+  set (e3:=e3x x).
+  assert (e5:paths _ (transportf _ _ (f (invf (f x))) (f x) (weqfg _ _ f is (f x)) (sx (invf (f x))))
+                     (transportf _ _ (f (invf (f x))) (f x) (maponpaths _ _ f _ _ e3) (sx (invf (f x))))).
+   apply (maponpaths _ _ (fun e40:_ => (transportf _ _ (f (invf (f x))) (f x) e40 (sx (invf (f x)))))).
+   apply (pathsinv0 _ _ (pathsweq4 _ _ f is (invf (f x)) x _)).
+  assert (e6: paths _ (transportf _ _ (f (invf (f x))) (f x) (maponpaths _ _ f (invf (f x)) x e3) (sx (invf (f x))))
+                      (transportf _ (compose P f) _ _ e3 (sx (invf (f x))))).
+   apply (pathsinv0 _ _ (functtransportf _ _ f P _ _ e3 (sx (invf (f x))))).
+  apply (pathscomp0 _ _ _ _ (pathscomp0 _ _ _ _ e5 e6)).
+  apply (maponsec1l2 _ (compose P f) (compose invf f) e3x).
+ apply (gradth _ _ map invmapp).
+  intro. apply funextsec.
+  intros. apply (maponsec1l2 _ _ (compose f invf)).
+ intro. apply funextsec, efg0.
+Defined. 
 
 
 (** ** Basics about h-levels. *)
