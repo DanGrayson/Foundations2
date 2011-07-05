@@ -93,7 +93,15 @@ Proof. intros X X0. unfold isaset.  unfold uu1.isaset in X0. apply u1isofhlevelt
 Coercion u1isasettou0isaset : uu1.isaset >-> isaset.
 
 
-
+Lemma u0u1empty : uu1.weq uu0.empty uu1.empty.
+Proof.
+  assert( f : uu0.empty -> uu1.empty).
+  intro H.
+   destruct H.
+  assert( is : uu1.isweq _ _ f ).
+   apply uu1.isweqtoempty.
+  exact (uu1.weqpair f is).
+Defined.
 
 
 (* End of the file uu0uu1.v *)

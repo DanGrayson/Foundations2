@@ -142,6 +142,16 @@ Inductive paths (T:UU)(t:T): T -> UU := idpath: paths _ t t.
 (* another plausible definition, with a slightly different induction principle: *)
 Inductive paths' (T:UU): T -> T -> UU := idpath': forall t:T, paths' _ t t.
 
+(* a parametrized version of paths: *)
+Inductive pathsf (S T:UU)(f:S->T)(s:S) : T -> UU := idpathf: pathsf S T f s (f s).
+
+Definition pathsf_to_paths (S T:UU)(f:S->T)(s:S) : forall t:T, pathsf S T f s t -> paths T (f s) t.
+Proof.
+  intros S T f s t e.
+  destruct e.
+  apply idpath.
+Defined.
+
 (* prove an induction principle for paths with endpoints reversed *)
 Lemma paths_rectr (T : UU) (t : T) (P : forall u : T, paths T u t -> Type):
         P t (idpath T t) -> forall (v : T) (p : paths T v t), P v p.
@@ -373,8 +383,7 @@ Lemma maponpathsinv (T U:UU)(f:T->U)(a b:T)(e:paths _ a b)
                           (maponpaths _ _ f _ _ (pathsinv0 _ _ e)).
 Proof. induction e. simpl. apply idpath. Defined.
 
-(* an induction principle for paths over Y relative to a weq f : X -> Y with a "good" homotopy inverse *)
-
+(** an induction principle for paths over Y relative to a weq f : X -> Y with a "good" homotopy inverse: *)
 Lemma paths_rect2w (X Y: UU)(f:X->Y)(g:Y->X)
         (b: forall x:X, paths _ (g (f x)) x)
         (c: forall y:Y, paths _ (f (g y)) y)
@@ -749,7 +758,7 @@ Proof. intros.
         apply diaglemma2, (hfibertriangle1 _ _ f (f x) xe1).
         Defined.
 
-(* another induction principle for paths, building on paths_rect2w *)
+(** another induction principle for paths, building on paths_rect2w: *)
 Lemma paths_rect2weq (X Y: UU)(f:X->Y)(is: isweq _ _ f)
         (P : forall x x' : X, paths Y (f x) (f x') -> Type)
       :  (forall x : X, P x x (idpath Y (f x)))
@@ -875,13 +884,21 @@ Definition hfibersgftog (X:UU) (Y:UU) (Z:UU) (f:X -> Y) (g: Y -> Z) (z:Z) : hfib
 Proof. intros X Y Z f g z X0. destruct X0 as [ t x ]. apply (hfiberpair _ _ g z (f t) x).  Defined. 
 
 
-Lemma constr2 (X:UU)(Y:UU)(f:X -> Y)(g: Y-> X)(efg: forall y:Y, paths _ (f(g y)) y) (z: X): forall z0: (hfiber _ _ g z), total2 (hfiber _ _ (fun x:X => g(f x)) z) (fun z':_ => paths _ z0 (hfibersgftog _ _ _ f g z z')). 
-Proof. intros.  destruct z0 as [ y e ]. 
-
-assert (eint: paths _ y (f z)).  assert (e0: paths _ (f(g y)) y). apply efg. assert (e1: paths _ (f(g y)) (f z)). apply (maponpaths _ _  f _ _ e). induction e1.  apply pathsinv0. assumption. 
-
-set (int1:=constr1 Y (fun y:Y => paths _ (g y) z) y (f z) eint). destruct int1 as [ t x ].
-set (int2:=hfiberpair _ _ (fun x0 : X => g (f x0)) z z (t e)).   split with int2.  apply x.  Defined. 
+Lemma constr2 (X:UU)(Y:UU)(f:X -> Y)(g: Y-> X)(efg: forall y:Y, paths _ (f(g y)) y) (z: X)
+        : forall ye: hfiber _ _ g z,
+                total2 (hfiber _ _ (compose g f) z)
+                       (fun xd => paths _ ye (hfibersgftog _ _ _ f g z xd)). 
+Proof.
+  intros.
+  destruct ye as [ y e ].
+  assert (eint: paths _ y (f z)).
+   induction e.
+   apply pathsinv0.
+   apply efg.
+  destruct (constr1 _ (fun y => paths _ (g y) z) y (f z) eint) as [ pmap L ].
+  split with (hfiberpair _ _ (compose g f) z z (pmap e)).
+  apply L.
+Defined. 
 
 
 Lemma isweql1 (X:UU)(Y:UU)(f:X -> Y)(g: Y-> X) : 
