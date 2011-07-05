@@ -94,9 +94,7 @@ Lemma isweqtransportf10 (X:UU1)(P:X -> UU0)(x:X)(x':X)(e:uu1.paths _ x x'): iswe
 Proof. intros. induction e.  apply idisweq. Defined.
 
 Lemma isweqtransportb10 (X:UU1)(P:X -> UU0)(x:X)(x':X)(e:uu1.paths _ x x'): isweq _ _ (uu1.transportb X P x x' e).
-Proof. intros. apply (isweqtransportf10 _ _ _ _ (uu1.pathsinv0 _ _ e)). Defined. 
-
-
+Proof. intros. destruct e.   apply idisweq. Defined.
 
 Lemma l1  (X0:UU0)(X0':UU0)(ee: uu1.paths _ X0 X0')(P:UU0 -> UU0)(pp': P X0')(R: forall X:UU0, forall X':UU0, forall w: weq X X', P X' -> P X)(r: forall X:UU0, forall p:P X, paths _ (R X X (idweq X) p) p):paths _ (R X0 X0' (eqweqmap _ _ ee) pp') (uu1.transportb UU0 P X0 X0' ee pp').
 Proof. intro. intro. intro. intro. intro. induction ee. simpl. intro. intro. apply r. Defined.
@@ -195,6 +193,12 @@ Proof.
   assumption.
 Defined. 
 
+
+(* this induction principle comes from AndrejBauer-Homotopy/OberwolfachTutorial/univalence.v *)
+Theorem weq_induction (P : forall (X Y:UU), weq X Y -> UU) :
+  (forall T:UU, P T T (idweq T)) -> forall (X Y:UU) (w : weq X Y), P X Y w.
+Proof.
+Abort.
 
 
 (* End of the file univ01.v *)
