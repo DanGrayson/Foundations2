@@ -1,44 +1,43 @@
 (** * Introduction 
 
-This is the first of the group of files which contain the (current state of) the mathematical library for the proof assistant Coq based on the Univalent Foundations.  
-Univalent Foundations are inspired by the univalent model of type theory which interprets types as homotopy types, Martin-Lof equality as paths spaces and universes as bases of universal ("univalent") fibrations. For a detailed overview of the content see the table of content in univ_toc.html . In has been modified from the eralier version in a several places but most importantly the part of the earlier file concerning the h-version of the inhabited construction and constructions related to finite sets have been moved to separate files.  
-
-I tried to keep the notations such that the names of types which are (expected to be) a property in the sense of being of h-level 1 start with "is" but I have not been very consistent about it.
-
-There is an increasing number of theorems which have very short proofs based on the univalence axiom  which are given much longer proofs here. One hopes that eventually a mechnaical procedure for the replacement of proofs using the univalence axiom by proofs which only use it in some computationally uninformative ways will be found but until then I am not using the univalence axiom in any of the constructions. 
-
-
-IMPORTANT: for those who may want to add to these files. There are some rules which have to be followed in creating new definitions and theorems which at the moment are not tracked by the proof checker.
-
-1. The current system of Coq is not completely compatible with the univalent semantics. The problem (the only one as far as I know) lies in the way the universe levels (u-levels) are assigned to the objects defined by the inductive definitions of the form
+This is the first of the group of files which contain the (current state of) the mathematical library for the proof assistant Coq based on the Univalent Foundations.
+  Univalent Foundations are inspired by the univalent model of type theory which interprets types as homotopy types, Martin-Lof equality as paths spaces and universes as bases of universal ("univalent") fibrations.
+  For a detailed overview of the content see the table of content in univ_toc.html .
+  In has been modified from the eralier version in a several places but most importantly the part of the earlier file concerning the h-version of the inhabited construction and constructions related to finite sets have been moved to separate files.
+  I tried to keep the notations such that the names of types which are (expected to be) a property in the sense of being of h-level 1 start with "is" but I have not been very consistent about it.
+  There is an increasing number of theorems which have very short proofs based on the univalence axiom  which are given much longer proofs here.
+  One hopes that eventually a mechnaical procedure for the replacement of proofs using the univalence axiom by proofs which only use it in some computationally uninformative ways will be found but until then I am not using the univalence axiom in any of the constructions.
+  IMPORTANT: for those who may want to add to these files.
+  There are some rules which have to be followed in creating new definitions and theorems which at the moment are not tracked by the proof checker.
+  1.
+  The current system of Coq is not completely compatible with the univalent semantics.
+  The problem (the only one as far as I know) lies in the way the universe levels (u-levels) are assigned to the objects defined by the inductive definitions of the form
 
 Inductive Ind (...)...(...): A -> Type := ...
-
-
-The current u-level assignemet takes into account the u-levels of the constructors but not the u-level of A. To ensure compatibility with the univalent model the u-level of Ind should be no less than the u-level of A. The u-levels of the parameters (the types appearing in (...)...(...) ) do not matter. 
-
-A particular case of this problem is the "singleton elimination" rule which provides a good example of this incompatibility. The inductive definition of the identity types which uses one of the points as a parametr has A=:T (the underlying type) but since no mention of T appears in the constructor the system considers that there are no u-level restrictions on the resulting object and in particular that it can be placed in Prop while still having the full Ind_rect elimninator (see elimination, singleton elimination in the Index to the Refernce Manual). 
-
-Since in the present approach the universe management is made explicit one has:
+  The current u-level assignemet takes into account the u-levels of the constructors but not the u-level of A.
+  To ensure compatibility with the univalent model the u-level of Ind should be no less than the u-level of A.
+  The u-levels of the parameters (the types appearing in (...)...(...) ) do not matter.
+  A particular case of this problem is the "singleton elimination" rule which provides a good example of this incompatibility.
+  The inductive definition of the identity types which uses one of the points as a parametr has A=:T (the underlying type) but since no mention of T appears in the constructor the system considers that there are no u-level restrictions on the resulting object and in particular that it can be placed in Prop while still having the full Ind_rect elimninator (see elimination, singleton elimination in the Index to the Refernce Manual).
+  Since in the present approach the universe management is made explicit one has:
 
 RULE 1 Do not use inductive definitions of the form 
 
 Inductive Ind (...)...(...): A -> UU := ...
-
-unless all the "arguments" of A can be typed to UU. 
-
-
-2. While it does not lead directly to any contradictions the shape of the foundations suggests very strongly that at the moment it is best to completely avoid the use of the universes Prop and Set. Instead we should use the the conditions isaprop and isaset which are applicable to the types of any of the type universes.  
-
-*)
+  unless all the "arguments" of A can be typed to UU.
+  2.
+  While it does not lead directly to any contradictions the shape of the foundations suggests very strongly that at the moment it is best to completely avoid the use of the universes Prop and Set.
+  Instead we should use the the conditions isaprop and isaset which are applicable to the types of any of the type universes.
+  *)
 
 
 
 
-(** Preambule. *)
+(** Preambule.
+  *)
 
 Unset Automatic Introduction.
-    (** This line has to be removed for the file to compile with Coq8.2 *)
+  (** This line has to be removed for the file to compile with Coq8.2 *)
 
 Definition UU:= Type.
 
@@ -198,7 +197,7 @@ Definition pathscomp0rid'  (T:UU) (b c:T)(e2: paths _ b c): paths _ (pathscomp0 
 Proof. intros.  induction e2. simpl. apply idpath.  Defined. 
 
 Definition pathscomp0path (T:UU) (a b c:T) (e1: paths _ a b) (e2: paths _ b c) : paths _ (pathscomp0 _ _ _ _ e1 e2) (pathscomp0' _ _ _ _ e1 e2).
-Proof. intros. induction e1. induction e2. apply idpath. Qed.
+Proof. intros. induction e1. induction e2. apply idpath. Defined.
 
 Definition pathsinv0 {T:UU} (a:T) (b:T) : paths _ a b -> paths _ b a.
 Proof. intros T a b e. induction e.  apply idpath. Defined. 
@@ -323,44 +322,64 @@ Proof.
   assumption.
 Defined.
 
-Lemma idtoid1: forall T1:UU, forall T2:UU, forall f:T1 -> T2, forall t1:T1, paths _ (maponpaths _ _ f t1 t1 (idpath _ t1)) (idpath _ (f t1)).
-Proof. intros. unfold maponpaths. simpl. apply idpath. Defined. 
+Lemma idtoid1 (X Y:UU)(f:X -> Y)(x:X) : paths _ (maponpaths _ _ f _ _ (idpath _ x)) (idpath _ (f x)).
+Proof. intros. apply idpath. Defined. 
 
 
 Definition maponpathscomp0 (X:UU)(Y:UU)(f:X -> Y)(x1:X)(x2:X)(x3:X)(e1: paths _ x1 x2)(e2: paths _ x2 x3)
-        : paths _ (maponpaths _ _ f _ _ (pathscomp0 _ _ _ _ e1 e2)) (pathscomp0 _ _ _ _ (maponpaths _ _ f _ _ e1) (maponpaths _ _ f _ _ e2)).
-Proof. intros.  induction e1. induction e2.  simpl. apply idpath. Defined. 
+        : paths _ (maponpaths _ _ f _ _ (pathscomp0 _ _ _ _ e1 e2))
+                  (pathscomp0 _ _ _ _ (maponpaths _ _ f _ _ e1) (maponpaths _ _ f _ _ e2)).
+Proof. intros. induction e1. apply idpath. Defined. 
 
-Definition maponpaths2a (X:UU)(Y:UU)(Z:UU)(f1:X-> Y)(f2:X->Y)(g:Y -> Z)
-        : paths _ f1 f2 -> paths _ (fun x:X => (g (f1 x))) (fun x:X => (g (f2 x))).
-Proof. intros X Y Z f1 f2 g X0. set (int1:= (fun f: X-> Y => (fun x:X => (g (f x))))).  apply (maponpaths _ _ int1 _ _ X0). Defined.
-
-Definition maponpaths2b (X:UU)(Y:UU)(Z:UU)(f:X-> Y)(g1:Y->Z)(g2:Y -> Z)
-        : paths _ g1 g2 -> paths _ (fun x:X => (g1 (f x))) (fun x:X => (g2 (f x))).
-Proof. intros X Y Z f g1 g2 X0. set (int1:= (fun g: Y-> Z => (fun x:X => (g (f x))))).  apply (maponpaths _ _ int1 _ _ X0). Defined. 
-
+Definition compose {X Y Z:UU} (g:Y->Z) (f:X->Y) := fun x => g (f x).
 Definition idfun (T:UU) := fun t:T => t.
 
-Lemma maponpathsidfun (X:UU)(x:X)(x':X)(e:paths _ x x'): paths _ (maponpaths _ _ (idfun X) _ _ e) e. 
-Proof. intros. simpl. induction e. apply (idtoid1 _ _ (fun x:X => x) x). Defined. 
+Definition maponpaths2a (X Y Z:UU)(f1 f2:X -> Y)(g:Y -> Z)
+        : paths _ f1 f2 -> paths _ (compose g f1) (compose g f2).
+Proof.
+ intros X Y Z f1 f2 g e.
+ induction e.
+ apply idpath.
+Defined.
 
-Lemma maponpathsfuncomp (X:UU)(Y:UU)(Z:UU)(f:X-> Y)(g:Y->Z)(x:X)(x':X)(e: paths _ x x')
-        : paths _ (maponpaths _ _ g _ _ (maponpaths _ _ f _ _ e)) (maponpaths _ _ (fun x:X => (g (f x))) _ _ e).
-Proof. intros. induction e. unfold maponpaths.  simpl. apply idpath. Defined. 
+Definition maponpaths2b (X Y Z:UU)(f:X-> Y)(g1:Y->Z)(g2:Y -> Z)
+        : paths _ g1 g2 -> paths _ (compose g1 f) (compose g2 f).
+Proof. intros X Y Z f g1 g2 e.  destruct e. apply idpath. Defined.
+
+Lemma maponpathsidfun (X:UU)(x:X)(x':X)(e:paths _ x x'): paths _ (maponpaths _ _ (idfun X) _ _ e) e. 
+Proof. intros. destruct e. apply idpath. Defined.
+
+Lemma maponpathsfuncomp (X Y Z:UU)(f:X-> Y)(g:Y->Z)(x:X)(x':X)(e: paths _ x x')
+        : paths _ (maponpaths _ _ g _ _ (maponpaths _ _ f _ _ e))
+                  (maponpaths _ _ (compose g f) _ _ e).
+Proof. intros. induction e. apply idpath. Defined.
 
 (** The following four statements show that maponpaths defined by a function f which is homotopic to the identity is "surjective". It is later used to show that the maponpaths defined by a function which is a weak equivalence is itself a weak equivalence. *) 
 
 
-Definition maponpathshomidinv (X:UU)(f:X -> X)(h: forall x:X, paths _ (f x) x)(x:X)(x':X): paths _ (f x) (f x') -> paths _ x x' := (fun e: paths _ (f x) (f x') => pathscomp0 _ _ _ _ (pathsinv0 _ _ (h x)) (pathscomp0 _ _ _ _ e (h x'))).
+Definition maponpathshomidinv (X:UU)(f:X -> X)(h: forall x:X, paths _ (f x) x)(x:X)(x':X)
+  : paths _ (f x) (f x') -> paths _ x x'
+  := fun e: paths _ (f x) (f x') => pathscomp0 _ _ _ _ (pathsinv0 _ _ (h x)) (pathscomp0 _ _ _ _ e (h x')).
 
+Ltac path_via x := apply (pathscomp0 _ _ x).
+Ltac path_via' x := apply (pathscomp0' _ _ x).
+Ltac path_from f := apply (maponpaths _ _ f).
 
-Lemma maponpathshomid1 (X:UU)(f:X -> X)(h: forall x:X, paths _ (f x) x)(x:X)(x':X)(e:paths _ x x'): paths _ (maponpaths _ _ f _ _ e) (pathscomp0 _ _ _ _ (h x) (pathscomp0 _ _ _ _ e (pathsinv0 _ _ (h x')))).
-Proof. intros. induction e. change (pathscomp0 _ _ _ _ (idpath _ x) (pathsinv0 _ _ (h x))) with (pathsinv0 _ _ (h x)). assert (ee: paths _  (maponpaths _ _ f x x (idpath _ x)) (idpath _ (f x))). apply idtoid1. 
-assert (eee: paths _ (idpath _ (f x)) (pathscomp0 _ _ _ _ (h x) (pathsinv0 _ _ (h x)))). apply (pathsinv0 _ _ (pathsinv0r1 _ _ _ (h x))). apply (pathscomp0 _ _ _ _ ee eee). Defined. 
+Lemma maponpathshomid1 (X:UU)(f:X -> X)(h: forall x:X, paths _ (f x) x)(x:X)(x':X)(e:paths _ x x')
+        : paths _ (maponpaths _ _ f _ _ e)
+                  (pathscomp0 _ _ _ _ (h x) (pathscomp0 _ _ _ _ e (pathsinv0 _ _ (h x')))).
+Proof.
+  intros.
+  induction e.
+  path_via (idpath _ (f x)).
+   apply idtoid1.
+  apply pathsinv0, pathsinv0r1.
+Defined. 
 
-
-Lemma maponpathshomid12 (X:UU)(x:X)(x':X)(fx:X)(fx':X)(e:paths _ fx fx')(hx:paths _ fx x)(hx':paths _ fx' x'): paths _   (pathscomp0 _ _ _ _ (hx) (pathscomp0 _ _ _ _ (pathscomp0 _ _ _ _ (pathsinv0 _ _ (hx)) (pathscomp0 _ _ _ _ e (hx'))) (pathsinv0 _ _ (hx')))) e.
-Proof. intros. induction hx. induction hx'. induction e.  simpl. apply idpath. Defined. 
+Lemma maponpathshomid12 (X:UU)(x:X)(x':X)(fx fx':X)(e:paths _ fx fx')(hx:paths _ fx x)(hx':paths _ fx' x')
+  : paths _ (pathscomp0 _ _ _ _ (hx) (pathscomp0 _ _ _ _ (pathscomp0 _ _ _ _ (pathsinv0 _ _ (hx)) (pathscomp0 _ _ _ _ e (hx'))) (pathsinv0 _ _ (hx'))))
+            e.
+Proof. intros. induction hx. induction hx'. induction e.  apply idpath. Defined. 
 
 Lemma pathscompfunc (T:UU) (a:T)(b:T)(c:T)
           (p:paths _ a b)(p':paths _ a b)(pp':paths _ p p')
@@ -376,12 +395,12 @@ Proof. intros. induction pp'. apply idpath. Defined.
 Lemma pathscompassociativity (T:UU)(a b c d:T)(e:paths T a b)(f:paths T b c)(g:paths T c d)
       : paths _ (pathscomp0 _ _ _ _ e (pathscomp0 _ _ _ _ f g))
                 (pathscomp0 _ _ _ _ (pathscomp0 _ _ _ _ e f) g).
-Proof. intros. induction e. induction f. induction g. apply idpath. Defined.
+Proof. intros. induction e. apply idpath. Defined.
 
 Lemma maponpathsinv (T U:UU)(f:T->U)(a b:T)(e:paths _ a b)
                 : paths _ (pathsinv0 _ _ (maponpaths _ _ f _ _ e))
                           (maponpaths _ _ f _ _ (pathsinv0 _ _ e)).
-Proof. induction e. simpl. apply idpath. Defined.
+Proof. induction e. apply idpath. Defined.
 
 (** an induction principle for paths over Y relative to a weq f : X -> Y with a "good" homotopy inverse: *)
 Lemma paths_rect2w (X Y: UU)(f:X->Y)(g:Y->X)
@@ -400,7 +419,7 @@ Proof.
     set (p' := p (g y)).
     clearbody p'.
     apply (transportproperty _ (P _ _) (idpath _ _) _).
-      apply (pathscomp0 _ _ (pathscomp0 _ _ _ _ (c y) (pathsinv0 _ _ (c y)))).
+      path_via (pathscomp0 _ _ _ _ (c y) (pathsinv0 _ _ (c y))).
         apply pathsinv0, pathsinv0r1.
       apply pathsinv0,pathscomp0rid'.
     apply p.    
@@ -417,7 +436,7 @@ Proof.
   apply pathsinv0.
   apply bc.
   apply pathscomp022.
-  apply (pathscomp0 _ _ (pathsinv0 _ _ (maponpaths _ _ f _ _ (b x')))).    
+  path_via (pathsinv0 _ _ (maponpaths _ _ f _ _ (b x'))).    
   apply pathsinvfunc.  
   apply pathsinv0.
   apply bc.
@@ -440,8 +459,7 @@ Proof.
 
    *)  
   intros.
-  apply (pathscomp0 _ _ 
-          (pathscomp0 _ _ _ _ 
+  path_via (pathscomp0 _ _ _ _ 
             (h x)
             (pathscomp0 _ _ _ _ 
               (pathscomp0 _ _ _ _ 
@@ -449,7 +467,7 @@ Proof.
                 (pathscomp0 _ _ _ _ 
                   e
                   (h x')))
-              (pathsinv0 _ _ (h x'))))).
+              (pathsinv0 _ _ (h x')))).
      apply maponpathshomid1.
   apply (maponpathshomid12 _ _ _ _ _ e).
 Defined. 
@@ -458,32 +476,26 @@ Defined.
 (** Here we consider the behavior of maponpaths in the case of a projection p with a section s. *)
 
 
-Definition pathssec1 (X: UU)(Y:UU)(s:X-> Y)(p:Y->X)(eps: forall x:X, paths _  (p (s x)) x): forall x:X, forall y:Y, paths _ (s x) y -> paths _ x (p y).
-Proof. intros X Y s p eps x y X0. set (e:= maponpaths _ _ p _ _ X0). apply (pathscomp0 _ _ _ _ (pathsinv0 _ _ (eps x)) e). Defined.
+Definition pathssec1 (X Y:UU)(s:X-> Y)(p:Y->X)(eps: forall x:X, paths _  (p (s x)) x): forall x:X, forall y:Y, paths _ (s x) y -> paths _ x (p y).
+Proof. intros. path_via (p (s x)). apply pathsinv0, eps. path_from p. assumption. Defined.
+
+Definition pathssec2 (X Y:UU)(s:X-> Y)(p:Y->X)(eps: forall x:X, paths _ (p (s x)) x): forall (x x':X), paths _ (s x) (s x') -> paths _ x x'.
+Proof. intros. path_via (p (s x')). apply (pathssec1 _ _ s); assumption. apply eps. Defined.
+
+Definition pathssec2id (X Y:UU)(s:X-> Y)(p:Y->X)(eps: forall x:X, paths _ (p (s x)) x)
+        : forall x:X, paths _ (pathssec2 _ _ s p eps _ _ (idpath _ (s x))) (idpath _ x).
+Proof.
+  intros.
+  path_via (pathscomp0 _ _ _ _ (pathsinv0 _ _ (eps x)) (eps x)).
+   apply (maponpaths _ _ (fun e0 => pathscomp0 _ _ _ _ e0 (eps x))).
+    apply pathscomp0rid.
+  apply pathsinv0l1.
+Defined. 
 
 
-Definition pathssec2 (X: UU)(Y:UU)(s:X-> Y)(p:Y->X)(eps: forall x:X, paths _ (p (s x)) x): forall x:X, forall x':X, paths _ (s x) (s x') -> paths _ x x'.
-Proof. intros X Y s p eps x x' X0. set (e:= pathssec1 _ _ s p eps _ _ X0).  apply (pathscomp0 _ _ _ _ e (eps x')). Defined.
-
-Definition pathssec2id (X: UU)(Y:UU)(s:X-> Y)(p:Y->X)(eps: forall x:X, paths _ (p (s x)) x): forall x:X, paths _ (pathssec2 _ _ s p eps _ _ (idpath _ (s x))) (idpath _ x).
-Proof. intros. unfold pathssec2. unfold pathssec1. simpl. assert (e: paths _ (pathscomp0 _ _ _ _ (pathsinv0 _ _ (eps x)) (idpath _ (p (s x)))) (pathsinv0 _ _ (eps x))). apply pathscomp0rid. assert (ee: paths _ 
-(pathscomp0 _ _ _ _ (pathscomp0 _ _ _ _ (pathsinv0 _ _ (eps x)) (idpath _ (p (s x)))) (eps x)) 
-(pathscomp0 _ _ _ _ (pathsinv0 _ _ (eps x)) (eps x))). 
-apply (maponpaths _ _ (fun e0: _ => pathscomp0 _ _ _ _ e0  (eps x)) _ _ e). assert (eee: paths _ (pathscomp0 _ _ _ _ (pathsinv0 _ _ (eps x)) (eps x)) (idpath _ x)).  apply (pathsinv0l1 _ _ _ (eps x)). apply (pathscomp0 _ _ _ _ ee eee). Defined. 
-
-
-Definition pathssec3 (X: UU)(Y:UU)(s:X-> Y)(p:Y->X)(eps: forall x:X, paths _ (p (s x)) x): forall x:X, forall x':X, forall e: paths _ x x', paths _  (pathssec2 _ _ s p eps _ _ (maponpaths _ _ s _ _ e)) e.
-Proof. intros. induction e.  simpl. unfold pathssec2. unfold pathssec1.  simpl. apply pathssec2id.  Defined. 
-
-
-
-
-
-
-
-
-
-
+Definition pathssec3 (X Y:UU)(s:X-> Y)(p:Y->X)(eps: forall x:X, paths _ (p (s x)) x)
+        : forall (x x':X) (e: paths _ x x'), paths _  (pathssec2 _ _ s p eps _ _ (maponpaths _ _ s _ _ e)) e.
+Proof. intros. induction e.  apply pathssec2id.  Defined. 
 
 
 (** ** Fibrations and paths. *)
@@ -505,33 +517,23 @@ Definition constr1 (X:UU)(P:X -> UU)(x:X)(x':X)(e:paths _ x x'):
                       )
                     )
                   ). 
-Proof. intros. induction e. split with (fun p: P x => p). split with (fun p: P x => idpath _ _). intro. apply idpath. Defined. 
+Proof. intros. induction e. split with (idfun (P x)). split with (fun p: P x => idpath _ _). intro. apply idpath. Defined. 
 
 (* this function lifts a path e from x to x' in X "forward" to a function from the fiber P x to the fiber P x' *)
 Definition transportf (X:UU)(P:X -> UU)(x:X)(x':X)(e:paths _ x x'): P x -> P x'.
-Proof.
-  intros X P x x' e p.
-  destruct e.
-  assumption.
-Defined.
+Proof. intros. destruct e. assumption. Defined.
 
 Lemma  transportfid (X:UU)(P:X -> UU)(x:X)(p: P x): paths _ (transportf _ P _ _ (idpath _ x) p) p.
-Proof. intros. unfold transportf. unfold idfun. apply idpath. Defined. 
+Proof. intros. apply idpath. Defined. 
 
 (* this function lifts a path e from x to x' in X "backward" to a function from the fiber P x' to the fiber P x *)
 Definition transportb (X:UU)(P:X -> UU)(x:X)(x':X)(e:paths _ x x'): P x' -> P x.
-Proof.
-  intros X P x x' e p.
-  destruct e.
-  assumption.
-Defined.
-
-Definition compose {X Y Z:UU} (g:Y->Z) (f:X->Y) := fun x => g (f x).
+Proof. intros. induction e. assumption. Defined.
 
 Lemma functtransportf (X:UU)(Y:UU)(f:X->Y)(P:Y->UU)(x:X)(x':X)(e: paths _ x x')(p: P (f x))
         : paths _ (transportf _ (compose P f) _ _ e p)
                   (transportf _ P _ _ (maponpaths _ _ f _ _ e) p).
-Proof.  intros.  induction e. apply idpath. Defined.   
+Proof.  intros. induction e. apply idpath. Defined.   
 
 (** ** First homotopy notions *)
 
@@ -546,23 +548,30 @@ Definition iscontrpair (T:UU) cntr (e: forall t:T, paths _ t cntr) : iscontr T :
 
 Lemma contrl1 (X Y:UU)(f:X -> Y)(g: Y-> X) : (forall y, paths _ y (f(g y))) -> iscontr X -> iscontr Y.
 Proof.
-  intros X Y f g efg isc.  
-  destruct isc as [x0 nh].
+  intros X Y f g efg [x0 nh].  
   split with (f x0).
-  exact (fun y => pathscomp0 _ _ _ _ (efg y) (maponpaths _ _ f _ _ (nh (g y)))).
+  intro y.
+  path_via (f (g y)).
+   apply efg.
+  path_from f.
+  apply nh.
 Defined. 
 
 Lemma contrl1' (X Y:UU)(f:X -> Y)(g: Y -> X) : (forall y, paths _ (f(g y)) y) -> iscontr X -> iscontr Y.
 Proof.
-  exact (fun X Y f g efg nh => contrl1 X Y f g (fun y => pathsinv0 _ _ (efg y)) nh).
+  intros X Y f g efg is.
+  apply (contrl1 _ _ f g).
+   intro y.
+   apply pathsinv0, efg.
+  exact is.
 Defined.
 
 Lemma contrl2 (X:UU) : iscontr X -> forall x x':X, paths _ x x'.
 Proof.
-   intros X is x x'.
-   unfold iscontr in is.
-   destruct is as [ x0 nh ].
-   exact (pathscomp0 _ _ _ _ (nh x) (pathsinv0 _ _ (nh x'))).
+   intros X [ x0 nh ] x x'.
+   path_via x0.
+    apply nh.
+   apply pathsinv0, nh.
 Defined.
 
 (* Here "coconustot" = "co conus to t", and "conus" = "cone" *)
@@ -570,7 +579,7 @@ Definition coconustot (T:UU) (t:T) := total2 T (fun t' => paths _ t' t).
 Definition coconustotpair (T:UU) (t t':T) (e: paths _ t' t) : coconustot T t := tpair _ (fun t' => paths _ t' t) t' e.
 
 Lemma connectedcoconustot: forall T:UU, forall t:T, forall e1: coconustot _ t, forall e2:coconustot _ t, paths _ e1 e2.
-Proof. intros. destruct e1 as [ x0 x ]. destruct x. destruct e2 as [ x1 x ]. destruct x. apply idpath. Defined. 
+Proof. intros T t [ x0 [] ] [ x1 [] ]. apply idpath. Defined. 
 
 Lemma iscontrcoconustot (T:UU) (t:T) : iscontr (coconustot T t).
 Proof. intros. unfold iscontr.  set (t0:= tpair _ (fun t':T => paths _ t' t) t (idpath _ t)).  split with t0. intros. apply  connectedcoconustot. Defined.
@@ -582,10 +591,10 @@ Definition coconusfromt (T:UU)(t:T) :=  total2 T (fun t':T => paths _ t t').
 Definition coconusfromtpair (T:UU) (t:T) (t':T) (e: paths _ t t'):coconusfromt T t := tpair T (fun t':T => paths _ t t') t' e.
 
 Lemma connectedcoconusfromt: forall T:UU, forall t:T, forall e1: coconusfromt T t, forall e2:coconusfromt T t, paths _ e1 e2.
-Proof. intros. destruct e1 as [x0 x]. destruct x. destruct e2 as [ x1 x ]. destruct x. apply idpath. Defined.
+Proof. intros T t [x1 []] [x2 []]. apply idpath. Defined.
 
 Lemma iscontrcoconusfromt (T:UU) (t:T) : iscontr (coconusfromt T t).
-Proof. intros. unfold iscontr.  set (t0:= tpair _ (fun t':T => paths _ t t') t (idpath _ t)).  split with t0. intros. apply  connectedcoconusfromt. Defined.
+Proof. intros.  split with (tpair _ (fun t':T => paths _ t t') t (idpath _ t)). intros. apply  connectedcoconusfromt. Defined.
 
 
 
@@ -603,38 +612,37 @@ Definition hfiberpair  (X:UU)(Y:UU)(f:X -> Y)(y:Y) (x:X) (e: paths _ (f x) y): h
 
 Definition hfiberpairpath (X:UU)(Y:UU)(f:X -> Y)(y:Y) (x:X) (e e': paths _ (f x) y)(p: paths _ e e') : paths _ (hfiberpair _ _ f y x e)(hfiberpair _ _ f y x e').
 Proof.
-  intros.
-  induction p.
+  intros X Y f y x e e' [].
   apply idpath.
 Defined.
 
 Lemma hfibertriangle1 (X Y:UU)(f:X -> Y)(y:Y)(xe1 xe2: hfiber _ _ f y)(e: paths _ xe1 xe2)
            : paths _ (pr22 _ _ xe1) (pathscomp0 _ _ _ _ (maponpaths _ _ f _ _ (maponpaths _ _ (pr21 _ _ ) _ _ e)) (pr22 _ _ xe2)).
-Proof. intros. destruct e.  simpl. apply idpath. Defined. 
+Proof. intros X Y f y xe1 xe2 [].  apply idpath. Defined. 
 
 Lemma hfibertriangle2 (X Y:UU)(f:X -> Y)(y:Y)
         (xe1 xe2: hfiber _ _ f y)
         (ee: paths _ (pr21 _ _ xe1) (pr21 _ _ xe2))
         (eee: paths _ (pr22 _ _ xe1) (pathscomp0 _ _ _ _ (maponpaths _ _ f _ _ ee) (pr22 _ _ xe2)))
         : paths _ xe1 xe2.
-Proof. intros. destruct xe1 as [ t e1 ]. destruct xe2.
-       simpl in eee. simpl in ee. destruct ee. simpl in eee.
-       apply (maponpaths _ _ (fun e: paths _ (f t) y => hfiberpair _ _ f y t e) _ _ eee). Defined. 
+Proof. intros X Y f y [ x e ] [ x' e' ] ee eee. 
+       simpl in ee. destruct ee.
+       path_from (fun e: paths _ (f x) y => hfiberpair _ _ f _ _ e).
+       assumption.
+Defined.
 
 Definition hfibertransport (X Y:UU)(f:X->Y)(y:Y)(y':Y) : paths _ y y' -> hfiber _ _ f y -> hfiber _ _ f y'.
 Proof.
-  intros X Y f y y' e H.
-  destruct H as [x e'].
+  intros X Y f y y' e [x e'].
   apply (hfiberpair _ _ f y' x).
-  apply (pathscomp0 _ _ _ _ e' e).
+  path_via y; assumption.
 Defined.
 
 Definition hfibertransport' (X Y:UU)(f:X->Y)(y:Y)(y':Y) : paths _ y y' -> hfiber _ _ f y -> hfiber _ _ f y'.
 Proof.
-  intros X Y f y y' e H.
-  destruct H as [x e'].
+  intros X Y f y y' e [x e'].
   apply (hfiberpair _ _ f y' x).
-  apply (pathscomp0' _ _ _ _ e' e).
+  path_via' y; assumption.
 Defined.
 
 Lemma hfibertransportcompare (X Y:UU)(f:X->Y)(y:Y)(y':Y)(p:paths _ y y')(xe:hfiber _ _ f y) 
@@ -650,27 +658,19 @@ Defined.
 
 Lemma hfibertransportid' (X Y:UU)(f:X->Y)(y:Y)(xe: hfiber _ _ f y) : paths _ xe (hfibertransport' _ _ _ _ _ (idpath _ y) xe).
 Proof.
-  intros.
-  unfold hfibertransport.
-  unfold pathscomp0'.
-  simpl.
-  induction xe.
-  unfold hfiberpair.
+  intros X Y f y [x e].
   apply idpath.
 Defined.
 
 Lemma hfibertransportid (X Y:UU)(f:X->Y)(y:Y)(xe: hfiber _ _ f y) : paths _ xe (hfibertransport _ _ _ _ _ (idpath _ y) xe).
 Proof.
-  intros.
-  unfold hfibertransport, hfiberpair.  
-  destruct xe as [x e].
+  intros X Y f y [x e].
   apply hfiberpairpath, pathsinv0, pathscomp0rid.
 Defined.
 
 Definition constr3 (X:UU)(Y:UU)(f:X -> Y)(y:Y) (x:X) (e1 e2: paths _ (f x) y) (ee: paths _  e1 e2)
                 : paths _ (hfiberpair _ _ _ _ x e1) (hfiberpair _ _ _ _ x e2).
 Proof. intros. destruct ee. apply idpath.  Defined.
-
 
 Definition coconusf (X Y:UU) (f: X -> Y):= total2 Y (fun y => hfiber _ _ f y).
 
@@ -687,10 +687,8 @@ Defined.
 Definition coconushhtransportpath (X Y:UU)(f:X->Y)(y:Y)(y':Y)(xe : hfiber X Y f y)(e' : paths _ y y') 
            : paths (coconusf X Y f) (tococonush _ _ _ _ xe) (tococonush _ _ _ _ (hfibertransport _ _ _ _ _ e' xe)).
 Proof.
-  intros.
-  induction e'.
+  intros X Y f y y' [x e] [].
   unfold tococonush, hfibertransport, hfiberpair. 
-  destruct xe as [x e].
   assert (p : paths _ e (pathscomp0 _ _ _ _ e (idpath Y y))).
     apply pathsinv0, pathscomp0rid.
   induction p.
@@ -799,7 +797,7 @@ Proof.
   apply paths_rect2weq.
   assumption.
   intro x.
-  apply (pathscomp0 _ _ (maponpaths _ _ f _ _ (idpath _ x))).
+  path_via (maponpaths _ _ f _ _ (idpath _ x)).
     apply maponpathsfunc, pathsweq2id.
   apply idtoid1.
 Defined.
@@ -901,16 +899,18 @@ Proof.
 Defined. 
 
 
-Lemma isweql1 (X:UU)(Y:UU)(f:X -> Y)(g: Y-> X) : 
-        (forall y, paths _ (f(g y)) y) -> forall  z: X, iscontr (hfiber _ _ (compose g f) z) -> iscontr (hfiber _ _ g z).
+Lemma isweql1 (X:UU)(Y:UU)(f:X -> Y)(g: Y -> X) : 
+        (forall y, paths _ (f(g y)) y) 
+        -> forall  z: X,
+                iscontr (hfiber _ _ (compose g f) z)
+                -> iscontr (hfiber _ _ g z).
 Proof.
-   intros X Y f g efg z.
-   exact (contrl1 _ _ 
-     (hfibersgftog _ _ _ f g z)
-     (fun z' => pr21 _ _ (constr2 _ _ _ _ efg z z'))
-     (fun y' => pr22 _ _ (constr2 _ _ _ _ efg z y'))).
-   Defined.
-
+ intros X Y f g efg z.
+ exact (contrl1 _ _ 
+   (hfibersgftog _ _ _ f g z)
+   (fun z' => pr21 _ _ (constr2 _ _ _ _ efg z z'))
+   (fun y' => pr22 _ _ (constr2 _ _ _ _ efg z y'))).
+Defined.
 
 Lemma isweql2 (X:UU)(Y:UU)(f1:X-> Y) (f2:X->Y) : (forall x:X, paths _ (f2 x) (f1 x)) -> forall y:Y, iscontr (hfiber _ _ f2 y) -> iscontr (hfiber _ _ f1 y).
 Proof.
@@ -1070,8 +1070,7 @@ Proof.
    assumption.
   apply (pathsweq2 _ _ invf); assumption.
  apply (gradth _ _ g invg); assumption.
- Defined.
-
+Defined.
 
 Lemma isweql3 (X Y:UU)(f:X-> Y)(g:Y->X) : (forall x:X, paths _ (g (f x)) x) -> isweq _ _ f -> isweq _ _ g.
 Proof. 
@@ -1296,9 +1295,9 @@ Definition d4f (X Y:UU)(f:X -> Y)(y:Y)(x:X)(xe': hfiber _ _ f y)(e:paths _ (f x)
 
 Lemma d4fhomot  (X Y:UU)(f:X -> Y)(y:Y)(x:X)(xe': hfiber _ _ f y)(e: paths _ (f x) y)(ee: paths _ (hfiberpair _ _ f y x e) xe') : paths _ (d4f _ _ f y x xe' e ee) (maponpaths _ _ (pr21 _ _) _ _ (pathsinv0 _ _ ee)).
 Proof. intros. 
-  apply (pathscomp0 _ _ (pathscomp0 _ _ _ _
+  path_via (pathscomp0 _ _ _ _
             (maponpaths _ _ (d1f _ _ f y) _ _ (pathsinv0 _ _ ee))
-            (idpath _ (d1f _ _ f y (d2f _ _ f y x e))))).
+            (idpath _ (d1f _ _ f y (d2f _ _ f y x e)))).
     apply (fibseqhomot2 _ _ _ (d2f _ _ f y x) (d1f _ _ f y) x (fun xe => idpath _ _) (isfibseq2 _ _ f y x) xe' e ee).  
   apply pathscomp0rid.
 Defined.
