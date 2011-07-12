@@ -1243,34 +1243,55 @@ Defined.
 Definition d1f (X Y:UU)(f:X -> Y)(y:Y): hfiber _ _ f y -> X := pr21 _ _.
 
 Theorem isfibseq1 (X Y:UU)(f:X -> Y)(y:Y) : isfibseq _ _ _ (d1f _ _ f y) f y (fun xe: _ => pr22 _ _ xe).
-Proof. intros. assert (X0:forall xe': hfiber _ _ f y, paths _ xe' (ezmap  _ _ _ (d1f _ _ f y) f y (fun xe: _ => pr22 _ _ xe) xe')). intro. apply tppr. apply (isweqhomot _ _ _ _ X0 (idisweq _)).  Defined.
+Proof.
+  intros.
+  apply (isweqhomot _ _ (idfun _)).
+   intro.
+   apply tppr.
+  apply idisweq.
+Defined.
 
 
 Definition d2f  (X Y:UU)(f:X -> Y)(y:Y)(x:X): paths _ (f x) y -> hfiber _ _ f y := hfiberpair _ _ f y x.
 
 
 Theorem isfibseq2  (X Y:UU)(f:X -> Y)(y:Y)(x:X): isfibseq _ _ _ (d2f _ _ f y x) (d1f _ _ f y) x (fun e:_ => idpath _ _).
-Proof. intros.  apply (isfibseqdiff1 _ _ _ (d1f _ _ f y) f y  (fun xe: _ => pr22 _ _ xe) (isfibseq1 _ _ f y) x). Defined.
+Proof. intros.  
+  apply (isfibseqdiff1 _ _ _ _ _ _ _ (isfibseq1 _ _ f y) x).
+Defined.
 
 
-Definition d3f (X Y:UU)(f:X -> Y)(y:Y)(x:X)(xe': hfiber _ _ f y): paths _ (pr21 _ _ xe') x -> paths _ (f x) y:= diff2f _ _ _ (d1f _ _ f y) f y (fun xe: _ => pr22 _ _ xe) (isfibseq1 _ _ f y) x xe'. 
+Definition d3f (X Y:UU)(f:X -> Y)(y:Y)(x:X)(xe': hfiber _ _ f y)
+        : paths _ (pr21 _ _ xe') x -> paths _ (f x) y
+        := diff2f _ _ _ (d1f _ _ f y) f y (fun xe => pr22 _ _ xe) (isfibseq1 _ _ f y) x xe'. 
 
-Lemma d3fhomot  (X Y:UU)(f:X -> Y)(y:Y)(x:X)(xe': hfiber _ _ f y)(e: paths _ (pr21 _ _ xe') x) : paths _ (d3f _ _ f y x xe' e) (pathscomp0 _ _ _ _ (maponpaths _ _ f _ _ (pathsinv0 _ _ e)) (pr22 _ _ xe')).
+Lemma d3fhomot  (X Y:UU)(f:X -> Y)(y:Y)(x:X)(xe': hfiber _ _ f y)(e: paths _ (pr21 _ _ xe') x)
+        : paths _ (d3f _ _ f y x xe' e)
+                  (pathscomp0 _ _ _ _ (maponpaths _ _ f _ _ (pathsinv0 _ _ e)) (pr22 _ _ xe')).
 Proof. intros. apply fibseqhomot2. Defined.
 
 
-Definition d3fez  (X Y:UU)(f:X -> Y)(y:Y)(x:X)(xe': hfiber _ _ f y): forall e: paths _ (pr21 _ _ xe') x, paths _ (d2f _ _ f y x (d3f _ _ f y x xe' e)) xe':= diff2ez _ _ _ (d1f _ _ f y) f y (fun xe: _ => pr22 _ _ xe) (isfibseq1 _ _ f y) x xe'. 
+Definition d3fez  (X Y:UU)(f:X -> Y)(y:Y)(x:X)(xe': hfiber _ _ f y)
+        : forall e: paths _ (pr21 _ _ xe') x, paths _ (d2f _ _ f y x (d3f _ _ f y x xe' e)) xe'
+        := diff2ez _ _ _ (d1f _ _ f y) f y (fun xe => pr22 _ _ xe) (isfibseq1 _ _ f y) x xe'. 
 
-Theorem isfibseq3 (X Y:UU)(f:X -> Y)(y:Y)(x:X)(xe': hfiber _ _ f y): isfibseq _ _ _ (d3f _ _ f y x xe') (d2f _ _ f y x) xe' (d3fez _ _ f y x xe').
-Proof. intros. unfold isfibseq. apply isfibseqdiff1. Defined.
+Theorem isfibseq3 (X Y:UU)(f:X -> Y)(y:Y)(x:X)(xe': hfiber _ _ f y)
+        : isfibseq _ _ _ (d3f _ _ f y x xe') (d2f _ _ f y x) xe' (d3fez _ _ f y x xe').
+Proof. intros. apply isfibseqdiff1. Defined.
 
 
 
-Definition d4f (X Y:UU)(f:X -> Y)(y:Y)(x:X)(xe': hfiber _ _ f y)(e:paths _ (f x) y): paths _ (hfiberpair _ _ f y x e) xe' -> paths _ (pr21 _ _ xe') x := diff2f _ _ _ (d2f _ _ f y x) (d1f _ _ f y) x (fun xe: _ => idpath _ _) (isfibseq2 _ _ f y x) xe' e. 
-
+Definition d4f (X Y:UU)(f:X -> Y)(y:Y)(x:X)(xe': hfiber _ _ f y)(e:paths _ (f x) y)
+        : paths _ (hfiberpair _ _ f y x e) xe' -> paths _ (pr21 _ _ xe') x 
+        := diff2f _ _ _ (d2f _ _ f y x) (d1f _ _ f y) x (fun xe => idpath _ _) (isfibseq2 _ _ f y x) xe' e. 
  
 
-Lemma d4fhomot  (X Y:UU)(f:X -> Y)(y:Y)(x:X)(xe': hfiber _ _ f y)(e: paths _ (f x) y)(ee: paths _ (hfiberpair _ _ f y x e) xe') : paths _ (d4f _ _ f y x xe' e ee) (maponpaths _ _ (pr21 _ _) _ _ (pathsinv0 _ _ ee)).
+Lemma d4fhomot  (X Y:UU)(f:X -> Y)(y:Y)(x:X)
+          (xe': hfiber _ _ f y)
+          (e: paths _ (f x) y)
+          (ee: paths _ (hfiberpair _ _ f y x e) xe')
+        : paths _ (d4f _ _ f y x xe' e ee)
+                  (maponpaths _ _ (pr21 _ _) _ _ (pathsinv0 _ _ ee)).
 Proof. intros. 
   path_via (pathscomp0 _ _ _ _
             (maponpaths _ _ (d1f _ _ f y) _ _ (pathsinv0 _ _ ee))
@@ -1283,8 +1304,9 @@ Definition d4fez  (X Y:UU)(f:X -> Y)(y:Y)(x:X)(xe': hfiber _ _ f y)(e: paths _ (
         : forall ee: paths _ (hfiberpair _ _ f y x e) xe', paths _ (d3f _ _ f y x xe' (d4f _ _ f y x xe' e ee)) e
        := diff2ez _ _ _ (d2f _ _ f y x) (d1f _ _ f y) x (fun xe: _ => idpath _ _) (isfibseq2 _ _ f y x) xe' e. 
 
-Theorem isfibseq4 (X Y:UU)(f:X -> Y)(y:Y)(x:X)(xe': hfiber _ _ f y)(e: paths _ (f x) y): isfibseq _ _ _ (d4f _ _ f y x xe' e) (d3f _ _ f y x xe') e (d4fez _ _ f y x xe' e).
-Proof. intros. unfold isfibseq. apply isfibseqdiff1. Defined.
+Theorem isfibseq4 (X Y:UU)(f:X -> Y)(y:Y)(x:X)(xe': hfiber _ _ f y)(e: paths _ (f x) y)
+        : isfibseq _ _ _ (d4f _ _ f y x xe' e) (d3f _ _ f y x xe') e (d4fez _ _ f y x xe' e).
+Proof. intros. apply isfibseqdiff1. Defined.
 
 
 
@@ -1361,36 +1383,60 @@ Let e:=pr22 _ _ ye.
 
 
 Definition hfibersinvezmap : hfiber _ _ (hfibersgftog _ _ _ f g z) ye ->  hfiber _ _ f y.
-Proof. intro X0. destruct X0 as [ t e0 ].  destruct t as [ x e'].   set (prg:= (fun z: (hfiber Y Z g z) => pr21 _ _ z)). set (int:= hfiberpair _ _ f y  x (maponpaths _ _ prg _ _ e0)). assumption. Defined.  
+Proof.
+  intros [ [ x e'] e0 ].
+  apply (hfiberpair _ _ f y x).
+  apply (maponpaths _ _ (fun z: hfiber _ _ g z => pr21 _ _ z) _ _ e0).
+Defined.  
 
 
-Definition hfiberpath1 (y1:Y)(e1: paths _ (g y1) z)(y2:Y)(e21:paths _ y2 y1): paths _ (hfiberpair _ _  g z y2 (pathscomp0 _ _ _ _ (maponpaths _ _ g _ _ e21) e1)) (hfiberpair _ _ g z y1 e1).
-Proof. intros.  induction e21. simpl. apply idpath. Defined.  
+Definition hfiberpath1 (y1:Y)(e1: paths _ (g y1) z)(y2:Y)(e21:paths _ y2 y1)
+        : paths _ (hfiberpair _ _  g z y2 (pathscomp0 _ _ _ _ (maponpaths _ _ g _ _ e21) e1))
+                  (hfiberpair _ _ g z y1 e1).
+Proof. intros.  induction e21. apply idpath. Defined.  
 
 Definition hfiberpath11 (y1:Y)(e1: paths _ (g y1) z)(y2:Y)(e21:paths _ y2 y1): paths _ (maponpaths _ _ (fun u: hfiber _ _ g z => pr21 _ _ u) _ _ (hfiberpath1 y1 e1 y2 e21)) e21.
-Proof. intros.  simpl. induction e21. simpl. apply idpath. Defined. 
+Proof. intros. induction e21. apply idpath. Defined. 
 
 Definition gzx: UU := total2 (hfiber _ _ g z) (fun u: (hfiber _ _  g z) => (hfiber _ _ f (pr21 _ _ u))). 
 
 
 
 Definition gzxmap3: hfiber _ _ f y -> hfiber _ _ (fun t: gzx => pr21 _ _ t) ye.
-Proof. intro X0.  set (int1:= tpair _  (fun u: (hfiber _ _  g z) => (hfiber _ _ f (pr21 _ _ u))) ye X0). split with int1. simpl. apply idpath. Defined.
+Proof.
+  intro X0.
+  split with (tpair _ (fun u: (hfiber _ _  g z) => (hfiber _ _ f (pr21 _ _ u))) _ X0).
+  apply idpath.
+Defined.
 
 Definition gzxmap4: hfiber _ _ (fun t: gzx  => pr21 _ _ t) ye -> hfiber _ _ f y.
-Proof. intro X0. destruct X0 as [ t e4 ].  destruct t as [ t x ].  destruct x as [ x e2 ]. destruct t as [ y' e1 ].  simpl in e4. simpl in x. set (ee0:= maponpaths _ _ (fun z: hfiber _ _ g z => pr21 _ _ z) _ _ e4).  set (ee:= pathscomp0 _ _ _ _ e2 ee0). simpl in ee. apply (hfiberpair _ _ f y x ee). Defined.
- 
-
+Proof.
+  intros [ [ [ y' e1 ] [ x e2 ] ] e4 ].
+  apply (hfiberpair _ _ f y x).
+  apply (pathscomp0 _ _ _ _ e2).
+  path_from (fun z: hfiber _ _ g z => pr21 _ _ z).
+  exact e4.
+Defined.
 
 Definition gzxmap1  : hfiber _ _ (hfibersgftog _ _ _ f g z) ye -> hfiber _ _ (fun t: gzx => pr21 _ _ t) ye.
-Proof. intro X0. destruct X0 as [t e0].  destruct t as [x e']. set (int1:= tpair (hfiber _ _ g z) (fun u: (hfiber _ _  g z) => (hfiber _ _ f (pr21 _ _ u))) (hfiberpair _ _ g z (f x) e') (hfiberpair _ _ f  (f x) x (idpath _ (f x)))). split with int1. simpl. assumption. Defined. 
+Proof.
+  intros [[x e'] e0].
+  split with (tpair _ (fun u: hfiber _ _  g z => (hfiber _ _ f (pr21 _ _ u)))
+                      (hfiberpair _ _ g z (f x) e')
+                      (hfiberpair _ _ f  (f x) x (idpath _ (f x)))).
+  exact e0.
+Defined. 
 
 
 Definition gzxmap2 : hfiber _ _ (fun t: gzx => pr21 _ _ t) ye ->  hfiber _ _ (hfibersgftog _ _ _ f g z) ye.
-Proof. intro X0. destruct X0 as [ t e4 ]. destruct t as [ t x0 ]. destruct x0 as [ x e2]. destruct t as [ y' e1 ].  simpl in e4. set (int1:= hfiberpair _ _ (fun x0 : X => g (f x0)) z x (pathscomp0 _ _ _ _ (maponpaths _ _ g _ _ e2) e1)).  split with int1. simpl. assert (e5: paths _  (hfiberpair Y Z g z (f x) (pathscomp0 _ _ _ _ (maponpaths _ _ g (f x) y' e2) e1)) (tpair Y (fun pointover : Y => paths _ (g pointover) z) y' e1)). apply hfiberpath1. apply (pathscomp0 _ _ _ _ e5 e4). Defined. 
-
-
-
+Proof.
+  intros [ [ [ y' e1 ] [ x e2] ] e4 ].
+  split with (hfiberpair _ _ (compose g f) z x (pathscomp0 _ _ _ _ (maponpaths _ _ g _ _ e2) e1)).
+   assert (e5: paths _ (hfiberpair Y Z g z (f x) (pathscomp0 _ _ _ _ (maponpaths _ _ g (f x) y' e2) e1))
+                       (tpair Y (fun pointover : Y => paths _ (g pointover) z) y' e1)).
+   apply hfiberpath1.
+  exact (pathscomp0 _ _ _ _ e5 e4).
+Defined. 
 
 
 Definition gzxhom412  (t: hfiber _ _ (fun t: gzx => pr21 _ _ t) ye): paths _ (gzxmap4  (gzxmap1 (gzxmap2  t))) (gzxmap4 t).
