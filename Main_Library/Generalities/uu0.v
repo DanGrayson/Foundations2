@@ -1640,29 +1640,51 @@ apply (gradth _ _  f g egf efg). Defined.
 
 
 Lemma isweqhff (X:UU)(Y:UU)(f: X -> Y)(P:Y-> UU): isweq _ _ (hffpmap2 _ _ f P). 
-Proof. intros. set (int:= total2 X (fun x:X => total2 (coconusfromt _ (f x)) (fun u: coconusfromt _ (f x) => P (pr21 _ _ u)))). set (intpair:= tpair X (fun x:X => total2 (coconusfromt _ (f x)) (fun u: coconusfromt _ (f x) => P (pr21 _ _ u)))).  set (toint:= fun z: (total2 (total2 Y P) (fun u:total2 Y P => hfiber _ _ f (pr21 _ _ u))) => intpair (pr21 _ _ (pr22 _ _ z)) (tpair _  (fun u: coconusfromt _ (f (pr21 _ _ (pr22 _ _ z))) => P (pr21 _ _ u)) (coconusfromtpair _ _ (pr21 _ _ (pr21 _ _ z)) (pr22 _ _ (pr22 _ _ z))) (pr22 _ _ (pr21 _ _ z)))). set (fromint:= fun z: int => tpair _ (fun u:total2 Y P => hfiber _ _ f (pr21 _ _ u)) (tpair Y P (pr21 _ _ (pr21 _ _ (pr22 _ _ z))) (pr22 _ _ (pr22 _ _ z))) (hfiberpair _ _ f (pr21 _ _ (pr21 _ _ (pr22 _ _ z))) (pr21 _ _ z) (pr22 _ _ (pr21 _ _ (pr22 _ _ z))))). assert (fromto: forall u:(total2 (total2 Y P) (fun u:total2 Y P => hfiber _ _ f (pr21 _ _ u))), paths _ (fromint (toint u)) u). simpl in toint. simpl in fromint. simpl. intro. destruct u as [ t x ]. destruct x. destruct t. simpl. unfold toint. unfold fromint. simpl. apply idpath. assert (tofrom: forall u:int, paths _ (toint (fromint u)) u). intro. destruct u as [ t x ]. destruct x as [ t0 x ]. destruct t0. simpl in x. simpl. unfold fromint. unfold toint. simpl. apply idpath. assert (is: isweq _ _ toint). apply (gradth _ _ toint fromint fromto tofrom).  clear tofrom. clear fromto.  clear fromint.
-
-set (h:= fun u: total2 X (fun x:X => P (f x)) => toint ((hffpmap2 _ _ f P) u)). simpl in h. 
-
-assert (l1: forall x:X, isweq _ _ (fun p: P (f x) => tpair _  (fun u: coconusfromt _ (f x) => P (pr21 _ _ u)) (coconusfromtpair _ _ (f x) (idpath _  (f x))) p)). intro. apply (centralfiber Y P (f x)).  
-
-assert (X0:isweq _ _ h). apply (isweqfibtototal X (fun x:X => P (f x))  (fun x:X => total2 (coconusfromt _ (f x)) (fun u: coconusfromt _ (f x) => P (pr21 _ _ u))) (fun x:X => (fun p: P (f x) => tpair _  (fun u: coconusfromt _ (f x) => P (pr21 _ _ u)) (coconusfromtpair _ _ (f x) (idpath _  (f x))) p))). assumption.   
-
-apply (twooutof3a _ _ _ (hffpmap2 _ _ f P) toint X0 is). Defined. 
+Proof.
+  intros.
+  pose (k := fun x:X => total2 (coconusfromt _ (f x)) (compose P (pr21 _ _))).
+  pose (int    := total2 X k).
+  pose (intpair:= tpair  X k).
+  pose (toint:= fun z: (total2 (total2 Y P) (fun u:total2 Y P => hfiber _ _ f (pr21 _ _ u)))
+        => intpair (pr21 _ _ (pr22 _ _ z))
+                   (tpair _  (compose P (pr21 _ _))
+                             (coconusfromtpair _ _ (pr21 _ _ (pr21 _ _ z)) (pr22 _ _ (pr22 _ _ z)))
+                             (pr22 _ _ (pr21 _ _ z)))).
+  pose (h := fun u => toint ((hffpmap2 _ _ f P) u)).
+  apply (twooutof3a _ _ _ (hffpmap2 _ _ f P) toint).
+   apply (isweqfibtototal _ (compose P f) k 
+                (fun x => tpair _  (compose P (pr21 _ _)) (coconusfromtpair _ _ (f x) (idpath _ _)))).
+   intro x.
+   apply (centralfiber _ P (f x)).
+  pose (fromint := fun z: int => tpair _ (fun u => hfiber _ _ f (pr21 _ _ u))
+                                         (tpair Y P (pr21 _ _ (pr21 _ _ (pr22 _ _ z))) (pr22 _ _ (pr22 _ _ z)))
+                                         (hfiberpair _ _ f (pr21 _ _ (pr21 _ _ (pr22 _ _ z))) (pr21 _ _ z) (pr22 _ _ (pr21 _ _ (pr22 _ _ z))))).
+  apply (gradth _ _ toint fromint).
+   intros [ [y b] [x e] ].
+   apply idpath.
+  intros [ t [ [y b] x ] ].
+  apply idpath.
+Defined. 
 
 
 
 
 Theorem isweqhfiberfp (X:UU)(Y:UU)(f:X -> Y)(P:Y-> UU)(yp: total2 Y P): isweq _ _ (hfiberfpmap _ _ f P yp).
-Proof. intros. set (int1:= hfibersgftog _ _ _ (hffpmap2 _ _ f P) (fun u: (total2 (total2 Y P) (fun u:total2 Y P => hfiber _ _ f (pr21 _ _ u))) => (pr21 _ _ u)) yp). assert (is1: isweq _ _ int1). apply isweqhfibersgftog. apply isweqhff. set (phi:= fibmap2 (total2 Y P) (fun u:total2 Y P => hfiber _ _ f (pr21 _ _ u)) yp). assert (is2: isweq _ _ phi). apply (isweqfibmap2 (total2 Y P) (fun u:total2 Y P => hfiber _ _ f (pr21 _ _ u)) yp). apply (twooutof3c _ _ _ int1 phi is1 is2).   Defined. 
+Proof.
+  intros.
+  apply (twooutof3c _ _ _ (hfibersgftog _ _ _ (hffpmap2 _ _ f P) (pr21 _ _) yp)).
+   apply isweqhfibersgftog, isweqhff.
+  apply (isweqfibmap2 _ (fun u => hfiber _ _ f (pr21 _ _ u))).
+Defined. 
 
 
 Corollary isweqfpmap (X:UU)(Y:UU)(f:X -> Y)(P:Y-> UU): isweq _ _ f -> isweq _ _ (fpmap _ _ f P).
-Proof. intros X Y f P X0. unfold isweq.   intro. unfold isweq in X0.  set (h:=hfiberfpmap _ _ f P y). 
-assert (X1:isweq _ _ h). apply isweqhfiberfp. 
-assert (is: iscontr (hfiber X Y f (pr21 _ _ y))). apply X0. apply (iscontrxifiscontry _ _  h X1 is). Defined. 
-
-
+Proof.
+  intros ? ? ? ? X0 y.
+  apply (iscontrxifiscontry _ _ (hfiberfpmap _ _ _ _ _)).
+  apply isweqhfiberfp.
+  apply X0.
+Defined. 
 
 
 (** ** The maps between total spaces of families given by a map between the bases of the families and maps between the corresponding members of the families. *)
@@ -1673,13 +1695,22 @@ match xp with
 tpair x p => tpair Y Q (f x) (fm x p)
 end.
 
-Theorem isweqbandfmap  (X Y:UU)(f: X -> Y) (P:X -> UU)(Q: Y -> UU)(fm: forall x:X, P x -> (Q (f x)))(isf: isweq _ _ f)(isfm: forall x:X, isweq _ _ (fm x)): isweq _ _ (bandfmap _ _ _ P Q fm).
-Proof. intros. set (f1:= totalfun _ P _ fm). set (is1:= isweqfibtototal X P (fun x:X => Q (f x)) fm isfm).  set (f2:= fpmap _ _ f Q).  set (is2:= isweqfpmap _ _ f Q isf). 
-assert (h: forall xp: total2 X P, paths _ (f2 (f1 xp)) (bandfmap _ _ f P Q fm xp)). intro. destruct xp. apply idpath.  apply (isweqhomot _ _ _ _ h (twooutof3c _ _ _ f1 f2 is1 is2)). Defined.
-
-
-
-
+Theorem isweqbandfmap  (X Y:UU)(f: X -> Y) (P:X -> UU)(Q: Y -> UU)
+                (fm: forall x:X, P x -> (Q (f x)))
+                (isf: isweq _ _ f)
+                (isfm: forall x:X, isweq _ _ (fm x))
+        : isweq _ _ (bandfmap _ _ _ P Q fm).
+Proof.
+  intros.
+  set (f1:= totalfun _ P _ fm).
+  set (is1:= isweqfibtototal X P (fun x:X => Q (f x)) fm isfm).
+  set (f2:= fpmap _ _ f Q).
+  set (is2:= isweqfpmap _ _ f Q isf).
+  assert (h: forall xp, paths _ (f2 (f1 xp)) (bandfmap _ _ f P Q fm xp)).
+   intros [x p].
+   apply idpath.
+  apply (isweqhomot _ _ _ _ h (twooutof3c _ _ _ f1 f2 is1 is2)).
+Defined.
 
 (** ** Homotopy fiber products. *)
 
