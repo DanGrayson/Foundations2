@@ -1422,11 +1422,10 @@ Definition gzxmap1  : hfiber _ _ (hfibersgftog _ _ _ f g z) ye -> hfiber _ _ (fu
 Proof.
   intros [[x e'] e0].
   split with (tpair _ (fun u: hfiber _ _  g z => (hfiber _ _ f (pr21 _ _ u)))
-                      (hfiberpair _ _ g z (f x) e')
-                      (hfiberpair _ _ f  (f x) x (idpath _ (f x)))).
+                      (hfiberpair _ _ g _ (f x) e')
+                      (hfiberpair _ _ f _ x (idpath _ (f x)))).
   exact e0.
 Defined. 
-
 
 Definition gzxmap2 : hfiber _ _ (fun t: gzx => pr21 _ _ t) ye ->  hfiber _ _ (hfibersgftog _ _ _ f g z) ye.
 Proof.
@@ -1440,101 +1439,79 @@ Defined.
 
 
 Definition gzxhom412  (t: hfiber _ _ (fun t: gzx => pr21 _ _ t) ye): paths _ (gzxmap4  (gzxmap1 (gzxmap2  t))) (gzxmap4 t).
-Proof. intros.  destruct t as [ t e4 ]. destruct t as [ t x0 ]. destruct t as [ y' e1 ]. destruct x0 as [ x e2 ]. simpl. simpl in x. 
-assert (int1: paths _ (maponpaths _ _
-  (fun z0 : hfiber Y Z g z =>
-    pr21 Y (fun pointover : Y => paths _ (g pointover) z) z0)
-  (tpair Y (fun pointover : Y => paths _ (g pointover) z) 
-    (f x)
-    (pathscomp0 _ _ _ _ (maponpaths _ _ g (f x) y' e2) e1)) ye
-  (pathscomp0 _ _ _ _ (hfiberpath1 y' e1 (f x) e2) e4))
-(pathscomp0 _ _ _ _ (maponpaths _ _  (fun z0 : hfiber Y Z g z =>
-  pr21 Y (fun pointover : Y => paths _ (g pointover) z) z0) _ _ (hfiberpath1 y' e1 (f x) e2)) (maponpaths _ _  (fun z0 : hfiber Y Z g z =>
-    pr21 Y (fun pointover : Y => paths _ (g pointover) z) z0) _ _ e4))).
-apply maponpathscomp0. simpl in int1. assert (int2: paths _  (pathscomp0 _ _ _ _
-              (maponpaths _ _
-                 (fun z0 : hfiber Y Z g z =>
-                  pr21 Y (fun pointover : Y => paths _ (g pointover) z) z0)
-                 (hfiberpair Y Z g z (f x)
-                    (pathscomp0 _ _ _ _ (maponpaths _ _ g (f x) y' e2) e1))
-                 (hfiberpair Y Z g z y' e1)
-                 (hfiberpath1 y' e1 (f x) e2))
-              (maponpaths _ _
-                 (fun z0 : hfiber Y Z g z =>
-                  pr21 Y (fun pointover : Y => paths _ (g pointover) z) z0)
-                 (tpair Y (fun pointover : Y => paths _ (g pointover) z) y'
-                    e1) ye e4))
-
-        (pathscomp0 _ _ _ _ e2
-           (maponpaths _ _
-              (fun z0 : hfiber Y Z g z =>
-               pr21 Y (fun pointover : Y => paths _ (g pointover) z) z0)
-              (tpair Y (fun pointover : Y => paths _ (g pointover) z) y' e1)
-              ye e4))).
-
-assert (int3: paths _ (maponpaths _ _
-           (fun z0 : hfiber Y Z g z =>
-            pr21 Y (fun pointover : Y => paths _ (g pointover) z) z0)
-           (hfiberpair Y Z g z (f x)
-              (pathscomp0 _ _ _ _ (maponpaths _ _ g (f x) y' e2)
-                 e1)) (hfiberpair Y Z g z y' e1)
-           (hfiberpath1 y' e1 (f x) e2)) e2).  simpl.
-apply (hfiberpath11 y' e1 (f x) e2). simpl in int3. 
-apply pathscomp021.  assumption. 
-
-assert (int5: paths _ (maponpaths _ _
-           (fun z0 : hfiber Y Z g z =>
-            pr21 Y (fun pointover : Y => paths _ (g pointover) z) z0)
-           (tpair Y (fun pointover : Y => paths _ (g pointover) z) 
-              (f x)
-              (pathscomp0 _ _ _ _ (maponpaths _ _ g (f x) y' e2)
-                 e1)) ye
-           (pathscomp0 _ _ _ _ (hfiberpath1 y' e1 (f x) e2) e4))
-
-(pathscomp0 _ _ _ _ e2
-           (maponpaths _ _
-              (fun z0 : hfiber Y Z g z =>
-               pr21 Y (fun pointover : Y => paths _ (g pointover) z) z0)
-              (tpair Y (fun pointover : Y => paths _ (g pointover) z) y' e1)
-              ye e4))). simpl. apply (pathscomp0 _ _ _ _ int1 int2). 
-
-simpl in int5. apply (maponpaths _ _ (fun eee: paths _ (f x) y => hfiberpair _ _ f y x eee) _ _ int5). Defined. 
+Proof.
+  pose (pg := (pr21 _ (fun p => paths _ (g p) z))).
+  intros [ [ [ y' e1 ] [ x e2 ] ] e4 ].
+  pose (r := hfiberpath1 y' e1 (f x) e2).
+  pose (q := (pathscomp0 _ _ _ _ (maponpaths _ _ pg _ _ r) (maponpaths _ _ pg _ _ e4))).
+  assert (int1: paths _ (maponpaths _ _ pg _ _ (pathscomp0 _ _ _ _ r e4)) q).
+   apply maponpathscomp0.
+  assert (int2: paths _ q (pathscomp0 _ _ _ _ e2 (maponpaths _ _ pg _ _ e4))).
+   apply pathscomp021.
+   exact (hfiberpath11 y' e1 (f x) e2).
+  exact (maponpaths _ _ (hfiberpair _ _ f y x) _ _ (pathscomp0 _ _ _ _ int1 int2)).
+Defined. 
 
 
 Lemma isweqgzxmap4l1  (u: hfiber _ _ f y):
- paths _ (gzxmap4  (fibmap1 _ (fun v: (hfiber _ _  g z) => (hfiber _ _ f (pr21 _ _ v))) ye u)) u.  
-Proof. intros. destruct u as [ t x ].   simpl. destruct ye.  assert (int: paths _ (pathscomp0 _ _ _ _ x (idpath _ y)) x). apply pathscomp0rid.   apply (maponpaths _ _ (fun ee: (paths _ (f t) y) => hfiberpair _ _ f y t ee) _ _ int).  Defined. 
+   paths _ (gzxmap4  (fibmap1 _ (fun v => (hfiber _ _ f (pr21 _ _ v))) ye u)) u.  
+Proof.
+  intros [ t x ].
+  simpl.
+  destruct ye.
+  path_from (hfiberpair _ _ f y t).
+  apply pathscomp0rid.
+Defined. 
 
 Lemma  isweqgzxmap4 : isweq _ _ gzxmap4.
-Proof. intros. set (h:=fibmap1 _ (fun ye: (hfiber _ _  g z) => (hfiber _ _ f (pr21 _ _ ye))) ye). simpl in h. assert (int1: isweq _ _ h). apply (isweqfibmap1  _ (fun ye: (hfiber _ _  g z) => (hfiber _ _ f (pr21 _ _ ye))) ye).  apply (isweql3 _ _  h gzxmap4 (isweqgzxmap4l1) int1). Defined. 
+Proof.
+  intros.
+  apply (isweql3 _ _ (fibmap1 _ (fun ye => hfiber _ _ f (pr21 _ _ ye)) ye)).
+  apply isweqgzxmap4l1.
+  apply (isweqfibmap1 _ (fun ye => hfiber _ _ f (pr21 _ _ ye))).
+Defined. 
 
 
 
 Definition gzxhom12   (t: hfiber _ _ (fun t: gzx  => pr21 _ _ t) ye): paths _ (gzxmap1  (gzxmap2  t)) t. 
-Proof. intros. assert (int1: paths _ (gzxmap4  (gzxmap1 (gzxmap2 t))) (gzxmap4 t)). apply gzxhom412. apply  (pathsweq2 _ _ (gzxmap4) (isweqgzxmap4 ) _ _ int1). Defined. 
+Proof.
+  intros.
+  apply (pathsweq2 _ _ gzxmap4).
+   apply isweqgzxmap4.
+  apply gzxhom412.
+Defined. 
 
 
 Definition gzxhom21  (t:hfiber _ _ (hfibersgftog _ _ _ f g z) ye) : paths _ (gzxmap2 (gzxmap1 t)) t. 
-Proof. intros. destruct t as [ t x ].  destruct t. simpl. apply idpath. Defined. 
+Proof. intros. destruct t as [ t x ].  destruct t. apply idpath. Defined. 
 
 
 Lemma isweqgzxmap1  : isweq _ _ gzxmap1 .
-Proof. intros. apply (gradth _  _ gzxmap1  gzxmap2  gzxhom21 gzxhom12 ).  Defined. 
+Proof. intros. exact (gradth _  _ gzxmap1  gzxmap2  gzxhom21 gzxhom12 ).  Defined. 
 
 
 Definition fibseqhom (u: hfiber _ _ (hfibersgftog _ _ _ f g z) ye): paths _ (gzxmap4 (gzxmap1  u)) (hfibersinvezmap  u).
-Proof. intros. destruct u as [ t x ].   destruct t. simpl. apply idpath. Defined. 
+Proof. intros. destruct u as [ t x ].   destruct t. apply idpath. Defined. 
 
 
 Theorem isweqhfibersinvezmap : isweq _ _ hfibersinvezmap.
-Proof.  intros. set (int1:= (fun u: hfiber _ _ (hfibersgftog _ _ _ f g z) ye => (gzxmap4  (gzxmap1  u)))).
-assert (X0:isweq _ _ int1). apply (twooutof3c _ _ _ gzxmap1  gzxmap4 isweqgzxmap1 isweqgzxmap4). apply (isweqhomot _ _ int1 hfibersinvezmap fibseqhom X0). Defined.
+Proof.
+  intros.
+  apply (isweqhomot _ _ (compose gzxmap4 gzxmap1) hfibersinvezmap fibseqhom).
+  apply (twooutof3c _ _ _ gzxmap1 gzxmap4 isweqgzxmap1 isweqgzxmap4).
+Defined.
 
 
 Definition hfibersezmap: hfiber _ _ f y -> hfiber _ _ (hfibersgftog _ _ _ f g z) ye := fun xe:_ => tpair _ _ (pr21 _ _ (invmap _ _ hfibersinvezmap isweqhfibersinvezmap xe)) (pr22 _ _ (invmap _ _ hfibersinvezmap isweqhfibersinvezmap xe)).
 
 Lemma isweqhfibersezmap: isweq _ _ hfibersezmap.
-Proof. assert (homot: forall xe: _ , paths _  (invmap _ _ hfibersinvezmap isweqhfibersinvezmap xe) (hfibersezmap xe)). intro. apply (tppr _ _ _).  apply (isweqhomot _ _ _ _ homot (isweqinvmap _ _ hfibersinvezmap isweqhfibersinvezmap)). Defined.
+Proof.
+  assert (homot: forall xe , paths _  (invmap _ _ hfibersinvezmap isweqhfibersinvezmap xe) (hfibersezmap xe)).
+  intro.
+  apply tppr.
+  apply (isweqhomot _ _ _ _ homot).
+  apply isweqinvmap.
+Defined.
 
 
 End hfibersseq. 
@@ -1544,16 +1521,23 @@ End hfibersseq.
 (** *** Main corollaries of the constructions of hfibersseq. *)
 
 
-Corollary isweqhfibersgftog (X:UU)(Y:UU)(Z:UU)(f:X -> Y)(g:Y -> Z)(z:Z):(isweq _ _ f) -> (isweq _ _ (hfibersgftog _ _ _ f g z)).
-Proof. intros X Y Z f g z X0. unfold isweq.   intro. set (u:= hfibersinvezmap X Y Z f g z y).
-assert (is1: isweq _ _ u). apply isweqhfibersinvezmap.  
-assert (int: iscontr (hfiber X Y f (pr21 Y (fun pointover : Y => paths _ (g pointover) z) y))). apply X0.  apply (iscontrxifiscontry _ _ u is1 int). Defined.
+Corollary isweqhfibersgftog (X:UU)(Y:UU)(Z:UU)(f:X -> Y)(g:Y -> Z)(z:Z): isweq _ _ f -> isweq _ _ (hfibersgftog _ _ _ f g z).
+Proof.
+  intros ? ? ? ? ? ? X0 y.
+  apply (iscontrxifiscontry _ _ (hfibersinvezmap X Y Z f g z y) ).
+  apply isweqhfibersinvezmap.
+  apply X0.
+Defined.
 
 
-Definition hfibersftogf (X Y Z:UU)(f:X -> Y)(g: Y -> Z)(z:Z)(ye: hfiber _ _ g z)(xe: hfiber _ _ f (pr21 _ _ ye)):  hfiber _ _ (fun x:X => g (f x)) z:= pr21 _ _ (hfibersezmap _ _ _ f g z ye xe). 
+Definition hfibersftogf (X Y Z:UU)(f:X -> Y)(g: Y -> Z)(z:Z)(ye: hfiber _ _ g z)(xe: hfiber _ _ f (pr21 _ _ ye))
+        :  hfiber _ _ (compose g f) z
+        := pr21 _ _ (hfibersezmap _ _ _ f g z ye xe). 
 
 
-Definition hfibersez (X Y Z:UU)(f:X -> Y)(g: Y -> Z)(z:Z)(ye: hfiber _ _ g z)(xe: hfiber _ _ f (pr21 _ _ ye)): paths _ (hfibersgftog _ _ _ f g z (hfibersftogf _ _ _ f g z ye xe)) ye := pr22 _ _ (hfibersezmap _ _ _ f g z ye xe).
+Definition hfibersez (X Y Z:UU)(f:X -> Y)(g: Y -> Z)(z:Z)(ye: hfiber _ _ g z)(xe: hfiber _ _ f (pr21 _ _ ye))
+        : paths _ (hfibersgftog _ _ _ f g z (hfibersftogf _ _ _ f g z ye xe)) ye
+        := pr22 _ _ (hfibersezmap _ _ _ f g z ye xe).
 
 
 
@@ -1567,19 +1551,15 @@ Definition hfibersez (X Y Z:UU)(f:X -> Y)(g: Y -> Z)(z:Z)(ye: hfiber _ _ g z)(xe
 However I do not know whether the are equivalent to the ones given below or whether one can prove that the resulting pre-fibration sequence is a fibration sequence. *)
 
 
-Corollary isfibseqhfibers (X Y Z:UU)(f:X -> Y)(g: Y -> Z)(z:Z)(ye: hfiber _ _ g z): isfibseq (hfiber _ _ f (pr21 _ _ ye)) (hfiber _ _ (fun x:X => g (f x)) z) (hfiber _ _ g z)  (hfibersftogf _ _ _ f g z ye) (hfibersgftog _ _ _ f g z) ye (hfibersez _ _ _ f g z ye).
-Proof. intros.  unfold isfibseq. apply isweqhfibersezmap. Defined.
-
-
-
-
-
-
-
-
-
-
-
+Corollary isfibseqhfibers (X Y Z:UU)(f:X -> Y)(g: Y -> Z)(z:Z)(ye: hfiber _ _ g z)
+        : isfibseq (hfiber _ _ f (pr21 _ _ ye))
+                   (hfiber _ _ (fun x:X => g (f x)) z)
+                   (hfiber _ _ g z)
+                   (hfibersftogf _ _ _ f g z ye)
+                   (hfibersgftog _ _ _ f g z)
+                   ye
+                   (hfibersez _ _ _ f g z ye).
+Proof. intros. apply isweqhfibersezmap. Defined.
 
 
 (** ** Fiber-wise weak equivalences. 
@@ -1593,36 +1573,42 @@ Definition totalfun (X:UU)(P:X-> UU)(Q:X -> UU)(f: forall x:X, P x -> Q x) := (f
 
 Theorem isweqtotaltofib (X:UU)(P: X -> UU)(Q: X -> UU)(f: forall x:X, P x -> Q x):
 isweq _ _ (totalfun _ _ _ f) -> forall x:X, isweq _ _ (f x).
-Proof. intros X P Q f X0 x. set (totp:= total2 X P). set (totq := total2 X Q).  set (totf:= (totalfun _ _ _ f)). set (pip:= fun z: totp => pr21 _ _ z). set (piq:= fun z: totq => pr21 _ _ z). 
-
-set (hfx:= hfibersgftog _ _ _ totf piq x).  simpl in hfx. 
-assert (H: isweq _ _ hfx). unfold isweq. intro. 
-set (int:=hfibersinvezmap _ _ _ totf piq x y). 
-assert (X1:isweq _ _ int). apply (isweqhfibersinvezmap _ _ _ totf piq x y). destruct y as [ t e ]. 
-assert (is1: iscontr (hfiber _ _ totf t)). apply (X0 t). apply (iscontrxifiscontry _ _ int X1 is1).   
-set (ip:= fibmap1 X P x). set (iq:= fibmap1 X Q x). set (h:= fun p: P x => hfx (ip p)).  
-assert (is2: isweq _ _ h). apply (twooutof3c _ _ _ ip hfx (isweqfibmap1 X P x) H). set (h':= fun p: P x => iq ((f x) p)). 
-assert (ee: forall p:P x, paths _ (h p) (h' p)). intro. apply idpath.  
-assert (X2:isweq _ _ h'). apply (isweqhomot  _ _ h h' ee is2). 
-apply (twooutof3a _ _ _ (f x) iq X2). 
-apply (isweqfibmap1 X Q x). Defined.
+Proof.
+  intros ? ? ? ? X0 x.
+  set (totf:= totalfun _ _ _ f).
+  set (piq:= fun z: total2 _ Q => pr21 _ _ z).
+  apply (twooutof3a _ _ _ (f x) (fibmap1 _ Q _)).
+   apply (isweqhomot _ _ (compose (hfibersgftog _ _ _ totf piq _) (fibmap1 _ P _))).
+    intro p.
+    apply idpath.
+   apply (twooutof3c _ _ _ _ _ (isweqfibmap1 _ _ _)).
+  intro y.
+   apply (iscontrxifiscontry _ _ (hfibersinvezmap _ _ _ totf piq _ _)).
+    apply isweqhfibersinvezmap.
+   apply X0.
+  apply isweqfibmap1.
+Defined.
  
 
 Theorem isweqfibtototal (X:UU)(P: X -> UU)(Q: X -> UU)(f: forall x:X, P x -> Q x):
 (forall x:X, isweq _ _ (f x)) -> isweq _ _ (totalfun _ _ _ f).
-Proof. intros X P Q f X0. set (fpq:= totalfun _ _ _ f). set (pr21p:= fun z: total2 X P => pr21 _ _ z). set (pr21q:= fun z: total2 X Q => pr21 _ _ z). unfold isweq. intro.  rename y into xq.  set (x:= pr21q xq). set (xqe:= hfiberpair _ _ pr21q x xq (idpath _ _)). set (hfpqx:= hfibersgftog _ _ _ fpq pr21q x). 
-
-assert (isint: iscontr (hfiber _ _ hfpqx xqe)). 
-assert (isint1: isweq _ _ hfpqx). set (ipx:= fibmap1 X P x). set (iqx:= fibmap1 X Q x).   set (diag:= fun p:P x => (iqx ((f x) p))). 
-assert (is2: isweq _ _ diag).  apply (twooutof3c _ _ _ (f x) iqx (X0 x) (isweqfibmap1 X Q x)).  apply (twooutof3b _ _ _ ipx hfpqx (isweqfibmap1 X P x) is2).  unfold isweq in isint1.  apply (isint1 xqe). 
-set (intmap:= hfibersinvezmap _ _ _ fpq pr21q x xqe). apply (isweqcontr2 _ _ intmap (isweqhfibersinvezmap _ _ _ fpq pr21q x xqe) isint). 
+Proof.
+  intros ? ? ? ? X0.
+  set (fpq:= totalfun _ _ _ f).
+  set (pr21q:= fun z: total2 _ Q => pr21 _ _ z).
+  intro xq.
+  set (x:= pr21q xq).
+  set (hfpqx:= hfibersgftog _ _ _ fpq pr21q x).
+  set (xqe:= hfiberpair _ _ pr21q _ xq (idpath _ _)).
+  set (intmap:= hfibersinvezmap _ _ _ fpq pr21q _ xqe).
+  apply (isweqcontr2 _ _ intmap).
+  apply isweqhfibersinvezmap.
+  apply (twooutof3b _ _ _ (fibmap1 _ P _)  ).
+  apply(isweqfibmap1 _ P _).
+  apply (twooutof3c _ _ _ (f x) (fibmap1 _ Q x)).
+  apply X0.
+  apply isweqfibmap1.
 Defined.
-
-
-
-
-
-
 
 
 (** ** Homotopy fibers of the function [fpmap: total2 X (P f) -> total2 Y P].
