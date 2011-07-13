@@ -332,6 +332,8 @@ Proof. intros. induction e1. apply idpath. Defined.
 Definition compose {X Y Z:UU} (g:Y->Z) (f:X->Y) := fun x => g (f x).
 Definition idfun (T:UU) := fun t:T => t.
 
+Definition constfun {X Y:UU} (y:Y) : X -> Y := fun x => y.
+
 Definition maponpaths2a (X Y Z:UU)(f1 f2:X -> Y)(g:Y -> Z)
         : paths _ f1 f2 -> paths _ (compose g f1) (compose g f2).
 Proof.
@@ -580,23 +582,23 @@ Lemma connectedcoconustot: forall T:UU, forall t:T, forall e1: coconustot _ t, f
 Proof. intros T t [ x0 [] ] [ x1 [] ]. apply idpath. Defined. 
 
 Lemma iscontrcoconustot (T:UU) (t:T) : iscontr (coconustot T t).
-Proof. intros. unfold iscontr.  set (t0:= tpair _ (fun t':T => paths _ t' t) t (idpath _ t)).  split with t0. intros. apply  connectedcoconustot. Defined.
+Proof. intros. unfold iscontr.  set (t0:= tpair _ (fun t' => paths _ t' t) t (idpath _ t)).  split with t0. intros. apply  connectedcoconustot. Defined.
 
 
 
 (* coconusfromt = co conus from t *)
-Definition coconusfromt (T:UU)(t:T) :=  total2 T (fun t':T => paths _ t t').
-Definition coconusfromtpair (T:UU) (t:T) (t':T) (e: paths _ t t'):coconusfromt T t := tpair T (fun t':T => paths _ t t') t' e.
+Definition coconusfromt (T:UU)(t:T) :=  total2 T (fun t' => paths _ t t').
+Definition coconusfromtpair (T:UU) (t:T) (t':T) (e: paths _ t t'):coconusfromt T t := tpair T (fun t' => paths _ t t') t' e.
 
 Lemma connectedcoconusfromt: forall T:UU, forall t:T, forall e1: coconusfromt T t, forall e2:coconusfromt T t, paths _ e1 e2.
 Proof. intros T t [x1 []] [x2 []]. apply idpath. Defined.
 
 Lemma iscontrcoconusfromt (T:UU) (t:T) : iscontr (coconusfromt T t).
-Proof. intros.  split with (tpair _ (fun t':T => paths _ t t') t (idpath _ t)). intros. apply  connectedcoconusfromt. Defined.
+Proof. intros.  split with (tpair _ (fun t' => paths _ t t') t (idpath _ t)). intros. apply  connectedcoconusfromt. Defined.
 
 
 
-Definition pathsspace (T:UU) := total2 T (fun t:T => coconusfromt _ t).
+Definition pathsspace (T:UU) := total2 T (fun t => coconusfromt _ t).
 Definition pathsspacetriple (T:UU) (t1:T)(t2:T)(e: paths _ t1 t2): pathsspace T := tpair _ _  t1 (coconusfromtpair _ _ t2 e). 
 
 Definition deltap (T:UU) : T -> pathsspace T := (fun t:T => pathsspacetriple _ t t (idpath _ t)). 
@@ -1730,22 +1732,34 @@ Definition hfppr1 {X X' Y:UU} (f:X -> Y) (f':X' -> Y):= pr21 X (fun x:X => hfibe
 
 (** *** Weak equivalences and pairwise direct products. *)
 
+Corollary isweqdirprodf (X Y X' Y':UU)(f:X-> Y)(f':X' -> Y') : isweq _ _ f -> isweq _ _ f' -> isweq _ _ (dirprodf _ _ _ _ f f').
+Proof.
+  intros ? ? ? ? ? ? is is'.
+  apply (isweqbandfmap _ _ f (constfun X') (constfun Y') (constfun f') is (constfun is')).
+Defined. 
 
 
- 
-Corollary isweqdirprodf (X Y X' Y':UU)(f:X-> Y)(f':X' -> Y')(is:isweq _ _ f)(is': isweq _ _ f'): isweq _ _ (dirprodf _ _ _ _ f f').
-Proof. intros.  apply (isweqbandfmap X Y f (fun x:X => X') (fun y:Y => Y') (fun x:X => f') is (fun x:X => is')). Defined. 
-
-
-Definition weqdirprodf (X Y X' Y':UU)(w: weq X Y)(w': weq X' Y') : weq (dirprod X X') (dirprod Y Y').
-Proof. intros. destruct w as [ t x ]. destruct w' as [ t0 x0 ]. split with (dirprodf _ _ _ _ t t0).  apply isweqdirprodf. apply x.  apply x0.  Defined. 
-
+Definition weqdirprodf (X Y X' Y':UU) : weq X Y -> weq X' Y' -> weq (dirprod X X') (dirprod Y Y').
+Proof.
+  intros ? ? ? ? [ t x ] [ t0 x0 ].
+  split with (dirprodf _ _ _ _ t t0).
+  apply isweqdirprodf.
+   apply x.
+  apply x0.
+Defined. 
 
 Definition weqtodirprodwithunit (X:UU): weq X (dirprod X unit).
-Proof. intros. set (f:=fun x:X => dirprodpair x tt). split with f.  set (g:= fun xu:dirprod X unit => pr21 _ _ xu). 
-assert (egf: forall x:X, paths _ (g (f x)) x). intro. apply idpath.
-assert (efg: forall xu:_, paths _ (f (g xu)) xu). intro. destruct xu as  [ t x ]. destruct x. apply idpath.    
-apply (gradth _ _ f g egf efg). Defined.
+Proof.
+  intros.
+  set (f:=fun x:X => dirprodpair x tt).
+  split with f.
+  set (g:= fun xu:dirprod X unit => pr21 _ _ xu).
+  apply (gradth _ _ f g).
+   intro x.
+   apply idpath.
+  intros [ t [] ].
+  apply idpath.
+Defined.
 
 
 (** *** Basics on pairwise coproducts (disjoint unions).  *)
@@ -1770,24 +1784,38 @@ Definition sumofmaps {X Y Z:UU}(fx: X -> Z)(fy: Y -> Z): (coprod X Y) -> Z := fu
 
 
 Definition boolascoprod: weq (coprod unit unit) bool.
-Proof. set (f:= fun xx: coprod unit unit => match xx with ii1 t => true | ii2 t => false end). split with f. 
-set (g:= fun t:bool => match t with true => ii1 _ _ tt | false => ii2 _ _ tt end). 
-assert (egf: forall xx:_, paths _ (g (f xx)) xx). destruct xx. destruct u. apply idpath. destruct u. apply idpath. 
-assert (efg: forall t:_, paths _ (f (g t)) t). destruct t. apply idpath. apply idpath. 
-apply (gradth _ _ f g egf efg). Defined.  
-
+Proof.
+  set (f:= fun xx: coprod unit unit => match xx with ii1 _ => true | ii2 _ => false end).
+  set (g:= fun t => match t with true => ii1 _ _ tt | false => ii2 _ _ tt end).
+  split with f.
+  apply (gradth _ _ f g).
+   intros [[]|[]]; apply idpath.
+  intros [|]; apply idpath.
+Defined.  
 
 Definition coprodasstor (X Y Z:UU): coprod (coprod X Y) Z -> coprod X (coprod Y Z).
-Proof. intros X Y Z c. induction c. induction x. apply ii1. exact x. apply ii2. apply ii1. assumption. apply ii2. apply ii2. assumption. Defined.
+Proof.
+  intros ? ? ? [[x|y]|z].
+  apply ii1; exact x.
+  apply ii2, ii1; exact y.
+  apply ii2, ii2; exact z.
+Defined.
 
 Definition coprodasstol (X Y Z: UU): coprod X (coprod Y Z) -> coprod (coprod X Y) Z.
-Proof. intros X Y Z c. induction c. apply ii1. apply ii1. assumption. induction y. apply ii1. apply ii2. assumption. apply ii2. assumption. Defined.
+Proof.
+  intros X Y Z [x|[y|z]].
+  apply ii1, ii1; exact x.
+  apply ii1, ii2; exact y.
+  apply ii2; exact z.
+Defined.
 
 Theorem isweqcoprodasstor (X Y Z:UU): isweq _ _ (coprodasstor X Y Z).
-Proof. intros. set (f:= coprodasstor X Y Z). set (g:= coprodasstol X Y Z).
-assert (egf: forall xyz:_, paths _ (g (f xyz)) xyz). intro. destruct xyz.  destruct c. apply idpath. apply idpath. apply idpath. 
-assert (efg: forall xyz:_, paths _ (f (g xyz)) xyz). intro.  destruct xyz.  apply idpath.  destruct c. apply idpath. apply idpath.
-apply (gradth _ _ f g egf efg). Defined. 
+Proof.
+  intros.
+  apply (gradth _ _ (coprodasstor X Y Z) (coprodasstol X Y Z)).
+  intros [[x|y]|z]; apply idpath.
+  intros [x|[y|z]]; apply idpath.
+Defined. 
 
 Corollary isweqcoprodasstol (X Y Z:UU): isweq _ _ (coprodasstol X Y Z).
 Proof. intros. apply (isweqinvmap _ _ _ (isweqcoprodasstor X Y Z)). Defined.
@@ -1799,26 +1827,36 @@ Definition weqcoprodasstol (X Y Z:UU):= weqpair _ (isweqcoprodasstol X Y Z).
 Definition coprodcomm (X Y:UU): coprod X Y -> coprod Y X := fun xy:_ => match xy with ii1 x => ii2 _ _ x | ii2 y => ii1 _ _ y end. 
 
 Theorem isweqcoprodcomm (X Y:UU): isweq _ _ (coprodcomm X Y).
-Proof. intros. set (f:= coprodcomm X Y). set (g:= coprodcomm Y X).
-assert (egf: forall xy:_, paths _ (g (f xy)) xy). intro. destruct xy. apply idpath. apply idpath.
-assert (efg: forall yx:_, paths _ (f (g yx)) yx). intro. destruct yx. apply idpath. apply idpath.
-apply (gradth _ _ f g egf efg). Defined. 
+Proof.
+  intros.
+  apply (gradth _ _ (coprodcomm X Y) (coprodcomm Y X) ).
+  intros [x|y]; apply idpath.
+  intros [y|x]; apply idpath.
+Defined. 
 
 Definition weqcoprodcomm (X Y:UU):= weqpair _ (isweqcoprodcomm X Y).
 
-Theorem isweqcoprodwithempty (X Y:UU)(nf:Y -> empty): isweq _ _ (ii1 X Y).
-Proof. intros. set (f:= ii1 X Y). set (g:= fun xy:coprod X Y => match xy with ii1 x => x | ii2 y => initmap _ (nf y) end).  
-assert (egf: forall x:X, paths _ (g (f x)) x). intro. apply idpath. 
-assert (efg: forall xy: coprod X Y, paths _ (f (g xy)) xy). intro. destruct xy. apply idpath. apply (initmap _ (nf y)).  
-apply (gradth _ _ f g egf efg). Defined.  
+Theorem isweqcoprodwithempty (X Y:UU): neg Y -> isweq _ _ (ii1 X Y).
+Proof.
+  intros ? ? nf.
+  apply (gradth _ _ (ii1 X Y) (fun xy => match xy with ii1 x => x | ii2 y => initmap _ (nf y) end) ).
+  intro x.
+  apply idpath.
+  intros [x|y].
+  apply idpath.
+  apply (initmap _ (nf y)).
+Defined.  
 
 
 
 Theorem isweqfromcoprodwithempty (X:UU): isweq _ _ (fun ex: coprod empty X => match ex with ii1 e => initmap _ e | ii2 x => x end).
-Proof. intros. set (f:=fun ex: coprod empty X => match ex with ii1 e => initmap _ e | ii2 x => x end). set (g:= ii2 empty X).
-assert (egf: forall ex:_, paths _ (g (f ex)) ex). intro. destruct ex.  destruct e. apply idpath.
-assert (efg: forall x:_, paths _ (f (g x)) x). intro. apply idpath. 
-apply (gradth _ _ f g egf efg). Defined.
+Proof.
+  intros X.
+  apply (gradth _ _ (fun ex => match ex with ii1 e => initmap _ e | ii2 x => x end)
+                    (ii2 empty X)).
+  intros [[]|x]. apply idpath.
+  intro y. apply idpath.
+Defined.
 
 Definition weqfromcoprodwithempty (X:UU):= weqpair _ (isweqfromcoprodwithempty X). 
 
@@ -1830,18 +1868,26 @@ ii2 y => ii2 _ _ (g y)
 end. 
 
 
-Theorem isweqcoprodf (X Y:UU)(X' Y':UU)(f: X -> X')(g: Y-> Y')(isf:isweq _ _ f)(isg: isweq _ _ g): isweq _ _ (coprodf _ _ _ _ f g).
-Proof. intros. set (finv:= invmap _ _ f isf). set (ginv:= invmap _ _ g isg). set (ff:=coprodf _ _ _ _ f g). set (gg:=coprodf _ _ _ _ finv ginv). 
-assert (egf: forall xy: coprod X Y, paths _ (gg (ff xy)) xy). intro. destruct xy. simpl. apply (maponpaths _ _ (ii1 X Y) _ _ (weqgf _ _ _ isf x)).     apply (maponpaths _ _ (ii2 X Y) _ _ (weqgf _ _ _ isg y)).
-assert (efg: forall xy': coprod X' Y', paths _ (ff (gg xy')) xy'). intro. destruct xy'. simpl.  apply (maponpaths _ _ (ii1 X' Y') _ _ (weqfg _ _ _ isf x)).     apply (maponpaths _ _ (ii2 X' Y') _ _ (weqfg _ _ _ isg y)). 
-apply (gradth _ _ ff gg egf efg). Defined. 
+Theorem isweqcoprodf (X Y:UU)(X' Y':UU)(f: X -> X')(g: Y-> Y') : isweq _ _ f -> isweq _ _ g -> isweq _ _ (coprodf _ _ _ _ f g).
+Proof.
+  intros ? ? ? ? ? ? isf isg.
+  apply (gradth _ _ (coprodf _ _ _ _ f g) (coprodf _ _ _ _ (invmap _ _ f isf) (invmap _ _ g isg))).
+  intros [x|y].
+   apply (maponpaths _ _ (ii1 X Y) _ _ (weqgf _ _ _ isf x)).
+   apply (maponpaths _ _ (ii2 X Y) _ _ (weqgf _ _ _ isg y)).
+  intros [x'|y'].
+   apply (maponpaths _ _ (ii1 X' Y') _ _ (weqfg _ _ _ isf x')).
+   apply (maponpaths _ _ (ii2 X' Y') _ _ (weqfg _ _ _ isg y')).
+Defined. 
 
 
 
-Definition weqcoprodf (X Y X' Y' :UU)(w1: weq X Y)(w2: weq X' Y'): weq (coprod X X') (coprod Y Y').
-Proof. intros. destruct w1 as [ t x ]. destruct w2 as [ t0 x0 ]. split with (coprodf _ _ _ _ t t0). apply (isweqcoprodf _ _ _ _ _ _ x x0).  Defined.
-
-
+Definition weqcoprodf (X Y X' Y' :UU) : weq X Y -> weq X' Y' -> weq (coprod X X') (coprod Y Y').
+Proof.
+  intros ? ? ? ? [ t x ] [ t0 x0 ].
+  split with (coprodf _ _ _ _ t t0).
+  apply isweqcoprodf; assumption.
+Defined.
 
 
 Lemma negpathsii1ii2 (X Y:UU)(x:X)(y:Y): neg (paths _ (ii1 _ _ x) (ii2 _ _ y)).
