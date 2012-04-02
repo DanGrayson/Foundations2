@@ -143,11 +143,7 @@ Inductive paths' (T:UU): T -> T -> UU := idpath': forall t:T, paths' _ t t.
 Inductive pathsf (S T:UU)(f:S->T)(s:S) : T -> UU := idpathf: pathsf S T f s (f s).
 
 Definition pathsf_to_paths (S T:UU)(f:S->T)(s:S) : forall t:T, pathsf S T f s t -> paths T (f s) t.
-Proof.
-  intros S T f s t e.
-  destruct e.
-  apply idpath.
-Defined.
+Proof. intros ? ? ? ? ? []. apply idpath. Defined.
 
 (* prove an induction principle for paths with endpoints reversed *)
 Lemma paths_rectr (T : UU) (t : T) (P : forall u : T, paths T u t -> Type):
@@ -329,7 +325,7 @@ Definition maponpathscomp0 (X:UU)(Y:UU)(f:X -> Y)(x1:X)(x2:X)(x3:X)(e1: paths _ 
                   (pathscomp0 _ _ _ _ (maponpaths _ _ f _ _ e1) (maponpaths _ _ f _ _ e2)).
 Proof. intros. induction e1. apply idpath. Defined. 
 
-Definition compose {X Y Z:UU} (g:Y->Z) (f:X->Y) := fun x => g (f x).
+Definition compose {X Y Z:Type} (g:Y->Z) (f:X->Y) := fun x => g (f x).
 Definition idfun (T:UU) := fun t:T => t.
 
 Definition constfun {X Y:UU} (y:Y) : X -> Y := fun x => y.
@@ -1018,8 +1014,10 @@ Defined.
 Corollary ifcontrcontrthenweq (X:UU)(Y:UU)(f:X -> Y) : iscontr X -> iscontr Y -> isweq _ _ f.
 Proof.
   intros ? ? ? isx isy.
-  apply (twooutof3a _ _ _ _ (terminalmap Y)); apply isweqcontrtounit; assumption.
-Defined. 
+  apply (twooutof3a _ _ _ _ (terminalmap Y)).
+  apply (isweqcontrtounit X); assumption.
+  apply (isweqcontrtounit Y); assumption.
+Defined.
 
 Theorem twooutof3b (X Y Z:UU)(f:X->Y)(g:Y->Z) : isweq _ _ f -> isweq _ _ (compose g f) -> isweq _ _ g.
 Proof.
@@ -1618,7 +1616,7 @@ Defined.
 Given [ X Y ] in [ UU ], [ P:Y -> UU ] and [ f: X -> Y ] we get a function [ fpmap: total2 X (P f) -> total2 Y P ]. The main theorem of this section asserts that the homotopy fiber of fpmap over [ yp:total Y P ] is naturally weakly equivalent to the homotopy fiber of [ f ] over [ pr21 yp ]. In particular, if  [ f ] is a weak equivalence then so is [ fpmap ]. *)
 
 
-Definition fpmap (X:UU)(Y:UU)(f: X -> Y)(P:Y-> UU) : total2 X (fun x:X => P (f x)) -> total2 Y P := 
+Definition fpmap (X:UU)(Y:UU)(f: X -> Y)(P:Y-> UU) : total2 X (compose P f) -> total2 Y P := 
 (fun z:total2 X (fun x:X => P (f x)) => tpair Y P (f (pr21 _ _ z)) (pr22 _ _ z)).
 
 
@@ -2054,8 +2052,6 @@ Proof.
       apply (eee (tpair _ _ t x)).
   assumption.
 Defined. 
-
-
 
 Theorem isweqtoforallpaths(T:UU)(P:T -> UU)(f g: forall t:T, P t): isweq _ _ (toforallpaths T P f g). 
 Proof.
