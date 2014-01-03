@@ -16,10 +16,19 @@ Unset Automatic Introduction. (** This line has to be removed for the file to co
 
 (** Imports *)
 
-(* Add LoadPath ".." as Foundations. *)
+Add LoadPath "../hlevel1" .
+Add LoadPath "../Generalities".
 
-Require Export Foundations.hlevel2.hnat .
-Require Export Foundations.hlevel2.algebra1d .
+Require Export "uuu".
+Require Export "uu0" . 
+Require Export "hProp" .
+Require Export "hSet" .
+Require Export "algebra1a" .
+Require Export "algebra1b" .
+Require Export "algebra1c" .
+Require Export "algebra1d" . 
+Require Export "hnat" .
+
 
 
 (** Upstream *)
@@ -857,12 +866,6 @@ Eval lazy in ( hzabsval ( hzplus ( natnattohz 2 3 ) ( natnattohz 3 2 ) ) ) .
 Eval lazy in ( hzabsval ( hzminus ( natnattohz 2 3 ) ( natnattohz 3 2 ) ) ) .
 
 Eval lazy in  ( hzabsval ( hzmult ( natnattohz 20 50 ) ( natnattohz 30 20 ) ) ) .
-
-
-
-
-   
-
 
 
 

@@ -11,9 +11,10 @@ This file contains the formulation of the univalence axiom and the proof that it
 
 Unset Automatic Introduction. (** This line has to be removed for the file to compile with Coq8.2 *)
 
-(* Add LoadPath ".." as Foundations. *)
+Add LoadPath "../Generalities".
 
-Require Export Foundations.Generalities.uu0.
+Require Export "uuu".
+Require Export "uu0".
 
 
 (** ** Univalence axiom. *)
