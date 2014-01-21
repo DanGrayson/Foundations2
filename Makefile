@@ -11,9 +11,11 @@ OTHERFLAGS += -indices-matter
 OTHERFLAGS += -no-sharing
 
 COQDEFS := --language=none -r '/^[[:space:]]*\(Axiom\|Theorem\|Class\|Instance\|Let\|Ltac\|Definition\|Lemma\|Record\|Remark\|Structure\|Fixpoint\|Fact\|Corollary\|Let\|Inductive\|Coinductive\|Proposition\)[[:space:]]+\([[:alnum:]_]+\)/\2/'
+all: announce
 include Make.makefile
-COQC := time $(COQC)
+COQC := set -x ; time $(COQC)
 TAGS : $(VFILES); etags $(COQDEFS) $^
+announce:; date; type coqc
 clean:clean2
 clean2:
 	rm -f TAGS

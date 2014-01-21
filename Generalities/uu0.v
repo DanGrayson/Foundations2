@@ -22,6 +22,7 @@ Require Export Foundations.Generalities.uuu.
 (** Universe structure *)
 
 Notation UU := Type (only parsing).
+Notation UU0 := Type (only parsing).
 
 (* end of "Preambule". *)
 

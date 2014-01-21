@@ -434,10 +434,10 @@ Definition iscoasymmresrel { X : UU0 } ( L : hrel X ) ( P : hsubtypes X ) ( isl 
 Proof . intros . intros x1 x2 r12 . apply ( isl _ _ r12 ) . Defined . 
 
 Definition istotalresrel { X : UU0 } ( L : hrel X ) ( P : hsubtypes X ) ( isl : istotal L ) : istotal ( resrel L P ) . 
-Proof . intros . intros x1 x2 . apply isl . Defined . 
+Proof . intros . intros x1 x2 . exact (isl _ _) . Defined . 
 
 Definition iscotransresrel { X : UU0 } ( L : hrel X ) ( P : hsubtypes X ) ( isl : iscotrans L ) : iscotrans ( resrel L P ) . 
-Proof . intros . intros x1 x2 x3 r13 . apply ( isl _ _ _ r13 ) .  Defined .
+Proof . intros . intros x1 x2 x3 r13 . exact ( isl _ _ _ r13 ) .  Defined .
 
 Definition isdecrelresrel { X : UU0 } ( L : hrel X ) ( P : hsubtypes X ) ( isl : isdecrel L ) : isdecrel ( resrel L P ) . 
 Proof . intros . intros x1 x2 . apply isl . Defined . 

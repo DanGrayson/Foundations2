@@ -93,7 +93,7 @@ Definition ishinh ( X : UU0 ) : hProp := hProppair ( ishinh_UU X ) ( isapropishi
 (* Canonical Structure ishinh .  (** RR1 *) *)
 
 
-Definition hinhpr ( X : UU0 ) : X -> ishinh X := fun x : X => fun P : hProp  => fun f : X -> P => f x .
+Definition hinhpr ( X : UU0 ) : X -> ishinh X := fun x : X => (fun P : hProp  => fun f : X -> P => f x) : hProppr1 (ishinh X).
 
 Definition hinhfun { X Y : UU0 } ( f : X -> Y ) : ishinh_UU X -> ishinh_UU Y := fun isx : ishinh X => fun P : _ =>  fun yp : Y -> P => isx P ( fun x : X => yp ( f x ) ) .
 
