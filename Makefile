@@ -4,14 +4,29 @@ VERSION = 8.4
 ifeq ("$(VERSION)","8.4")
 OTHERFLAGS += -indices-matter
 # compiling uu0 takes 32 seconds with sharing and 20 seconds with no-sharing, using a patched coq 8.4
-# using Matthieu's polyproj branch, it takes 600 seconds with sharing before it crashes on line 2914, but only 15 seconds without sharing
 OTHERFLAGS += -no-sharing
 # OTHERFLAGS += -verbose
 else
 endif
-COQDEFS := --language=none -r '/^[[:space:]]*\(Axiom\|Theorem\|Class\|Instance\|Let\|Ltac\|Definition\|Lemma\|Record\|Remark\|Structure\|Fixpoint\|Fact\|Corollary\|Let\|Inductive\|Coinductive\|Proposition\)[[:space:]]+\([[:alnum:]_]+\)/\2/'
 include Make.makefile
-COQC := time $(COQC)
+
+TIME=gnu
+ifeq ($(TIME),gnu)
+TIMECMD = \time -f "%U sec, %M bytes"
+else
+ifeq ($(TIME),bsd)
+TIMECMD = \time -p
+else
+ifeq ($(TIME),bash)
+TIMECMD = time -p
+else
+TIMECMD = time
+endif
+endif
+endif
+COQC := $(TIMECMD) $(COQC)
+
+COQDEFS := --language=none -r '/^[[:space:]]*\(Axiom\|Theorem\|Class\|Instance\|Let\|Ltac\|Definition\|Lemma\|Record\|Remark\|Structure\|Fixpoint\|Fact\|Corollary\|Let\|Inductive\|Coinductive\|Proposition\)[[:space:]]+\([[:alnum:]_]+\)/\2/'
 TAGS : $(VFILES); etags $(COQDEFS) $^
 clean:clean2
 clean2:
