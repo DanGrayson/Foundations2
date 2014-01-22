@@ -12,7 +12,7 @@ include Make.makefile
 
 TIME=gnu
 ifeq ($(TIME),gnu)
-TIMECMD = \time -f "%U sec, %M bytes"
+TIMECMD = \time -f "%U sec, %M bytes: $*"
 else
 ifeq ($(TIME),bsd)
 TIMECMD = \time -p
@@ -24,7 +24,7 @@ TIMECMD = time
 endif
 endif
 endif
-COQC := $(TIMECMD) $(COQC)
+COQC = $(TIMECMD) $(COQBIN)coqc
 
 COQDEFS := --language=none -r '/^[[:space:]]*\(Axiom\|Theorem\|Class\|Instance\|Let\|Ltac\|Definition\|Lemma\|Record\|Remark\|Structure\|Fixpoint\|Fact\|Corollary\|Let\|Inductive\|Coinductive\|Proposition\)[[:space:]]+\([[:alnum:]_]+\)/\2/'
 TAGS : $(VFILES); etags $(COQDEFS) $^
