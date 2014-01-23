@@ -29,12 +29,12 @@ TIMECMD = time
 endif
 endif
 endif
-COQC = >$*.timing $(TIMECMD) $(COQBIN)coqc
+COQC = : compiling $*.v ; >$*.timing $(TIMECMD) $(COQBIN)coqc
 
 all:announce
 announce:; type $(COQBIN)coqc
 
-topten:; @find . -name \*.timing | while read x ; do if [ -f "$$x" ] ; then <"$$x" sed -e "s=^=$$x =" -e "s/timing/v/" -e "s/ Chars /:/" -e "s/ - \([0-9]*\)/-\1:/"; fi; done | sort -grk 3 | head -10
+topten:; @find . -name \*.timing | while read x ; do if [ -f "$$x" ] ; then grep '^Chars' "$$x" | sed -e "s=^=$$x =" -e "s/timing/v/" -e "s/ Chars /:/" -e "s/ - \([0-9]*\)/-\1:/"; fi; done | sort -grk 3 | head -10
 
 COQDEFS := --language=none -r '/^[[:space:]]*\(Axiom\|Theorem\|Class\|Instance\|Let\|Ltac\|Definition\|Lemma\|Record\|Remark\|Structure\|Fixpoint\|Fact\|Corollary\|Let\|Inductive\|Coinductive\|Proposition\)[[:space:]]+\([[:alnum:]_]+\)/\2/'
 TAGS : $(VFILES); etags $(COQDEFS) $^

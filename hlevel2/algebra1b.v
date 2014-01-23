@@ -946,17 +946,49 @@ Opaque iscotransabgrfracrel .
 
 
 Lemma abgrfracrelimpl ( X : abmonoid ) { L L' : hrel X } ( is : isbinophrel L ) ( is' : isbinophrel L' )  ( impl : forall x x' , L x x' -> L' x x' ) ( x x' : abgrfrac X ) ( ql : abgrfracrel X is x x' ) : abgrfracrel X is' x x'  .
-Proof . intros .   generalize ql .  apply quotrelimpl .  intros x0 x0' .  simpl .  apply hinhfun .  intro t2 . split with ( pr1 t2 ) .   apply ( impl _ _ ( pr2 t2 ) ) . Defined . 
+Proof . intros .   generalize ql .  apply (quotrelimpl (iscomprelabgrfracrelint X is) (iscomprelabgrfracrelint X is')) .  intros x0 x0' .  simpl .  apply hinhfun .  intro t2 . split with ( pr1 t2 ) .   apply ( impl _ _ ( pr2 t2 ) ) . Defined . 
 
 
 Opaque abgrfracrelimpl . 
 
 
 Lemma abgrfracrellogeq ( X : abmonoid ) { L L' : hrel X } ( is : isbinophrel L ) ( is' : isbinophrel L' )  ( lg : forall x x' , L x x' <-> L' x x' ) ( x x' : abgrfrac X ) :  ( abgrfracrel X is x x' ) <-> ( abgrfracrel X is' x x' ) .
-Proof . intros .   apply quotrellogeq .  intros x0 x0' .  split . 
-
-simpl .  apply hinhfun .  intro t2 . split with ( pr1 t2 ) .   apply ( pr1 ( lg _ _ ) ( pr2 t2 ) ) .
-simpl .  apply hinhfun .  intro t2 . split with ( pr1 t2 ) .   apply ( pr2 ( lg _ _ ) ( pr2 t2 ) ) . Defined . 
+Proof . intros .   
+exact (
+  quotrellogeq (iscomprelabgrfracrelint X is) (iscomprelabgrfracrelint X is')
+    (fun x0 x0' : abmonoiddirprod X X =>
+     tpair
+       (fun _ : abgrfracrelint X L x0 x0' -> abgrfracrelint X L' x0 x0' =>
+        abgrfracrelint X L' x0 x0' -> abgrfracrelint X L x0 x0')
+       (hinhfun
+          (fun
+             t2 : total2
+                    (fun c0 : pr1 X =>
+                     L (pr1 x0 * pr2 x0' * c0)%multmonoid
+                       (pr1 x0' * pr2 x0 * c0)%multmonoid) =>
+           tpair
+             (fun c0 : pr1 X =>
+              L' (pr1 x0 * pr2 x0' * c0)%multmonoid
+                (pr1 x0' * pr2 x0 * c0)%multmonoid) (pr1 t2)
+             (pr1
+                (lg (pr1 x0 * pr2 x0' * pr1 t2)%multmonoid
+                   (pr1 x0' * pr2 x0 * pr1 t2)%multmonoid) 
+                (pr2 t2))))
+       (hinhfun
+          (fun
+             t2 : total2
+                    (fun c0 : pr1 X =>
+                     L' (pr1 x0 * pr2 x0' * c0)%multmonoid
+                       (pr1 x0' * pr2 x0 * c0)%multmonoid) =>
+           tpair
+             (fun c0 : pr1 X =>
+              L (pr1 x0 * pr2 x0' * c0)%multmonoid
+                (pr1 x0' * pr2 x0 * c0)%multmonoid) (pr1 t2)
+             (pr2
+                (lg (pr1 x0 * pr2 x0' * pr1 t2)%multmonoid
+                   (pr1 x0' * pr2 x0 * pr1 t2)%multmonoid) 
+                (pr2 t2))))) x x').
+Defined.
 
 Opaque abgrfracrellogeq . 
   
