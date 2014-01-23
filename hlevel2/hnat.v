@@ -1078,9 +1078,7 @@ Proof. intro . induction n as [ | n IHn ] . simpl .  intros . apply idpath . int
 simpl .  apply ( maponpaths S ( IHn m is ) ) .
 
 simpl . set ( is' := lthnatrem n m is ) .  destruct ( natgthchoice2 _ _ is' ) as [ h | e ] .    destruct ( natlehtonegnatgth _ _ t h ) .  fold ( natdiv n m ) . set ( e'' := maponpaths S ( IHn m is ) ) .  change (S (natrem n m + natdiv n m * m) ) with (  S ( natrem n m ) + natdiv n m * m ) in  e'' . rewrite ( pathsinv0 e ) in e'' . apply e'' . 
-Defined . 
-
-Opaque natdivremrule . 
+Qed. 
 
 
 Lemma natlehmultnatdiv ( n m : nat ) ( is : natneq m 0 ) :  natleh ( mult ( natdiv n m ) m ) n .
@@ -1094,18 +1092,14 @@ intros j i' j' lj lj' .  intro e .  simpl in e . rewrite ( natplusr0 j ) in e . 
 
 intros j i' j' lj lj' e . destruct i' as [ | i' ] .  simpl in e .  rewrite ( natplusr0 j' ) in e . rewrite ( pathsinv0 e ) in lj' .   rewrite ( natpluscomm m ( i * m ) ) in lj' .  rewrite ( pathsinv0 ( natplusassoc _ _ _ ) ) in lj' .  destruct ( negnatgthmplusnm _ _ lj' ) .  
 
-simpl in e .  rewrite ( natpluscomm m ( i * m ) ) in e .  rewrite ( natpluscomm m ( i' * m ) ) in e .  rewrite ( pathsinv0 ( natplusassoc j _ _ ) ) in e .  rewrite ( pathsinv0 ( natplusassoc j' _ _ ) ) in e . set ( e' := invmaponpathsincl _ ( isinclnatplusr m ) _ _ e ) .  set ( ee := IHi j i' j' lj lj' e' ) .  apply ( dirprodpair ( maponpaths S ( pr1 ee ) ) ( pr2 ee )  ) .  Defined . 
-
-Opaque natdivremunique .
+simpl in e .  rewrite ( natpluscomm m ( i * m ) ) in e .  rewrite ( natpluscomm m ( i' * m ) ) in e .  rewrite ( pathsinv0 ( natplusassoc j _ _ ) ) in e .  rewrite ( pathsinv0 ( natplusassoc j' _ _ ) ) in e . set ( e' := invmaponpathsincl _ ( isinclnatplusr m ) _ _ e ) .  set ( ee := IHi j i' j' lj lj' e' ) .  apply ( dirprodpair ( maponpaths S ( pr1 ee ) ) ( pr2 ee )  ) .  Qed.
 
 Lemma natdivremandmultl ( n m k : nat ) ( ism : natneq m 0 ) ( iskm : natneq ( k * m ) 0 ) : dirprod ( paths ( natdiv ( k * n ) ( k * m ) ) ( natdiv n m ) ) ( paths ( natrem ( k * n ) ( k * m ) ) ( k * ( natrem n m ) ) ) . 
 Proof . intros . set ( ak := natdiv ( k * n ) ( k * m ) ) . set ( bk := natrem ( k * n ) ( k * m ) ) . set ( a :=  natdiv n m ) . set ( b :=  natrem n m ) . assert ( e1 : paths ( bk + ak * ( k * m )  ) ( ( b * k ) + a * ( k * m ) ) ) . unfold ak. unfold bk .   rewrite ( pathsinv0 ( natdivremrule  ( k * n ) ( k * m ) iskm ) ) . rewrite ( natmultcomm k m ) .   rewrite ( pathsinv0 ( natmultassoc _ _ _ ) ) . rewrite ( pathsinv0 ( natrdistr _ _ _ ) ) .  unfold a . unfold b .  rewrite ( pathsinv0 ( natdivremrule  n m ism ) ) . apply ( natmultcomm k n ) . assert ( l1 := lthnatrem  n m ism ) . assert ( l1' := ( natlthandmultr _ _ _ ( natneq0andmultlinv _ _ iskm ) l1 ) )  .   rewrite ( natmultcomm m k ) in l1' . set ( int := natdivremunique _ _ _ _ _ ( lthnatrem ( k * n ) ( k * m ) iskm ) l1' e1 ) . 
 
 split with ( pr1 int ) . 
 
-rewrite ( natmultcomm k b ) . apply ( pr2 int ) .  Defined . 
-
-Opaque natdivremandmultl .
+rewrite ( natmultcomm k b ) . apply ( pr2 int ) .  Qed.
 
 
 Definition natdivandmultl ( n m k : nat ) ( ism : natneq m 0 ) ( iskm : natneq ( k * m ) 0 ) : paths ( natdiv ( k * n ) ( k * m ) ) ( natdiv n m ) := pr1 ( natdivremandmultl _ _ _ ism iskm ) .
@@ -1115,10 +1109,7 @@ Definition natremandmultl ( n m k : nat ) ( ism : natneq m 0 ) ( iskm : natneq (
 
 
 Lemma natdivremandmultr ( n m k : nat ) ( ism : natneq m 0 ) ( ismk : natneq ( m * k ) 0 ) : dirprod ( paths ( natdiv ( n * k ) ( m * k ) ) ( natdiv n m ) ) ( paths ( natrem ( n * k ) ( m * k) ) ( ( natrem n m ) * k  ) ) . 
-Proof . intros . rewrite ( natmultcomm m k ) .   rewrite ( natmultcomm m k ) in ismk .  rewrite ( natmultcomm n k ) . rewrite ( natmultcomm ( natrem _ _ ) k ) .  apply ( natdivremandmultl _ _ _ ism ismk ) . Defined . 
-
-
-Opaque natdivremandmultr .
+Proof . intros . rewrite ( natmultcomm m k ) .   rewrite ( natmultcomm m k ) in ismk .  rewrite ( natmultcomm n k ) . rewrite ( natmultcomm ( natrem _ _ ) k ) .  apply ( natdivremandmultl _ _ _ ism ismk ) . Qed.
 
 
 Definition natdivandmultr ( n m k : nat ) ( ism : natneq m 0 ) ( ismk : natneq ( m * k ) 0 ) : paths ( natdiv ( n * k ) ( m * k ) ) ( natdiv n m ) := pr1 ( natdivremandmultr _ _ _ ism ismk ) .

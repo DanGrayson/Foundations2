@@ -716,9 +716,7 @@ Proof . Opaque hq.  unfold iscomprelfun .  intros xa1 xa2 .  set ( x1 := pr1 xa1
 
 simpl in e .  assert ( e' := ( maponpaths hzabsval ( hzmultrcan _ _ _ ( pr2 ( pr1 t2 ) ) e ) ) : paths ( hzabsval ( x1 * a2 )%hz ) ( hzabsval ( x2 * a1 )%hz ) ) .  clear e . clear t2 . rewrite ( pathsinv0 ( hzabsvalandmult _ _ ) ) in e' . rewrite ( pathsinv0 ( hzabsvalandmult _ _ ) ) in e' .
 
-unfold intpartint0 . simpl .  change ( paths ( natdiv ( hzabsval x1 ) ( hzabsval a1 ) ) ( natdiv ( hzabsval x2 ) ( hzabsval a2 ) ) ) . rewrite ( pathsinv0 ( natdivandmultr (hzabsval x1 ) (hzabsval a1 ) ( hzabsval a2 ) ( hzabsvalneq0  ( pr2 aa1 ) ) ( natneq0andmult _ _ ( hzabsvalneq0 (pr2 aa1) ) ( hzabsvalneq0  (pr2 aa2) ) ) ) ) .   rewrite ( pathsinv0 ( natdivandmultr (hzabsval x2 ) (hzabsval a2 ) ( hzabsval a1 ) ( hzabsvalneq0  ( pr2 aa2 ) ) ( natneq0andmult _ _ ( hzabsvalneq0 (pr2 aa2) ) ( hzabsvalneq0  (pr2 aa1) ) ) ) ) .  rewrite ( natmultcomm ( hzabsval a1 ) ( hzabsval a2 ) ) .  rewrite e' . apply idpath . Transparent hq .  Defined .  
-
-Opaque iscompintpartint0 .
+unfold intpartint0 . simpl .  change ( paths ( natdiv ( hzabsval x1 ) ( hzabsval a1 ) ) ( natdiv ( hzabsval x2 ) ( hzabsval a2 ) ) ) . rewrite ( pathsinv0 ( natdivandmultr (hzabsval x1 ) (hzabsval a1 ) ( hzabsval a2 ) ( hzabsvalneq0  ( pr2 aa1 ) ) ( natneq0andmult _ _ ( hzabsvalneq0 (pr2 aa1) ) ( hzabsvalneq0  (pr2 aa2) ) ) ) ) .   rewrite ( pathsinv0 ( natdivandmultr (hzabsval x2 ) (hzabsval a2 ) ( hzabsval a1 ) ( hzabsvalneq0  ( pr2 aa2 ) ) ( natneq0andmult _ _ ( hzabsvalneq0 (pr2 aa2) ) ( hzabsvalneq0  (pr2 aa1) ) ) ) ) .  rewrite ( natmultcomm ( hzabsval a1 ) ( hzabsval a2 ) ) .  rewrite e' . apply idpath . Transparent hq .  Qed.
 
 Definition intpart0 : hq -> nat := setquotuniv ( eqrelabmonoidfrac hzmultabmonoid (intdomnonzerosubmonoid hzintdom) ) natset _ 
      ( iscompintpartint0 ) .   

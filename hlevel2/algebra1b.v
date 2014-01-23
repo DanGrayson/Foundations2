@@ -73,9 +73,7 @@ Proof . intros . apply ( isasetsubset ( pr1monoidfun X Y  ) ) . change ( isofhle
 
 
 Lemma ismonoidfuncomp { X Y Z : monoid } ( f : monoidfun X Y ) ( g : monoidfun Y Z ) : ismonoidfun ( funcomp ( pr1 f ) ( pr1 g ) ) .
-Proof . intros . split with ( isbinopfuncomp f g ) . unfold funcomp .  rewrite ( pr2 ( pr2 f ) ) .  apply ( pr2 ( pr2 g ) ) . Defined .  
-
-Opaque ismonoidfuncomp . 
+Proof . intros . split with ( isbinopfuncomp f g ) . unfold funcomp .  rewrite ( pr2 ( pr2 f ) ) .  apply ( pr2 ( pr2 g ) ) . Qed. 
 
 Definition monoidfuncomp { X Y Z : monoid } ( f : monoidfun X Y ) ( g : monoidfun Y Z ) : monoidfun X Z := monoidfunconstr ( ismonoidfuncomp f g ) . 
 
@@ -107,9 +105,7 @@ Coercion monoidisotobinopiso : monoidiso >-> binopiso .
 
 
 Lemma ismonoidfuninvmap { X Y : monoid } ( f : monoidiso X Y ) : ismonoidfun ( invmap ( pr1 f ) ) . 
-Proof . intros . split with ( isbinopfuninvmap f ) .  apply ( invmaponpathsweq ( pr1 f ) ) .  rewrite ( homotweqinvweq ( pr1 f ) ) . apply ( pathsinv0 ( pr2 ( pr2 f ) ) ) . Defined .
-
-Opaque ismonoidfuninvmap .  
+Proof . intros . split with ( isbinopfuninvmap f ) .  apply ( invmaponpathsweq ( pr1 f ) ) .  rewrite ( homotweqinvweq ( pr1 f ) ) . apply ( pathsinv0 ( pr2 ( pr2 f ) ) ) . Qed.  
 
 Definition invmonoidiso { X Y : monoid } ( f : monoidiso X Y ) : monoidiso Y X := monoidisopair ( invweq ( pr1 f ) ) ( ismonoidfuninvmap f ) .
 
@@ -148,9 +144,7 @@ Coercion carrierofsubmonoid : submonoids >-> monoid .
 (** **** Quotient objects *)
 
 Lemma isassocquot { X : monoid } ( R : @binopeqrel X ) : isassoc ( @op ( setwithbinopquot R ) ) . 
-Proof . intros . intros a b c .  apply  ( setquotuniv3prop R ( fun x x' x'' : setwithbinopquot R  => hProppair _ ( setproperty ( setwithbinopquot R ) ( op ( op x x' ) x'' ) ( op x ( op x' x'' )) ) ) ) .  intros x x' x'' . apply ( maponpaths ( setquotpr R ) ( assocax X x x' x'' ) ) .  Defined . 
-
-Opaque isassocquot .
+Proof . intros . intros a b c .  apply  ( setquotuniv3prop R ( fun x x' x'' : setwithbinopquot R  => hProppair _ ( setproperty ( setwithbinopquot R ) ( op ( op x x' ) x'' ) ( op x ( op x' x'' )) ) ) ) .  intros x x' x'' . apply ( maponpaths ( setquotpr R ) ( assocax X x x' x'' ) ) .  Qed.
     
 
 Lemma isunitquot { X : monoid } ( R : @binopeqrel X ) : isunit ( @op ( setwithbinopquot R ) ) ( setquotpr R ( pr1 ( pr2 ( pr2 X ) ) ) ) .
@@ -158,9 +152,7 @@ Proof . intros .  set ( qun := setquotpr R ( pr1 ( pr2 ( pr2 X ) ) ) ) . set ( q
 
 intro x . apply ( setquotunivprop R ( fun x => @eqset qsetwithop ( ( @op qsetwithop ) qun x ) x ) ) .  simpl . intro x0 .   apply ( maponpaths ( setquotpr R ) ( lunax X x0 ) ) . 
 
-intro x . apply ( setquotunivprop R ( fun x => @eqset qsetwithop ( ( @op qsetwithop ) x qun ) x ) ) .  simpl . intro x0 . apply ( maponpaths ( setquotpr R ) ( runax X x0 ) ) . Defined .
-
-Opaque isunitquot . 
+intro x . apply ( setquotunivprop R ( fun x => @eqset qsetwithop ( ( @op qsetwithop ) x qun ) x ) ) .  simpl . intro x0 . apply ( maponpaths ( setquotpr R ) ( runax X x0 ) ) . Qed. 
 
 
 Definition ismonoidquot { X : monoid } ( R : @binopeqrel X ) : ismonoidop ( @op ( setwithbinopquot R ) ) := tpair _ ( isassocquot R ) ( tpair _ ( setquotpr R ( pr1 ( pr2 ( pr2 X ) ) ) ) ( isunitquot R ) ) .  
@@ -172,17 +164,13 @@ Proof . intros . split with ( setwithbinopquot R ) . apply ismonoidquot . Define
 (** **** Direct products *)
 
 Lemma isassocdirprod ( X Y : monoid ) : isassoc ( @op ( setwithbinopdirprod X Y ) ) .
-Proof . intros .  simpl . intros xy xy' xy'' .  simpl . apply pathsdirprod .  apply ( assocax X ) .  apply ( assocax Y ) .  Defined . 
-
-Opaque isassocdirprod .
+Proof . intros .  simpl . intros xy xy' xy'' .  simpl . apply pathsdirprod .  apply ( assocax X ) .  apply ( assocax Y ) .  Qed.
 
 Lemma isunitindirprod ( X Y : monoid ) : isunit ( @op ( setwithbinopdirprod X Y ) ) ( dirprodpair ( unel X ) ( unel Y ) ) .
 Proof . split . 
 
 intro xy . destruct xy as [ x y ] . simpl . apply pathsdirprod .  apply ( lunax X ) .  apply ( lunax Y ) . 
-intro xy .  destruct xy as [ x y ] . simpl . apply pathsdirprod .  apply ( runax X ) .  apply ( runax Y ) . Defined . 
-
-Opaque isunitindirprod . 
+intro xy .  destruct xy as [ x y ] . simpl . apply pathsdirprod .  apply ( runax X ) .  apply ( runax Y ) . Qed. 
 
 Definition ismonoiddirprod ( X Y : monoid ) : ismonoidop ( @op ( setwithbinopdirprod X Y ) ) := tpair _ ( isassocdirprod X Y ) ( tpair _ ( dirprodpair ( unel X ) ( unel Y ) ) ( isunitindirprod X Y ) ) .  
 
@@ -218,9 +206,7 @@ Definition subabmonoids { X : abmonoid } := @submonoids X .
 Identity Coercion id_subabmonoids : subabmonoids >-> submonoids . 
 
 Lemma iscommcarrier { X : abmonoid } ( A : @submonoids X ) : iscomm ( @op A ) . 
-Proof . intros .   intros a a' .  apply ( invmaponpathsincl _ ( isinclpr1carrier A ) ) .  simpl . apply ( pr2 ( pr2 X ) ) . Defined .
-
-Opaque iscommcarrier . 
+Proof . intros .   intros a a' .  apply ( invmaponpathsincl _ ( isinclpr1carrier A ) ) .  simpl . apply ( pr2 ( pr2 X ) ) . Qed. 
 
 Definition  isabmonoidcarrier  { X : abmonoid } ( A : @submonoids X ) : isabmonoidop ( @op A ) := dirprodpair ( ismonoidcarrier A ) ( iscommcarrier A ) . 
 
@@ -235,9 +221,7 @@ Coercion carrierofsubabmonoid : subabmonoids >-> abmonoid .
 (** **** Quotient objects *)
 
 Lemma iscommquot { X : abmonoid } ( R : @binopeqrel X ) : iscomm ( @op ( setwithbinopquot R ) ) .
-Proof . intros .  set ( X0 := setwithbinopquot R ) . intros x x' .  apply ( setquotuniv2prop R ( fun x x' : X0 => hProppair _ ( setproperty X0 ( op x x') ( op x' x) ) ) ) . intros x0 x0' .  apply ( maponpaths ( setquotpr R ) ( ( commax X ) x0 x0' ) ) . Defined .
-
-Opaque iscommquot . 
+Proof . intros .  set ( X0 := setwithbinopquot R ) . intros x x' .  apply ( setquotuniv2prop R ( fun x x' : X0 => hProppair _ ( setproperty X0 ( op x x') ( op x' x) ) ) ) . intros x0 x0' .  apply ( maponpaths ( setquotpr R ) ( ( commax X ) x0 x0' ) ) . Qed. 
 
 Definition isabmonoidquot { X : abmonoid } ( R : @binopeqrel X ) : isabmonoidop ( @op ( setwithbinopquot R ) ) := dirprodpair ( ismonoidquot R ) ( iscommquot R ) . 
 
@@ -248,9 +232,7 @@ Proof . intros . split with  ( setwithbinopquot R )  . apply isabmonoidquot . De
 (** **** Direct products *)
 
 Lemma iscommdirprod ( X Y : abmonoid ) : iscomm ( @op ( setwithbinopdirprod X Y ) ) .
-Proof . intros . intros xy xy' . destruct xy as [ x y ] . destruct xy' as [ x' y' ] .  simpl .  apply pathsdirprod .  apply ( commax X ) .  apply ( commax Y ) .  Defined .
-
-Opaque iscommdirprod . 
+Proof . intros . intros xy xy' . destruct xy as [ x y ] . destruct xy' as [ x' y' ] .  simpl .  apply pathsdirprod .  apply ( commax X ) .  apply ( commax Y ) .  Qed. 
 
 Definition isabmonoiddirprod ( X Y : abmonoid ) : isabmonoidop ( @op ( setwithbinopdirprod X Y ) ) := dirprodpair ( ismonoiddirprod X Y ) ( iscommdirprod X Y ) .
 
@@ -279,16 +261,12 @@ assert ( trans : istrans R ) .  unfold istrans . intros ab cd ef .  simpl . appl
 
 assert ( refl : isrefl R ) . intro xa .  simpl .  apply hinhpr . split with ( pr2 xa ) . apply idpath .  
 
-apply ( iseqrelconstr trans refl symm ) . Defined .
-
-Opaque iseqrelabmonoidfrac .  
+apply ( iseqrelconstr trans refl symm ) . Qed.  
 
 Definition eqrelabmonoidfrac ( X : abmonoid ) ( A : @submonoids X ) : eqrel ( setwithbinopdirprod X A ) := eqrelpair ( hrelabmonoidfrac X A ) ( iseqrelabmonoidfrac X A ) .
 
 Lemma isbinophrelabmonoidfrac ( X : abmonoid ) ( A : @submonoids X ) : @isbinophrel ( setwithbinopdirprod X A ) ( eqrelabmonoidfrac X A ) . 
-Proof . intros . apply ( isbinopreflrel ( eqrelabmonoidfrac X A ) ( eqrelrefl ( eqrelabmonoidfrac X A ) ) ) .  set ( rer := abmonoidoprer ( pr2 X ) ) .  intros a b c d .  simpl . apply hinhfun2 .  destruct a as [ a a' ] . destruct a' as [ a' isa' ] . destruct b as [ b b' ] . destruct b' as [ b' isb' ] . destruct c as [ c c' ] . destruct c' as [ c' isc' ] . destruct d as [ d d' ] . destruct d' as [ d' isd' ] . intros ax ay .  destruct ax as [ a1 eq1 ] . destruct ay as [ a2 eq2 ] . split with ( @op A  a1 a2 ) .  destruct a1 as [ a1 aa1 ] . destruct a2 as [ a2 aa2 ] . simpl in *.  rewrite ( rer a c b' d' ) . rewrite ( rer b d a' c' ) . rewrite ( rer ( a + b' ) ( c + d' ) a1 a2 ) .  rewrite ( rer ( b + a' ) ( d + c' ) a1 a2 ) . destruct eq1 . destruct eq2 . apply idpath . Defined .
-
-Opaque isbinophrelabmonoidfrac .
+Proof . intros . apply ( isbinopreflrel ( eqrelabmonoidfrac X A ) ( eqrelrefl ( eqrelabmonoidfrac X A ) ) ) .  set ( rer := abmonoidoprer ( pr2 X ) ) .  intros a b c d .  simpl . apply hinhfun2 .  destruct a as [ a a' ] . destruct a' as [ a' isa' ] . destruct b as [ b b' ] . destruct b' as [ b' isb' ] . destruct c as [ c c' ] . destruct c' as [ c' isc' ] . destruct d as [ d d' ] . destruct d' as [ d' isd' ] . intros ax ay .  destruct ax as [ a1 eq1 ] . destruct ay as [ a2 eq2 ] . split with ( @op A  a1 a2 ) .  destruct a1 as [ a1 aa1 ] . destruct a2 as [ a2 aa2 ] . simpl in *.  rewrite ( rer a c b' d' ) . rewrite ( rer b d a' c' ) . rewrite ( rer ( a + b' ) ( c + d' ) a1 a2 ) .  rewrite ( rer ( b + a' ) ( d + c' ) a1 a2 ) . destruct eq1 . destruct eq2 . apply idpath . Qed.
  
 Definition abmonoidfracop ( X : abmonoid ) ( A : @submonoids X ) : binop ( setquot ( hrelabmonoidfrac X A ) ) := setquotfun2 ( hrelabmonoidfrac X A ) ( eqrelabmonoidfrac X A ) ( abmonoidfracopint X A ) ( ( iscompbinoptransrel _ ( eqreltrans _ ) ( isbinophrelabmonoidfrac X A ) ) ) . 
 
@@ -356,9 +334,7 @@ Proof . intros . set ( assoc := ( assocax X ) : isassoc ( @op X ) ) . unfold isa
 
 intros xa xa' yb . unfold hrelabmonoidfrac . simpl . apply ( @hinhfun2 ) . intros t2e t2l .  destruct t2e as [ c1a e ] . destruct t2l as [ c0a l ] . set ( x := pr1 xa ) . set ( a := pr1 ( pr2 xa ) ) . set ( x' := pr1 xa' ) . set ( a' := pr1 ( pr2 xa' ) ) . set ( y := pr1 yb ) . set ( b := pr1 ( pr2 yb ) ) . set ( c0 := pr1 c0a ) . set ( c1 := pr1 c1a ) . split with ( ( pr2 xa ) + c1a + c0a ) . change ( L ( ( x' + b ) + ( ( a + c1 ) + c0 ) ) ( ( y + a' ) + ( ( a + c1 ) + c0 ) ) ) . change ( paths ( x + a' + c1 ) ( x' + a + c1 ) ) in e .   rewrite ( rer x' _ _ c0 ) .  destruct ( assoc x' a c1 )  . destruct e .  rewrite ( assoc x a' c1 ) .  rewrite ( rer x _ _ c0 ) . rewrite ( assoc a c1 c0 ) . rewrite ( rer _ a' a _ ) . rewrite ( assoc a' c1 c0 ) . rewrite ( comm a' _ ) .  rewrite ( comm c1 _ ) . rewrite ( assoc  c0 c1 a' ) . destruct ( assoc ( x + b ) c0 ( @op X c1 a' ) ) .  destruct ( assoc ( y + a ) c0 ( @op X c1 a' ) ) . apply ( ( pr2 is ) _ _ _ ( pr2 ( @op A c1a ( pr2 xa' ) ) ) l )  . 
 
-intros xa yb yb' . unfold hrelabmonoidfrac . simpl . apply ( @hinhfun2 ) . intros t2e t2l .  destruct t2e as [ c1a e ] . destruct t2l as [ c0a l ] . set ( x := pr1 xa ) . set ( a := pr1 ( pr2 xa ) ) . set ( y' := pr1 yb' ) . set ( b' := pr1 ( pr2 yb' ) ) . set ( y := pr1 yb ) . set ( b := pr1 ( pr2 yb ) ) . set ( c0 := pr1 c0a ) . set ( c1 := pr1 c1a ) . split with ( ( pr2 yb ) + c1a + c0a ) . change ( L ( ( x + b' ) + ( ( b + c1 ) + c0 ) ) ( ( y' + a ) + ( ( b + c1 ) + c0 ) ) ) . change ( paths ( y + b' + c1 ) ( y' + b + c1 ) ) in e .   rewrite ( rer y' _ _ c0 ) .  destruct ( assoc y' b c1 )  . destruct e .  rewrite ( assoc y b' c1 ) .  rewrite ( rer y _ _ c0 ) . rewrite ( assoc b c1 c0 ) . rewrite ( rer _ b' b _ ) . rewrite ( assoc b' c1 c0 ) . rewrite ( comm b' _ ) .  rewrite ( comm c1 _ ) . rewrite ( assoc  c0 c1 b' ) . destruct ( assoc ( x + b ) c0 ( @op X c1 b' ) ) .  destruct ( assoc ( y + a ) c0 ( @op X c1 b' ) ) . apply ( ( pr2 is ) _ _ _ ( pr2 ( @op A c1a ( pr2 yb' ) ) ) l )  . Defined . 
-
-Opaque iscomprelabmonoidfracrelint . 
+intros xa yb yb' . unfold hrelabmonoidfrac . simpl . apply ( @hinhfun2 ) . intros t2e t2l .  destruct t2e as [ c1a e ] . destruct t2l as [ c0a l ] . set ( x := pr1 xa ) . set ( a := pr1 ( pr2 xa ) ) . set ( y' := pr1 yb' ) . set ( b' := pr1 ( pr2 yb' ) ) . set ( y := pr1 yb ) . set ( b := pr1 ( pr2 yb ) ) . set ( c0 := pr1 c0a ) . set ( c1 := pr1 c1a ) . split with ( ( pr2 yb ) + c1a + c0a ) . change ( L ( ( x + b' ) + ( ( b + c1 ) + c0 ) ) ( ( y' + a ) + ( ( b + c1 ) + c0 ) ) ) . change ( paths ( y + b' + c1 ) ( y' + b + c1 ) ) in e .   rewrite ( rer y' _ _ c0 ) .  destruct ( assoc y' b c1 )  . destruct e .  rewrite ( assoc y b' c1 ) .  rewrite ( rer y _ _ c0 ) . rewrite ( assoc b c1 c0 ) . rewrite ( rer _ b' b _ ) . rewrite ( assoc b' c1 c0 ) . rewrite ( comm b' _ ) .  rewrite ( comm c1 _ ) . rewrite ( assoc  c0 c1 b' ) . destruct ( assoc ( x + b ) c0 ( @op X c1 b' ) ) .  destruct ( assoc ( y + a ) c0 ( @op X c1 b' ) ) . apply ( ( pr2 is ) _ _ _ ( pr2 ( @op A c1a ( pr2 yb' ) ) ) l )  . Qed. 
 
 Definition abmonoidfracrel ( X : abmonoid ) ( A : @submonoids X ) { L : hrel X } ( is : ispartbinophrel A L ) := quotrel ( iscomprelabmonoidfracrelint X A is ) . 
 
@@ -371,17 +347,13 @@ assert ( ll2 : L ( ( ( x2 + a3 ) + c2 ) + ( @op X a1 c1 ) )  ( ( x3 + a1 ) + ( a
 
 assert ( e : paths (x2 + a1 + c1 + (c2 + a3)) (x2 + a3 + c2 + (a1 + c1)) ) . rewrite ( assoc ( x2 + a1 ) c1 _ ) .  rewrite ( assoc ( x2 + a3 ) c2 _ ) . rewrite ( assoc x2 a1 _ ) .  rewrite ( assoc x2 a3 _ ) . destruct ( assoc a1 c1 ( c2 + a3 ) ) . destruct ( assoc a3 c2 ( a1 + c1 ) ) .  destruct ( comm ( c2 + a3 ) ( a1 + c1 ) ) .  rewrite ( comm a3 c2 ) . apply idpath . 
 
-destruct e . apply ( isl _ _ _ ll1 ll2 ) . Defined . 
-
-Opaque istransabmonoidfracrelint . 
+destruct e . apply ( isl _ _ _ ll1 ll2 ) . Qed. 
 
 Lemma istransabmonoidfracrel ( X : abmonoid ) ( A : @subabmonoids X ) { L : hrel X } ( is : ispartbinophrel A L ) ( isl : istrans L ) : istrans ( abmonoidfracrel X A is ) .
 Proof . intros .  apply istransquotrel . apply istransabmonoidfracrelint .  apply is . apply isl . Defined . 
 
 Lemma issymmabmonoidfracrelint ( X : abmonoid ) ( A : @subabmonoids X ) { L : hrel X } ( is : ispartbinophrel A L ) ( isl : issymm L ) : issymm ( abmonoidfracrelint X A L ) .
-Proof . intros . intros xa1 xa2 .  unfold abmonoidfracrelint .  simpl .   apply hinhfun . intros t2l1 .  set ( c1a := pr1 t2l1 ) . set ( l1 := pr2 t2l1 ) .  split with ( c1a ) . apply ( isl _ _ l1 ) . Defined . 
-
-Opaque issymmabmonoidfracrelint .
+Proof . intros . intros xa1 xa2 .  unfold abmonoidfracrelint .  simpl .   apply hinhfun . intros t2l1 .  set ( c1a := pr1 t2l1 ) . set ( l1 := pr2 t2l1 ) .  split with ( c1a ) . apply ( isl _ _ l1 ) . Qed.
 
 Lemma issymmabmonoidfracrel ( X : abmonoid ) ( A : @subabmonoids X ) { L : hrel X } ( is : ispartbinophrel A L ) ( isl : issymm L ) : issymm ( abmonoidfracrel X A is ) .
 Proof . intros .  apply issymmquotrel . apply issymmabmonoidfracrelint .  apply is . apply isl . Defined . 
@@ -417,9 +389,7 @@ assert ( ll1 : L ( ( x1 + a2 ) + ( @op X c1 c2 ) ) ( ( x2 + a1 ) + ( @op X c1 c2
 
 assert ( ll2 : L ( ( x2 + a1 ) + ( @op X c1 c2 ) ) ( ( x1 + a2 ) + ( @op X c1 c2 ) ) ) .  destruct ( comm c2 c1 ) .  destruct ( assoc ( x1 + a2 ) c2 c1 ) . destruct ( assoc ( x2 + a1 ) c2 c1 ) . apply ( ( pr2 is ) _ _ _ ( pr2 c1a ) ) . apply l2 .
 
-apply ( isl _ _ ll1 ll2 ) . Defined .
-
-Opaque  isasymmabmonoidfracrelint .
+apply ( isl _ _ ll1 ll2 ) . Qed.
 
 
 Lemma isasymmabmonoidfracrel ( X : abmonoid ) ( A : @subabmonoids X ) { L : hrel X } ( is : ispartbinophrel A L ) ( isl : isasymm L ) : isasymm ( abmonoidfracrel X A is ) .
@@ -427,9 +397,7 @@ Proof . intros . apply isasymmquotrel . apply isasymmabmonoidfracrelint . apply 
 
 
 Lemma iscoasymmabmonoidfracrelint ( X : abmonoid ) ( A : @subabmonoids X ) { L : hrel X } ( is : ispartbinophrel A L ) ( isl : iscoasymm L ) : iscoasymm ( abmonoidfracrelint X A L ) .
-Proof . intros . set ( assoc := ( assocax X ) : isassoc ( @op X ) ) . unfold isassoc in assoc .  set ( comm := commax X ) .  unfold iscomm in comm . unfold iscoasymm.  intros xa1 xa2 .  intro nl0 . set ( nl := neghexisttoforallneg _ nl0 ( unel A ) ) . simpl in nl .  set ( l := isl _ _ nl ) . apply hinhpr . split with ( unel A ) . apply l . Defined . 
-
-Opaque  isasymmabmonoidfracrelint .
+Proof . intros . set ( assoc := ( assocax X ) : isassoc ( @op X ) ) . unfold isassoc in assoc .  set ( comm := commax X ) .  unfold iscomm in comm . unfold iscoasymm.  intros xa1 xa2 .  intro nl0 . set ( nl := neghexisttoforallneg _ nl0 ( unel A ) ) . simpl in nl .  set ( l := isl _ _ nl ) . apply hinhpr . split with ( unel A ) . apply l . Qed.
 
 Lemma iscoasymmabmonoidfracrel ( X : abmonoid ) ( A : @subabmonoids X ) { L : hrel X } ( is : ispartbinophrel A L ) ( isl : iscoasymm L ) : iscoasymm ( abmonoidfracrel X A is ) .
 Proof . intros . apply iscoasymmquotrel . apply iscoasymmabmonoidfracrelint . apply is . apply isl .   Defined .
@@ -449,9 +417,7 @@ assert ( int : L z1 z3 ) . unfold z1 . unfold z3 . rewrite ( comm a2 c0 ) .  rew
 
 apply ii1 .  apply hinhpr .  split with ( ( pr2 xa3 ) + c0a ) . change ( L ( x1 + a2 + ( a3 + c0 ) ) ( x2 + a1 + ( a3 + c0 ) ) ) . rewrite ( rer _ a2 a3 _ ) . apply l12 . 
 
-apply ii2 . apply hinhpr . split with ( ( pr2 xa1 ) + c0a ) . change ( L ( x2 + a3 + ( a1 + c0 ) ) ( x3 + a2 + ( a1 + c0 ) ) ) .  rewrite ( rer _ a3 a1 _ ) . rewrite ( rer _ a2 a1 _ ) . apply l23 . Defined .    
-
-Opaque iscotransabmonoidfracrelint . 
+apply ii2 . apply hinhpr . split with ( ( pr2 xa1 ) + c0a ) . change ( L ( x2 + a3 + ( a1 + c0 ) ) ( x3 + a2 + ( a1 + c0 ) ) ) .  rewrite ( rer _ a3 a1 _ ) . rewrite ( rer _ a2 a1 _ ) . apply l23 . Qed. 
 
 Lemma iscotransabmonoidfracrel ( X : abmonoid ) ( A : @subabmonoids X ) { L : hrel X } ( is : ispartbinophrel A L ) ( isl : iscotrans L ) : iscotrans ( abmonoidfracrel X A is ) .
 Proof . intros .  apply iscotransquotrel . apply iscotransabmonoidfracrelint .  apply is . apply isl . Defined .
@@ -460,9 +426,7 @@ Proof . intros .  apply iscotransquotrel . apply iscotransabmonoidfracrelint .  
 
 
 Lemma isantisymmnegabmonoidfracrel ( X : abmonoid ) ( A : @subabmonoids X ) { L : hrel X } ( is : ispartbinophrel A L ) ( isl : isantisymmneg L ) : isantisymmneg ( abmonoidfracrel X A is ) .
-Proof . intros . assert ( int : forall x1 x2  , isaprop ( neg ( abmonoidfracrel X A is x1 x2 )-> neg ( abmonoidfracrel X A is x2 x1 ) -> paths x1 x2 ) ) .  intros x1 x2 . apply impred . intro . apply impred . intro . apply ( isasetsetquot _ x1 x2 ) . unfold isantisymmneg .   apply ( setquotuniv2prop _ ( fun x1 x2 => hProppair _ ( int x1 x2 ) ) ) .  intros xa1 xa2 . intros r r' . apply ( weqpathsinsetquot _  ) . generalize r r' . clear r r' . change ( neg ( abmonoidfracrelint X A L xa1 xa2 ) -> neg ( abmonoidfracrelint X A L xa2 xa1 ) -> ( eqrelabmonoidfrac X A xa1 xa2 ) )  .    intros nr12 nr21 . set ( nr12' := neghexisttoforallneg _ nr12 ( unel A ) ) .  set ( nr21' := neghexisttoforallneg _ nr21 ( unel A ) ) .  set ( int' := isl _ _ nr12' nr21' ) .  simpl .   apply hinhpr . split with ( unel A ) . apply int' . Defined .  
-
-Opaque  isantisymmnegabmonoidfracrel .
+Proof . intros . assert ( int : forall x1 x2  , isaprop ( neg ( abmonoidfracrel X A is x1 x2 )-> neg ( abmonoidfracrel X A is x2 x1 ) -> paths x1 x2 ) ) .  intros x1 x2 . apply impred . intro . apply impred . intro . apply ( isasetsetquot _ x1 x2 ) . unfold isantisymmneg .   apply ( setquotuniv2prop _ ( fun x1 x2 => hProppair _ ( int x1 x2 ) ) ) .  intros xa1 xa2 . intros r r' . apply ( weqpathsinsetquot _  ) . generalize r r' . clear r r' . change ( neg ( abmonoidfracrelint X A L xa1 xa2 ) -> neg ( abmonoidfracrelint X A L xa2 xa1 ) -> ( eqrelabmonoidfrac X A xa1 xa2 ) )  .    intros nr12 nr21 . set ( nr12' := neghexisttoforallneg _ nr12 ( unel A ) ) .  set ( nr21' := neghexisttoforallneg _ nr21 ( unel A ) ) .  set ( int' := isl _ _ nr12' nr21' ) .  simpl .   apply hinhpr . split with ( unel A ) . apply int' . Qed.
 
 
 Lemma isantisymmabmonoidfracrel ( X : abmonoid ) ( A : @subabmonoids X ) { L : hrel X } ( is : ispartbinophrel A L ) ( isl : isantisymm L ) : isantisymm ( abmonoidfracrel X A is ) .
@@ -472,49 +436,35 @@ assert ( ll1 : L ( ( x1 + a2 ) + ( @op X c1 c2 ) ) ( ( x2 + a1 ) + ( @op X c1 c2
 
 assert ( ll2 : L ( ( x2 + a1 ) + ( @op X c1 c2 ) ) ( ( x1 + a2 ) + ( @op X c1 c2 ) ) ) .  destruct ( comm c2 c1 ) .  destruct ( assoc ( x1 + a2 ) c2 c1 ) . destruct ( assoc ( x2 + a1 ) c2 c1 ) . apply ( ( pr2 is ) _ _ _ ( pr2 c1a ) ) . apply l2 .
 
-apply ( isl _ _ ll1 ll2 ) . Defined .
-
-Opaque  isantisymmabmonoidfracrel .
+apply ( isl _ _ ll1 ll2 ) . Qed.
 
 
 
 
  
 Lemma ispartbinopabmonoidfracrelint ( X : abmonoid ) ( A : @subabmonoids X ) { L : hrel X } ( is : ispartbinophrel A L ) : @ispartbinophrel ( setwithbinopdirprod X A ) ( fun xa => A ( pr1 xa ) ) ( abmonoidfracrelint X A L ) . 
-Proof . intros . set ( assoc := ( assocax X ) : isassoc ( @op X ) ) . unfold isassoc in assoc .  set ( comm := commax X ) .  unfold iscomm in comm . set ( rer := abmonoidrer X ) . apply ispartbinophrelif . apply ( commax ( abmonoiddirprod X A ) ) . intros xa yb zc s . unfold abmonoidfracrelint . simpl . apply ( @hinhfun ) .  intro t2l .  destruct t2l as [ c0a l ] . set ( x := pr1 xa ) . set ( a := pr1 ( pr2 xa ) ) . set ( y := pr1 yb ) . set ( b := pr1 ( pr2 yb ) ) . set ( z := pr1 zc ) .  set ( c := pr1 ( pr2 zc ) ) . set ( c0 := pr1 c0a ) . split with c0a .  change ( L ( ( ( z + x ) + ( c + b ) ) + c0 ) ( ( ( z + y ) + ( c + a ) ) + c0 ) ) .  change ( pr1 ( L ( ( x + b ) + c0 ) ( ( y + a ) + c0 ) ) ) in l . rewrite ( rer z _ _ b ) . rewrite ( assoc ( z + c ) _ _ ) . rewrite ( rer z _ _ a ) . rewrite ( assoc ( z + c ) _ _ ) .  apply ( ( pr1 is ) _ _ _ ( pr2 ( @op A ( carrierpair A z s ) ( pr2 zc ) ) ) ) . apply l . Defined . 
-
-Opaque ispartbinopabmonoidfracrelint . 
+Proof . intros . set ( assoc := ( assocax X ) : isassoc ( @op X ) ) . unfold isassoc in assoc .  set ( comm := commax X ) .  unfold iscomm in comm . set ( rer := abmonoidrer X ) . apply ispartbinophrelif . apply ( commax ( abmonoiddirprod X A ) ) . intros xa yb zc s . unfold abmonoidfracrelint . simpl . apply ( @hinhfun ) .  intro t2l .  destruct t2l as [ c0a l ] . set ( x := pr1 xa ) . set ( a := pr1 ( pr2 xa ) ) . set ( y := pr1 yb ) . set ( b := pr1 ( pr2 yb ) ) . set ( z := pr1 zc ) .  set ( c := pr1 ( pr2 zc ) ) . set ( c0 := pr1 c0a ) . split with c0a .  change ( L ( ( ( z + x ) + ( c + b ) ) + c0 ) ( ( ( z + y ) + ( c + a ) ) + c0 ) ) .  change ( pr1 ( L ( ( x + b ) + c0 ) ( ( y + a ) + c0 ) ) ) in l . rewrite ( rer z _ _ b ) . rewrite ( assoc ( z + c ) _ _ ) . rewrite ( rer z _ _ a ) . rewrite ( assoc ( z + c ) _ _ ) .  apply ( ( pr1 is ) _ _ _ ( pr2 ( @op A ( carrierpair A z s ) ( pr2 zc ) ) ) ) . apply l . Qed. 
 
 Lemma ispartlbinopabmonoidfracrel ( X : abmonoid ) ( A : @subabmonoids X ) { L : hrel X } ( is : ispartbinophrel A L ) ( aa aa' : A ) ( z z' : abmonoidfrac X A ) ( l : abmonoidfracrel X A is z z' ) : abmonoidfracrel X A is ( ( prabmonoidfrac X A ( pr1 aa ) aa' ) + z ) ( ( prabmonoidfrac X A ( pr1 aa ) aa' ) + z' ) .
 Proof . intros X A L is aa aa' . set ( assoc := ( assocax X ) : isassoc ( @op X ) ) . unfold isassoc in assoc .  set ( comm := commax X ) .  unfold iscomm in comm . set ( rer := abmonoidrer X ) . assert ( int : forall z z' , isaprop ( abmonoidfracrel X A is z z' -> abmonoidfracrel X A is (prabmonoidfrac X A (pr1 aa) aa' + z) (prabmonoidfrac X A (pr1 aa) aa' + z') ) ) . intros z z' . apply impred . intro . apply ( pr2 ( abmonoidfracrel _ _ _ _ _ ) ) .  apply ( setquotuniv2prop _ ( fun z z' => hProppair _ ( int z z' ) ) ) . intros xa1 xa2 .  change ( abmonoidfracrelint X A L xa1 xa2 -> abmonoidfracrelint X A L ( @op ( abmonoiddirprod X A ) ( dirprodpair ( pr1 aa ) aa' ) xa1 ) (  @op ( abmonoiddirprod X A ) ( dirprodpair ( pr1 aa ) aa' ) xa2 ) ) . unfold abmonoidfracrelint .  simpl . apply hinhfun . intro t2l .  set ( a := pr1 aa ) . set ( a' := pr1 aa' ) . set ( c0a := pr1 t2l ) . set ( l := pr2 t2l ) .  set ( c0 := pr1 c0a ) .  set ( x1 := pr1 xa1 ) . set ( a1 := pr1 ( pr2 xa1 ) ) .  set ( x2 := pr1 xa2 ) . set ( a2 := pr1 ( pr2 xa2 ) ) . split with c0a .  
 
-change ( L ( a + x1 + ( a' + a2 ) + c0 ) ( a + x2 + ( a' + a1 ) + c0 ) ) . rewrite ( rer _ x1 a' _ ) . rewrite ( rer _ x2 a' _ ) .  rewrite ( assoc _ ( x1 + a2 ) c0 ) .  rewrite ( assoc _ ( x2 + a1 ) c0 ) . apply ( ( pr1 is ) _ _ _ ( pr2 ( @op A aa aa' ) ) ) . apply l . Defined . 
-
-Opaque ispartlbinopabmonoidfracrel . 
+change ( L ( a + x1 + ( a' + a2 ) + c0 ) ( a + x2 + ( a' + a1 ) + c0 ) ) . rewrite ( rer _ x1 a' _ ) . rewrite ( rer _ x2 a' _ ) .  rewrite ( assoc _ ( x1 + a2 ) c0 ) .  rewrite ( assoc _ ( x2 + a1 ) c0 ) . apply ( ( pr1 is ) _ _ _ ( pr2 ( @op A aa aa' ) ) ) . apply l . Qed. 
 
 
 Lemma ispartrbinopabmonoidfracrel ( X : abmonoid ) ( A : @subabmonoids X ) { L : hrel X } ( is : ispartbinophrel A L ) ( aa aa' : A ) ( z z' : abmonoidfrac X A ) ( l : abmonoidfracrel X A is z z' ) : abmonoidfracrel X A is ( z + ( prabmonoidfrac X A ( pr1 aa ) aa' ) ) ( z' + ( prabmonoidfrac X A ( pr1 aa ) aa' ) ) .
 Proof . intros X A L is aa aa' . set ( assoc := ( assocax X ) : isassoc ( @op X ) ) . unfold isassoc in assoc .  set ( comm := commax X ) .  unfold iscomm in comm . set ( rer := abmonoidrer X ) . assert ( int : forall z z' : abmonoidfrac X A , isaprop ( abmonoidfracrel X A is z z' -> abmonoidfracrel X A is ( z + ( prabmonoidfrac X A (pr1 aa) aa') )  ( z' + prabmonoidfrac X A (pr1 aa) aa' ) ) )  . intros z z' . apply impred . intro . apply ( pr2 ( abmonoidfracrel _ _ _ _ _ ) ) .  apply ( setquotuniv2prop _ ( fun z z' => hProppair _ ( int z z' ) ) ) . intros xa1 xa2 .  change ( abmonoidfracrelint X A L xa1 xa2 -> abmonoidfracrelint X A L ( @op ( abmonoiddirprod X A ) xa1 ( dirprodpair ( pr1 aa ) aa' ) ) (  @op ( abmonoiddirprod X A ) xa2 ( dirprodpair ( pr1 aa ) aa' ) ) ) . unfold abmonoidfracrelint .  simpl . apply hinhfun . intro t2l .  set ( a := pr1 aa ) . set ( a' := pr1 aa' ) . set ( c0a := pr1 t2l ) . set ( l := pr2 t2l ) .  set ( c0 := pr1 c0a ) .  set ( x1 := pr1 xa1 ) . set ( a1 := pr1 ( pr2 xa1 ) ) .  set ( x2 := pr1 xa2 ) . set ( a2 := pr1 ( pr2 xa2 ) ) . split with c0a .  
 
-change ( L ( x1 + a + ( a2 + a' ) + c0 ) ( x2 + a + ( a1 + a' ) + c0 ) ) . rewrite ( rer _ a a2 _ ) . rewrite ( rer _ a a1 _ ) .  rewrite ( assoc ( x1 + a2 ) _ c0 ) .  rewrite ( assoc ( x2 + a1 ) _ c0 ) .  rewrite ( comm _ c0 ) . destruct ( assoc ( x1 + a2 ) c0 ( a + a' ) ) . destruct ( assoc ( x2 + a1 ) c0 ( a + a' ) ) . apply ( ( pr2 is ) _ _ _ ( pr2 ( @op A aa aa' ) ) ) . apply l . Defined . 
-
-Opaque ispartrbinopabmonoidfracrel .
+change ( L ( x1 + a + ( a2 + a' ) + c0 ) ( x2 + a + ( a1 + a' ) + c0 ) ) . rewrite ( rer _ a a2 _ ) . rewrite ( rer _ a a1 _ ) .  rewrite ( assoc ( x1 + a2 ) _ c0 ) .  rewrite ( assoc ( x2 + a1 ) _ c0 ) .  rewrite ( comm _ c0 ) . destruct ( assoc ( x1 + a2 ) c0 ( a + a' ) ) . destruct ( assoc ( x2 + a1 ) c0 ( a + a' ) ) . apply ( ( pr2 is ) _ _ _ ( pr2 ( @op A aa aa' ) ) ) . apply l . Qed.
 
 
 Lemma abmonoidfracrelimpl ( X : abmonoid ) ( A : @subabmonoids X ) { L L' : hrel X } ( is : ispartbinophrel A L ) ( is' : ispartbinophrel A L' )  ( impl : forall x x' , L x x' -> L' x x' ) ( x x' : abmonoidfrac X A ) ( ql : abmonoidfracrel X A is x x' ) : abmonoidfracrel X A is' x x'  .
-Proof . intros .  generalize ql .  apply quotrelimpl .  intros x0 x0' .  unfold abmonoidfracrelint .  simpl .  apply hinhfun .  intro t2 . split with ( pr1 t2 ) .   apply ( impl _ _ ( pr2 t2 ) ) . Defined . 
-
-
-Opaque abmonoidfracrelimpl . 
-
+Proof . intros .  generalize ql .  apply quotrelimpl .  intros x0 x0' .  unfold abmonoidfracrelint .  simpl .  apply hinhfun .  intro t2 . split with ( pr1 t2 ) .   apply ( impl _ _ ( pr2 t2 ) ) . Qed.
 
 Lemma abmonoidfracrellogeq ( X : abmonoid ) ( A : @subabmonoids X ) { L L' : hrel X } ( is : ispartbinophrel A L ) ( is' : ispartbinophrel A L' )  ( lg : forall x x' , L x x' <-> L' x x' ) ( x x' : abmonoidfrac X A ) :  ( abmonoidfracrel X A is x x' ) <-> ( abmonoidfracrel X A is' x x' ) .
 Proof . intros .   apply quotrellogeq .  intros x0 x0' .  split . 
 
 unfold abmonoidfracrelint .  simpl .  apply hinhfun .  intro t2 . split with ( pr1 t2 ) .   apply ( pr1 ( lg _ _ ) ( pr2 t2 ) ) .
-unfold abmonoidfracrelint .  simpl .  apply hinhfun .  intro t2 . split with ( pr1 t2 ) .   apply ( pr2 ( lg _ _ ) ( pr2 t2 ) ) . Defined . 
-
-Opaque abmonoidfracrellogeq . 
+unfold abmonoidfracrelint .  simpl .  apply hinhfun .  intro t2 . split with ( pr1 t2 ) .   apply ( pr2 ( lg _ _ ) ( pr2 t2 ) ) . Qed. 
 
 
 
@@ -529,9 +479,7 @@ Proof . intros . apply isdecquotrel . apply isdecabmonoidfracrelint .   apply is
 (** **** Relations and the canonical homomorphism to [ abmonoidfrac ] *)
 
 Lemma iscomptoabmonoidfrac ( X : abmonoid ) ( A : @submonoids X ) { L : hrel X } ( is : ispartbinophrel A L ) : iscomprelrelfun L ( abmonoidfracrel X A is ) ( toabmonoidfrac X A ) .
-Proof . intros . unfold iscomprelrelfun .  intros x x' l . change ( abmonoidfracrelint X A L ( dirprodpair x ( unel A ) ) ( dirprodpair x' ( unel A ) ) ) .    simpl . apply ( hinhpr ) .  split with ( unel A ) .  apply ( ( pr2 is ) _ _ 0 ) . apply ( pr2 ( unel A ) ) .   apply ( ( pr2 is ) _ _ 0 ) . apply ( pr2 ( unel A ) ) . apply l . Defined .
-
-Opaque iscomptoabmonoidfrac .   
+Proof . intros . unfold iscomprelrelfun .  intros x x' l . change ( abmonoidfracrelint X A L ( dirprodpair x ( unel A ) ) ( dirprodpair x' ( unel A ) ) ) .    simpl . apply ( hinhpr ) .  split with ( unel A ) .  apply ( ( pr2 is ) _ _ 0 ) . apply ( pr2 ( unel A ) ) .   apply ( ( pr2 is ) _ _ 0 ) . apply ( pr2 ( unel A ) ) . apply l . Qed.   
 
 
 
@@ -592,18 +540,14 @@ Proof . intros . set ( is1 := pr1 is ) . set ( is2 := pr2 is ) .   split .
 
 intros a b c r .  set ( r' := is1 _ _ ( grinv X c ) r ) . clearbody r' .  rewrite ( pathsinv0 ( assocax X _ _ a ) ) in r' .  rewrite ( pathsinv0 ( assocax X _ _ b ) ) in r' .  rewrite ( grlinvax X c ) in r' .  rewrite ( lunax X a ) in r' .   rewrite ( lunax X b ) in r' . apply r' .   
 
-intros a b c r .  set ( r' := is2 _ _ ( grinv X c ) r ) . clearbody r' .  rewrite ( ( assocax X a _ _ ) ) in r' .  rewrite ( ( assocax X b _ _ ) ) in r' .  rewrite ( grrinvax X c ) in r' .  rewrite ( runax X a ) in r' . rewrite ( runax X b ) in r' . apply r' . Defined .
-
-Opaque isinvbinophrelgr .
+intros a b c r .  set ( r' := is2 _ _ ( grinv X c ) r ) . clearbody r' .  rewrite ( ( assocax X a _ _ ) ) in r' .  rewrite ( ( assocax X b _ _ ) ) in r' .  rewrite ( grrinvax X c ) in r' .  rewrite ( runax X a ) in r' . rewrite ( runax X b ) in r' . apply r' . Qed.
 
 Lemma isbinophrelgr ( X : gr ) { R : hrel X } ( is : isinvbinophrel R ) : isbinophrel R .
 Proof . intros . set ( is1 := pr1 is ) . set ( is2 := pr2 is ) .   split . 
 
 intros a b c r .  rewrite ( pathsinv0 ( lunax X a ) ) in r .  rewrite ( pathsinv0 ( lunax X b ) ) in r .  rewrite ( pathsinv0 ( grlinvax X c ) ) in r .  rewrite ( assocax X _ _ a ) in r .  rewrite ( assocax X _ _ b ) in r .  apply ( is1 _ _ ( grinv X c ) r ) . 
 
-intros a b c r . rewrite ( pathsinv0 ( runax X a ) ) in r .  rewrite ( pathsinv0 ( runax X b ) ) in r .  rewrite ( pathsinv0 ( grrinvax X c ) ) in r .  rewrite ( pathsinv0 ( assocax X a _ _ ) ) in r .  rewrite ( pathsinv0 ( assocax X b _ _ ) ) in r .  apply ( is2 _ _ ( grinv X c ) r ) .  Defined .
-
-Opaque isbinophrelgr . 
+intros a b c r . rewrite ( pathsinv0 ( runax X a ) ) in r .  rewrite ( pathsinv0 ( runax X b ) ) in r .  rewrite ( pathsinv0 ( grrinvax X c ) ) in r .  rewrite ( pathsinv0 ( assocax X a _ _ ) ) in r .  rewrite ( pathsinv0 ( assocax X b _ _ ) ) in r .  apply ( is2 _ _ ( grinv X c ) r ) .  Qed. 
 
 Lemma grfromgtunel ( X : gr ) { R : hrel X } ( is : isbinophrel R ) { x : X } ( isg : R x ( unel X ) ) : R ( unel X ) ( grinv X x ) .
 Proof . intros . assert ( r := ( pr2 is ) _ _ ( grinv X x ) isg ) . rewrite ( grrinvax X x ) in r .  rewrite ( lunax X _ ) in r . apply r . Defined .    
@@ -653,9 +597,7 @@ Coercion carrierofasubgr : subgrs >-> gr .
 (** **** Quotient objects *)
 
 Lemma grquotinvcomp { X : gr } ( R : @binopeqrel X ) : iscomprelrelfun R R (grinv X) .
-Proof . intros .  destruct R as [ R isb ] . set ( isc := iscompbinoptransrel _ ( eqreltrans _ ) isb  ) . unfold iscomprelrelfun .   intros x x' r .  destruct R as [ R iseq ] .  destruct iseq as [ ispo0 symm0 ] . destruct ispo0 as [ trans0 refl0 ] . unfold isbinophrel in isb .   set ( r0 := isc _ _ _ _ ( isc _ _ _ _ ( refl0 ( grinv X x' ) ) r ) ( refl0 ( grinv X x ) ) ) .   rewrite ( grlinvax X x' ) in r0 .  rewrite ( assocax X ( grinv X x' ) x ( grinv X x ) ) in r0 .  rewrite ( grrinvax X x ) in r0 . rewrite ( lunax X _ ) in r0 . rewrite ( runax X _ ) in r0 .   apply ( symm0 _ _ r0 ) .  Defined . 
-
-Opaque grquotinvcomp . 
+Proof . intros .  destruct R as [ R isb ] . set ( isc := iscompbinoptransrel _ ( eqreltrans _ ) isb  ) . unfold iscomprelrelfun .   intros x x' r .  destruct R as [ R iseq ] .  destruct iseq as [ ispo0 symm0 ] . destruct ispo0 as [ trans0 refl0 ] . unfold isbinophrel in isb .   set ( r0 := isc _ _ _ _ ( isc _ _ _ _ ( refl0 ( grinv X x' ) ) r ) ( refl0 ( grinv X x ) ) ) .   rewrite ( grlinvax X x' ) in r0 .  rewrite ( assocax X ( grinv X x' ) x ( grinv X x ) ) in r0 .  rewrite ( grrinvax X x ) in r0 . rewrite ( lunax X _ ) in r0 . rewrite ( runax X _ ) in r0 .   apply ( symm0 _ _ r0 ) .  Qed. 
 
 Definition invongrquot { X : gr } ( R : @binopeqrel X ) : setquot R -> setquot R := setquotfun R R ( grinv X ) ( grquotinvcomp R ) .
   
@@ -664,9 +606,7 @@ Proof . intros . split .
 
 unfold islinv .  apply ( setquotunivprop R ( fun x : setwithbinopquot R => eqset (@op ( setwithbinopquot R ) (invongrquot R x) x) (setquotpr R (unel X)) ) ) .  intro x . apply ( @maponpaths _ _ ( setquotpr R ) ( @op X ( grinv X x ) x ) ( unel X ) ) .  apply ( grlinvax X ) . 
 
-unfold isrinv .  apply ( setquotunivprop R ( fun x : setwithbinopquot R => eqset (@op ( setwithbinopquot R ) x (invongrquot R x) ) (setquotpr R (unel X)) ) ) .  intro x . apply ( @maponpaths _ _ ( setquotpr R ) ( @op X x ( grinv X x ) ) ( unel X ) ) .  apply ( grrinvax X ) . Defined .
-
-Opaque isinvongrquot . 
+unfold isrinv .  apply ( setquotunivprop R ( fun x : setwithbinopquot R => eqset (@op ( setwithbinopquot R ) x (invongrquot R x) ) (setquotpr R (unel X)) ) ) .  intro x . apply ( @maponpaths _ _ ( setquotpr R ) ( @op X x ( grinv X x ) ) ( unel X ) ) .  apply ( grrinvax X ) . Qed. 
 
 Definition isgrquot { X : gr } ( R : @binopeqrel X ) : isgrop ( @op ( setwithbinopquot R ) ) := tpair _ ( ismonoidquot R ) ( tpair _ ( invongrquot R ) ( isinvongrquot R ) ) . 
 
@@ -755,16 +695,12 @@ Proof . intros . split . simpl . apply hinhfun . intro t2 .  set ( a0 := pr1 ( p
 
 
 Lemma iseqrelabgrfrac ( X : abmonoid ) : iseqrel ( hrelabgrfrac X ) .
-Proof . intro . apply ( iseqrellogeqf ( logeqhrelsabgrfrac X ) ) .   apply ( iseqrelconstr ) . intros xx' xx'' xx''' . intros r1 r2 . apply ( eqreltrans ( eqrelabmonoidfrac X ( totalsubmonoid X ) ) _ _ _ r1 r2 ) . intro xx. apply ( eqrelrefl ( eqrelabmonoidfrac X ( totalsubmonoid X ) ) _ ) . intros xx xx' .  intro r . apply ( eqrelsymm ( eqrelabmonoidfrac X ( totalsubmonoid X ) ) _ _ r ) . Defined .
-
-Opaque iseqrelabgrfrac . 
+Proof . intro . apply ( iseqrellogeqf ( logeqhrelsabgrfrac X ) ) .   apply ( iseqrelconstr ) . intros xx' xx'' xx''' . intros r1 r2 . apply ( eqreltrans ( eqrelabmonoidfrac X ( totalsubmonoid X ) ) _ _ _ r1 r2 ) . intro xx. apply ( eqrelrefl ( eqrelabmonoidfrac X ( totalsubmonoid X ) ) _ ) . intros xx xx' .  intro r . apply ( eqrelsymm ( eqrelabmonoidfrac X ( totalsubmonoid X ) ) _ _ r ) . Qed. 
 
 Definition eqrelabgrfrac ( X : abmonoid ) : @eqrel ( abmonoiddirprod X X ) := eqrelpair _ ( iseqrelabgrfrac X ) .
 
 Lemma isbinophrelabgrfrac ( X : abmonoid ) : @isbinophrel ( abmonoiddirprod X X ) ( hrelabgrfrac X ) .
-Proof . intro .  apply ( @isbinophrellogeqf ( abmonoiddirprod X X ) _ _ ( logeqhrelsabgrfrac X ) ) . split . intros a b c r . apply ( pr1 ( isbinophrelabmonoidfrac X ( totalsubmonoid X ) ) _ _ ( dirprodpair ( pr1 c ) ( carrierpair ( fun x : X => htrue ) ( pr2 c ) tt ) ) r ) .  intros a b c r . apply ( pr2 ( isbinophrelabmonoidfrac X ( totalsubmonoid X ) ) _ _ ( dirprodpair ( pr1 c ) ( carrierpair ( fun x : X => htrue ) ( pr2 c ) tt ) ) r ) .   Defined .  
-
-Opaque isbinophrelabgrfrac .
+Proof . intro .  apply ( @isbinophrellogeqf ( abmonoiddirprod X X ) _ _ ( logeqhrelsabgrfrac X ) ) . split . intros a b c r . apply ( pr1 ( isbinophrelabmonoidfrac X ( totalsubmonoid X ) ) _ _ ( dirprodpair ( pr1 c ) ( carrierpair ( fun x : X => htrue ) ( pr2 c ) tt ) ) r ) .  intros a b c r . apply ( pr2 ( isbinophrelabmonoidfrac X ( totalsubmonoid X ) ) _ _ ( dirprodpair ( pr1 c ) ( carrierpair ( fun x : X => htrue ) ( pr2 c ) tt ) ) r ) .   Qed.
 
 Definition binopeqrelabgrfrac ( X : abmonoid ) : @binopeqrel ( abmonoiddirprod X X ) := binopeqrelpair ( eqrelabgrfrac X ) ( isbinophrelabgrfrac X ) .
 
@@ -773,9 +709,7 @@ Definition abgrfraccarrier ( X : abmonoid ) : abmonoid := @abmonoidquot ( abmono
 Definition abgrfracinvint ( X : abmonoid ) :  dirprod X X -> dirprod X X := fun xs : _ => dirprodpair ( pr2 xs ) ( pr1 xs ) . 
 
 Lemma  abgrfracinvcomp ( X : abmonoid ) : iscomprelrelfun ( hrelabgrfrac X ) ( eqrelabgrfrac X ) ( abgrfracinvint X ) .   
-Proof . intros .  unfold iscomprelrelfun . unfold eqrelabgrfrac . unfold hrelabgrfrac .   unfold eqrelabmonoidfrac .  unfold hrelabmonoidfrac . simpl . intros xs xs' .  apply ( hinhfun ) .   intro tt0 . set ( x := pr1 xs ) .  set ( s := pr2 xs ) . set ( x' := pr1 xs' ) . set ( s' := pr2 xs' ) . split with ( pr1 tt0 ) . destruct tt0 as [ a eq ] .  change ( paths ( s + x' + a ) ( s' + x + a ) ) .  apply pathsinv0 . simpl . set  ( e := commax X s' x ) . simpl in e . rewrite e . clear e . set  ( e := commax X s x' ) . simpl in e . rewrite e .    clear e.  apply eq . Defined . 
-
-Opaque abgrfracinvcomp . 
+Proof . intros .  unfold iscomprelrelfun . unfold eqrelabgrfrac . unfold hrelabgrfrac .   unfold eqrelabmonoidfrac .  unfold hrelabmonoidfrac . simpl . intros xs xs' .  apply ( hinhfun ) .   intro tt0 . set ( x := pr1 xs ) .  set ( s := pr2 xs ) . set ( x' := pr1 xs' ) . set ( s' := pr2 xs' ) . split with ( pr1 tt0 ) . destruct tt0 as [ a eq ] .  change ( paths ( s + x' + a ) ( s' + x + a ) ) .  apply pathsinv0 . simpl . set  ( e := commax X s' x ) . simpl in e . rewrite e . clear e . set  ( e := commax X s x' ) . simpl in e . rewrite e .    clear e.  apply eq . Qed. 
 
 Definition abgrfracinv ( X : abmonoid ) : abgrfraccarrier X -> abgrfraccarrier X := setquotfun ( hrelabgrfrac X ) ( eqrelabgrfrac X ) ( abgrfracinvint X ) ( abgrfracinvcomp X ) .   
 
@@ -784,10 +718,7 @@ Proof . intros . set ( R := eqrelabgrfrac X ) .
 
 assert ( isl : islinv ( @op ( abgrfraccarrier X ) ) ( unel ( abgrfraccarrier X ) ) ( abgrfracinv X ) ) .  unfold islinv . apply ( setquotunivprop R  ( fun x : abgrfraccarrier X => eqset (abgrfracinv X x + x) (unel (abgrfraccarrier X)) ) ) . intro xs . set ( x := pr1 xs ) .  set ( s := pr2 xs ) . apply ( iscompsetquotpr R ( @op ( abmonoiddirprod X X  ) ( abgrfracinvint X xs ) xs ) ( unel _ ) ) .  simpl . apply hinhpr . split with ( unel X ) . change ( paths ( s + x + ( unel X ) + ( unel X ) ) ( ( unel X ) + ( x + s ) + ( unel X ) ) ) .   destruct ( commax X x s ) .  destruct ( commax X ( unel X ) ( x + s ) ) . apply idpath .
 
-apply ( dirprodpair isl ( weqlinvrinv ( @op ( abgrfraccarrier X ) ) ( commax ( abgrfraccarrier X ) ) ( unel ( abgrfraccarrier X ) ) ( abgrfracinv X ) isl ) ) .   Defined . 
-
-
-Opaque abgrfracisinv . 
+apply ( dirprodpair isl ( weqlinvrinv ( @op ( abgrfraccarrier X ) ) ( commax ( abgrfraccarrier X ) ) ( unel ( abgrfraccarrier X ) ) ( abgrfracinv X ) isl ) ) .   Qed.
 
 Definition abgrfrac ( X : abmonoid ) : abgr := abgrconstr ( abgrfraccarrier X ) ( abgrfracinv X ) ( abgrfracisinv X ) .  
 
@@ -854,9 +785,7 @@ Lemma logeqabgrfracrelints ( X : abmonoid ) ( L : hrel X ) : hrellogeq ( abgrfra
 Proof . intros . split . unfold abgrfracrelint . unfold abgrfracrelint' . simpl .  apply hinhfun .  intro t2 .  set ( a0 := pr1 ( pr1 t2 ) ) . split with a0 . apply ( pr2 t2 ) .  simpl . apply hinhfun . intro t2 . set ( x0 := pr1 t2 ) . split with ( tpair _ x0 tt ) .  apply ( pr2 t2 ) .  Defined .
 
 Lemma iscomprelabgrfracrelint ( X : abmonoid ) { L : hrel X } ( is : isbinophrel L ) : iscomprelrel ( eqrelabgrfrac X ) ( abgrfracrelint X L ) . 
-Proof . intros . apply ( iscomprelrellogeqf1 _ ( logeqhrelsabgrfrac X ) ) . apply ( iscomprelrellogeqf2 _ ( logeqabgrfracrelints X L ) ) .  intros x x' x0 x0' r r0 .  apply ( iscomprelabmonoidfracrelint _ ( totalsubmonoid X ) ( isbinoptoispartbinop _ _ is )  _ _ _ _ r r0 ) .  Defined . 
-
-Opaque iscomprelabgrfracrelint . 
+Proof . intros . apply ( iscomprelrellogeqf1 _ ( logeqhrelsabgrfrac X ) ) . apply ( iscomprelrellogeqf2 _ ( logeqabgrfracrelints X L ) ) .  intros x x' x0 x0' r r0 .  apply ( iscomprelabmonoidfracrelint _ ( totalsubmonoid X ) ( isbinoptoispartbinop _ _ is )  _ _ _ _ r r0 ) .  Qed. 
 
 Definition abgrfracrel ( X : abmonoid ) { L : hrel X } ( is : isbinophrel L ) := quotrel ( iscomprelabgrfracrelint X is ) .
 
@@ -872,18 +801,14 @@ assert ( int : forall x x' , isaprop ( abgrfracrel X is x x' -> abgrfracrel' X i
 
 
 Lemma istransabgrfracrelint ( X : abmonoid ) { L : hrel X } ( is : isbinophrel L ) ( isl : istrans L ) : istrans ( abgrfracrelint X L ) .
-Proof . intros .  apply ( istranslogeqf ( logeqabgrfracrelints X L ) ) .  intros a b c rab rbc . apply ( istransabmonoidfracrelint _ ( totalsubmonoid X ) ( isbinoptoispartbinop _ _ is ) isl _ _ _ rab rbc ) .  Defined . 
-
-Opaque istransabgrfracrelint . 
+Proof . intros .  apply ( istranslogeqf ( logeqabgrfracrelints X L ) ) .  intros a b c rab rbc . apply ( istransabmonoidfracrelint _ ( totalsubmonoid X ) ( isbinoptoispartbinop _ _ is ) isl _ _ _ rab rbc ) .  Qed. 
 
 Lemma istransabgrfracrel ( X : abmonoid ) { L : hrel X } ( is : isbinophrel L ) ( isl : istrans L ) : istrans ( abgrfracrel X is ) .
 Proof . intros . apply istransquotrel .  apply istransabgrfracrelint . apply is . apply isl . Defined . 
 
 
 Lemma issymmabgrfracrelint ( X : abmonoid ) { L : hrel X } ( is : isbinophrel L ) ( isl : issymm L ) : issymm ( abgrfracrelint X L ) .
-Proof . intros . apply ( issymmlogeqf ( logeqabgrfracrelints X L ) ) .  intros a b rab . apply ( issymmabmonoidfracrelint _ ( totalsubmonoid X ) ( isbinoptoispartbinop _ _ is ) isl _ _ rab ) .  Defined . 
-
-Opaque issymmabgrfracrelint .
+Proof . intros . apply ( issymmlogeqf ( logeqabgrfracrelints X L ) ) .  intros a b rab . apply ( issymmabmonoidfracrelint _ ( totalsubmonoid X ) ( isbinoptoispartbinop _ _ is ) isl _ _ rab ) .  Qed.
 
 Lemma issymmabgrfracrel ( X : abmonoid ) { L : hrel X } ( is : isbinophrel L ) ( isl : issymm L ) : issymm ( abgrfracrel X is ) .
 Proof . intros .  apply issymmquotrel . apply issymmabgrfracrelint .  apply is . apply isl . Defined . 
@@ -911,45 +836,30 @@ Lemma isantisymmnegabgrfracrel ( X : abmonoid ) { L : hrel X } ( is : isbinophre
 Proof . intros . apply ( isantisymmneglogeqf ( logeqabgrfracrels X is ) ) .  intros a b rab rba . set ( int := isantisymmnegabmonoidfracrel _ ( totalsubmonoid X ) ( isbinoptoispartbinop _ _ is ) isl ( weqabgrfrac X a ) ( weqabgrfrac X b ) rab rba ) . apply ( invmaponpathsweq _ _ _ int ) .  Defined . 
 
 Lemma isantisymmabgrfracrel ( X : abmonoid ) { L : hrel X } ( is : isbinophrel L ) ( isl : isantisymm L ) : isantisymm ( abgrfracrel X is ) .
-Proof . intros . apply ( isantisymmlogeqf ( logeqabgrfracrels X is ) ) .  intros a b rab rba . set ( int := isantisymmabmonoidfracrel _ ( totalsubmonoid X ) ( isbinoptoispartbinop _ _ is ) isl ( weqabgrfrac X a ) ( weqabgrfrac X b ) rab rba ) . apply ( invmaponpathsweq _ _ _ int ) .  Defined .
-
-Opaque  isantisymmabgrfracrel .
+Proof . intros . apply ( isantisymmlogeqf ( logeqabgrfracrels X is ) ) .  intros a b rab rba . set ( int := isantisymmabmonoidfracrel _ ( totalsubmonoid X ) ( isbinoptoispartbinop _ _ is ) isl ( weqabgrfrac X a ) ( weqabgrfrac X b ) rab rba ) . apply ( invmaponpathsweq _ _ _ int ) .  Qed.
 
 
 Lemma isirreflabgrfracrel ( X : abmonoid ) { L : hrel X } ( is : isbinophrel L ) ( isl : isirrefl L ) : isirrefl ( abgrfracrel X is ) .
-Proof . intros .  apply ( isirrefllogeqf ( logeqabgrfracrels X is ) ) .  intros a raa . apply ( isirreflabmonoidfracrel _ ( totalsubmonoid X ) ( isbinoptoispartbinop _ _ is ) isl ( weqabgrfrac X a ) raa ) . Defined .
-
-Opaque isirreflabgrfracrel .
+Proof . intros .  apply ( isirrefllogeqf ( logeqabgrfracrels X is ) ) .  intros a raa . apply ( isirreflabmonoidfracrel _ ( totalsubmonoid X ) ( isbinoptoispartbinop _ _ is ) isl ( weqabgrfrac X a ) raa ) . Qed.
 
 
 Lemma isasymmabgrfracrel ( X : abmonoid ) { L : hrel X } ( is : isbinophrel L ) ( isl : isasymm L ) : isasymm ( abgrfracrel X is ) .
-Proof . intros . apply ( isasymmlogeqf ( logeqabgrfracrels X is ) ) .  intros a b rab rba . apply ( isasymmabmonoidfracrel _ ( totalsubmonoid X ) ( isbinoptoispartbinop _ _ is ) isl ( weqabgrfrac X a ) ( weqabgrfrac X b ) rab rba ) . Defined .
-
-Opaque  isasymmabgrfracrel .
+Proof . intros . apply ( isasymmlogeqf ( logeqabgrfracrels X is ) ) .  intros a b rab rba . apply ( isasymmabmonoidfracrel _ ( totalsubmonoid X ) ( isbinoptoispartbinop _ _ is ) isl ( weqabgrfrac X a ) ( weqabgrfrac X b ) rab rba ) . Qed.
 
 Lemma iscoasymmabgrfracrel ( X : abmonoid ) { L : hrel X } ( is : isbinophrel L ) ( isl : iscoasymm L ) : iscoasymm ( abgrfracrel X is ) .
-Proof . intros . apply ( iscoasymmlogeqf ( logeqabgrfracrels X is ) ) .  intros a b rab . apply ( iscoasymmabmonoidfracrel _ ( totalsubmonoid X ) ( isbinoptoispartbinop _ _ is ) isl ( weqabgrfrac X a ) ( weqabgrfrac X b ) rab ) .  Defined .
-
-Opaque  iscoasymmabgrfracrel .
+Proof . intros . apply ( iscoasymmlogeqf ( logeqabgrfracrels X is ) ) .  intros a b rab . apply ( iscoasymmabmonoidfracrel _ ( totalsubmonoid X ) ( isbinoptoispartbinop _ _ is ) isl ( weqabgrfrac X a ) ( weqabgrfrac X b ) rab ) .  Qed.
 
 Lemma istotalabgrfracrel ( X : abmonoid ) { L : hrel X } ( is : isbinophrel L ) ( isl : istotal L ) : istotal ( abgrfracrel X is ) .
-Proof . intros . apply ( istotallogeqf ( logeqabgrfracrels X is ) ) .  intros a b . apply ( istotalabmonoidfracrel _ ( totalsubmonoid X ) ( isbinoptoispartbinop _ _ is ) isl ( weqabgrfrac X a ) ( weqabgrfrac X b ) ) . Defined .
-
-Opaque istotalabgrfracrel . 
+Proof . intros . apply ( istotallogeqf ( logeqabgrfracrels X is ) ) .  intros a b . apply ( istotalabmonoidfracrel _ ( totalsubmonoid X ) ( isbinoptoispartbinop _ _ is ) isl ( weqabgrfrac X a ) ( weqabgrfrac X b ) ) . Qed. 
 
 Lemma iscotransabgrfracrel ( X : abmonoid ) { L : hrel X } ( is : isbinophrel L ) ( isl : iscotrans L ) : iscotrans ( abgrfracrel X is ) .
-Proof . intros . apply ( iscotranslogeqf ( logeqabgrfracrels X is ) ) .  intros a b c . apply ( iscotransabmonoidfracrel _ ( totalsubmonoid X ) ( isbinoptoispartbinop _ _ is ) isl ( weqabgrfrac X a ) ( weqabgrfrac X b ) ( weqabgrfrac X c ) ) . Defined .
-
-Opaque iscotransabgrfracrel . 
+Proof . intros . apply ( iscotranslogeqf ( logeqabgrfracrels X is ) ) .  intros a b c . apply ( iscotransabmonoidfracrel _ ( totalsubmonoid X ) ( isbinoptoispartbinop _ _ is ) isl ( weqabgrfrac X a ) ( weqabgrfrac X b ) ( weqabgrfrac X c ) ) . Qed. 
 
 
 
 
 Lemma abgrfracrelimpl ( X : abmonoid ) { L L' : hrel X } ( is : isbinophrel L ) ( is' : isbinophrel L' )  ( impl : forall x x' , L x x' -> L' x x' ) ( x x' : abgrfrac X ) ( ql : abgrfracrel X is x x' ) : abgrfracrel X is' x x'  .
-Proof . intros .   generalize ql .  apply (quotrelimpl (iscomprelabgrfracrelint X is) (iscomprelabgrfracrelint X is')) .  intros x0 x0' .  simpl .  apply hinhfun .  intro t2 . split with ( pr1 t2 ) .   apply ( impl _ _ ( pr2 t2 ) ) . Defined . 
-
-
-Opaque abgrfracrelimpl . 
+Proof . intros .   generalize ql .  apply (quotrelimpl (iscomprelabgrfracrelint X is) (iscomprelabgrfracrelint X is')) .  intros x0 x0' .  simpl .  apply hinhfun .  intro t2 . split with ( pr1 t2 ) .   apply ( impl _ _ ( pr2 t2 ) ) . Qed. 
 
 
 Lemma abgrfracrellogeq ( X : abmonoid ) { L L' : hrel X } ( is : isbinophrel L ) ( is' : isbinophrel L' )  ( lg : forall x x' , L x x' <-> L' x x' ) ( x x' : abgrfrac X ) :  ( abgrfracrel X is x x' ) <-> ( abgrfracrel X is' x x' ) .
@@ -988,9 +898,7 @@ exact (
                 (lg (pr1 x0 * pr2 x0' * pr1 t2)%multmonoid
                    (pr1 x0' * pr2 x0 * pr1 t2)%multmonoid) 
                 (pr2 t2))))) x x').
-Defined.
-
-Opaque abgrfracrellogeq . 
+Qed. 
   
 
 Lemma isbinopabgrfracrelint ( X : abmonoid ) { L : hrel X } ( is : isbinophrel L ) : @isbinophrel ( setwithbinopdirprod X X ) ( abgrfracrelint X L ) . 
@@ -998,9 +906,7 @@ Proof . intros . apply ( isbinophrellogeqf ( logeqabgrfracrelints X L ) ) . spli
 
 intros a b c lab . apply ( pr1 ( ispartbinopabmonoidfracrelint _ ( totalsubmonoid X ) ( isbinoptoispartbinop _ _ is ) ) ( abgrfracphi X a ) ( abgrfracphi X b ) ( abgrfracphi X c ) tt lab ) . 
 
-intros a b c lab . apply ( pr2 ( ispartbinopabmonoidfracrelint _ ( totalsubmonoid X ) ( isbinoptoispartbinop _ _ is ) ) ( abgrfracphi X a ) ( abgrfracphi X b ) ( abgrfracphi X c ) tt lab ) . Defined . 
-
-Opaque isbinopabgrfracrelint . 
+intros a b c lab . apply ( pr2 ( ispartbinopabmonoidfracrelint _ ( totalsubmonoid X ) ( isbinoptoispartbinop _ _ is ) ) ( abgrfracphi X a ) ( abgrfracphi X b ) ( abgrfracphi X c ) tt lab ) . Qed. 
 
 Lemma isbinopabgrfracrel ( X : abmonoid ) { L : hrel X } ( is : isbinophrel L ) : @isbinophrel ( abgrfrac X ) ( abgrfracrel X is ) . 
 Proof . intros . apply ( isbinopquotrel ( binopeqrelabgrfrac X ) ( iscomprelabgrfracrelint X is ) ) . apply ( isbinopabgrfracrelint X is ) .  Defined . 
@@ -1016,9 +922,7 @@ Proof . intros . apply isdecquotrel . apply isdecabgrfracrelint .   apply isi . 
 (** **** Relations and the canonical homomorphism to [ abgrfrac ] *)
 
 Lemma iscomptoabgrfrac ( X : abmonoid ) { L : hrel X } ( is : isbinophrel L ) : iscomprelrelfun L ( abgrfracrel X is ) ( toabgrfrac X ) .
-Proof . intros . unfold iscomprelrelfun .  intros x x' l . change ( abgrfracrelint X L ( dirprodpair x ( unel X ) ) ( dirprodpair x' ( unel X ) ) ) .    simpl . apply ( hinhpr ) .  split with ( unel X ) .  apply ( ( pr2 is ) _ _ 0 ) .   apply ( ( pr2 is ) _ _ 0 ) .  apply l . Defined .
-
-Opaque iscomptoabgrfrac .   
+Proof . intros . unfold iscomprelrelfun .  intros x x' l . change ( abgrfracrelint X L ( dirprodpair x ( unel X ) ) ( dirprodpair x' ( unel X ) ) ) .    simpl . apply ( hinhpr ) .  split with ( unel X ) .  apply ( ( pr2 is ) _ _ 0 ) .   apply ( ( pr2 is ) _ _ 0 ) .  apply l . Qed.   
 
 
 

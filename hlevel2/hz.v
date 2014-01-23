@@ -748,9 +748,7 @@ Definition nattohzand1 : paths ( nattohz 1%nat ) 1 := idpath _ .
 Definition nattohzandplus ( n m : nat ) : paths ( nattohz ( n + m )%nat ) ( nattohz n + nattohz m ) := isbinop1funtorngdiff natcommrig n m .
 
 Definition nattohzandminus ( n m : nat ) ( is : natgeh n m ) : paths ( nattohz ( n - m )%nat ) ( nattohz n - nattohz m ) .
-Proof . intros .  apply ( hzplusrcan _ _ ( nattohz m ) ) . unfold hzminus .  rewrite ( hzplusassoc ( nattohz n ) ( - nattohz m ) ( nattohz m ) ) . rewrite ( hzlminus _ ) .   rewrite hzplusr0 .  rewrite ( pathsinv0 ( nattohzandplus _ _ ) ) .  rewrite ( minusplusnmm _ _ is ) . apply idpath . Defined . 
-
-Opaque nattohzandminus . 
+Proof . intros .  apply ( hzplusrcan _ _ ( nattohz m ) ) . unfold hzminus .  rewrite ( hzplusassoc ( nattohz n ) ( - nattohz m ) ( nattohz m ) ) . rewrite ( hzlminus _ ) .   rewrite hzplusr0 .  rewrite ( pathsinv0 ( nattohzandplus _ _ ) ) .  rewrite ( minusplusnmm _ _ is ) . apply idpath . Qed. 
 
 Definition nattohzandmult ( n m : nat ) : paths ( nattohz ( n * m )%nat ) ( nattohz n * nattohz m ) .
 Proof . intros . simpl . change nattohz with ( torngdiff natcommrig ) . apply ( isbinop2funtorngdiff natcommrig n m ) . Defined . 
@@ -801,9 +799,7 @@ Proof . assert ( int : forall x : hz , isaprop ( hzgth x 0 ->  paths ( nattohz (
 
 rewrite ( minusplusnmm _ _ ( natlthtoleh _ _ g'' ) ) . apply idpath . 
 
-destruct ( l g' ) .  Defined .  
-
-Opaque hzabsvalgth0 .
+destruct ( l g' ) .  Qed.
 
 Lemma hzabsvalgeh0 { x : hz } ( is : hzgeh x 0 ) : paths ( nattohz ( hzabsval x ) ) x .
 Proof .  intros . destruct ( hzgehchoice _ _ is ) as [ g | e ] .  apply ( hzabsvalgth0 g ) . rewrite e .  apply idpath .  Defined . 
@@ -813,9 +809,7 @@ Proof . assert ( int : forall x : hz , isaprop ( hzlth x 0 ->  paths ( nattohz (
 
 destruct ( isasymmnatgth _ _ g l' ) .
 
-rewrite ( minusplusnmm _ _ l'' ) . apply idpath . Defined .
-
-Opaque hzabsvallth0 .
+rewrite ( minusplusnmm _ _ l'' ) . apply idpath . Qed.
 
 Lemma hzabsvalleh0 { x : hz } ( is : hzleh x 0 ) : paths ( nattohz ( hzabsval x ) ) ( - x ) .
 Proof .  intros . destruct ( hzlehchoice _ _ is ) as [ l | e ] .  apply ( hzabsvallth0 l ) . rewrite e .  apply idpath .  Defined . 

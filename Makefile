@@ -13,7 +13,16 @@ ifeq ("$(COQTIME)","yes")
 OTHERFLAGS += -time
 endif
 
+all:announce
+announce:; which $(COQBIN)coqc
+
 include Make.makefile
+
+# install: installN
+# installN:
+# 	@find . -name \*.cmxs -o -name \*.native | while read i ; \
+# 	do (set -x ; install -m 0644 $$i "$(DSTROOT)$(COQLIBINSTALL)/Foundations/." ); \
+# 	done
 
 TIME=gnu
 ifeq ($(TIME),gnu)
@@ -30,9 +39,6 @@ endif
 endif
 endif
 COQC = : compiling $*.v ; >$*.timing $(TIMECMD) $(COQBIN)coqc
-
-all:announce
-announce:; type $(COQBIN)coqc
 
 topten:; @find . -name \*.timing | while read x ; do if [ -f "$$x" ] ; then grep '^Chars' "$$x" | sed -e "s=^=$$x =" -e "s/timing/v/" -e "s/ Chars /:/" -e "s/ - \([0-9]*\)/-\1:/"; fi; done | sort -grk 3 | head -10
 

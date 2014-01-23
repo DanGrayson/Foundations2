@@ -177,7 +177,7 @@ Lemma isapropisabmonoidop { X : hSet } ( opp : binop X ) : isaprop ( isabmonoido
 Proof . intros . apply ( isofhleveldirprod 1 ) . apply isapropismonoidop . apply isapropiscomm . Defined . 
 
 Lemma abmonoidoprer { X : hSet } { opp : binop X } ( is : isabmonoidop opp ) ( a b c d : X ) : paths ( opp ( opp a b ) ( opp c d ) ) ( opp ( opp a c ) ( opp b d ) ) .
-Proof . intros . destruct is as [ is comm ] . destruct is as [ assoc unital0 ] .  simpl in * .  destruct ( assoc ( opp a b ) c d ) .  destruct ( assoc ( opp a c ) b d ) . destruct ( pathsinv0 ( assoc a b c ) ) . destruct ( pathsinv0 ( assoc a c b ) ) .   destruct ( comm b c ) . apply idpath .  Defined . 
+Proof . intros . destruct is as [ is comm ] . destruct is as [ assoc unital0 ] .  simpl in * .  destruct ( assoc ( opp a b ) c d ) .  destruct ( assoc ( opp a c ) b d ) . destruct ( pathsinv0 ( assoc a b c ) ) . destruct ( pathsinv0 ( assoc a c b ) ) .   destruct ( comm b c ) . apply idpath .  Qed.
 
 
 
@@ -220,9 +220,6 @@ assert ( f : ( islinv opp un0 inv0 ) -> ( isrinv opp un0 inv0 ) ) . unfold islin
 assert ( g : ( isrinv opp un0 inv0 ) -> ( islinv opp un0 inv0 ) ) . unfold islinv . unfold isrinv .  intro isr . intro x .  destruct ( is x ( inv0 x ) ) .  apply ( isr x ) .  
 
 split with f . apply ( isweqimplimpl f g ( isapropislinv opp un0 inv0 )  ( isapropisrinv opp un0 inv0 ) ) .  Defined .  
-
-
-Opaque abmonoidoprer .
 
 
 (** *)
@@ -314,34 +311,24 @@ Lemma isapropisrngops { X : hSet } ( opp1 opp2 : binop X ) : isaprop ( isrngops 
 Proof . intros . apply ( isofhleveldirprod 1 ) . apply ( isofhleveldirprod 1 ) . apply isapropisabgrop . apply isapropismonoidop. apply isapropisdistr . Defined . 
 
 Lemma multx0_is_l { X : hSet } { opp1 opp2 : binop X } ( is1 : isgrop opp1 ) ( is2 : ismonoidop opp2 ) ( is12 : isdistr opp1 opp2 ) : forall x : X , paths ( opp2 x ( unel_is ( pr1 is1 ) ) ) ( unel_is ( pr1 is1 ) )  .
-Proof . intros .  destruct is12 as [ ldistr0 rdistr0 ] . destruct is2 as [ assoc2 [ un2 [ lun2 run2 ] ] ] . simpl in * . apply ( invmaponpathsweq ( weqpair _ ( isweqrmultingr_is is1 ( opp2 x un2 ) ) ) ) .  simpl .  destruct is1 as [ [ assoc1 [ un1 [ lun1 run1 ] ] ] [ inv0 [ linv0 rinv0 ] ] ] .  unfold unel_is .  simpl in * . rewrite ( lun1 ( opp2 x un2 ) ) . destruct ( ldistr0 un1 un2 x ) .    rewrite ( run2 x ) .  rewrite ( lun1 un2 ) .  rewrite ( run2 x ) . apply idpath .  Defined .
-
-Opaque multx0_is_l .
+Proof . intros .  destruct is12 as [ ldistr0 rdistr0 ] . destruct is2 as [ assoc2 [ un2 [ lun2 run2 ] ] ] . simpl in * . apply ( invmaponpathsweq ( weqpair _ ( isweqrmultingr_is is1 ( opp2 x un2 ) ) ) ) .  simpl .  destruct is1 as [ [ assoc1 [ un1 [ lun1 run1 ] ] ] [ inv0 [ linv0 rinv0 ] ] ] .  unfold unel_is .  simpl in * . rewrite ( lun1 ( opp2 x un2 ) ) . destruct ( ldistr0 un1 un2 x ) .    rewrite ( run2 x ) .  rewrite ( lun1 un2 ) .  rewrite ( run2 x ) . apply idpath .  Qed.
 
 Lemma mult0x_is_l { X : hSet } { opp1 opp2 : binop X } ( is1 : isgrop opp1 ) ( is2 : ismonoidop opp2 ) ( is12 : isdistr opp1 opp2 ) : forall x : X , paths ( opp2 ( unel_is ( pr1 is1 ) ) x ) ( unel_is ( pr1 is1 ) ) .
-Proof . intros .  destruct is12 as [ ldistr0 rdistr0 ] . destruct is2 as [ assoc2 [ un2 [ lun2 run2 ] ] ] . simpl in * . apply ( invmaponpathsweq ( weqpair _ ( isweqrmultingr_is is1 ( opp2 un2 x ) ) ) ) .  simpl .  destruct is1 as [ [ assoc1 [ un1 [ lun1 run1 ] ] ] [ inv0 [ linv0 rinv0 ] ] ] .  unfold unel_is .  simpl in * . rewrite ( lun1 ( opp2 un2 x ) ) . destruct ( rdistr0 un1 un2 x ) .  rewrite ( lun2 x ) .  rewrite ( lun1 un2 ) .  rewrite ( lun2 x ) . apply idpath .  Defined .
-
-Opaque mult0x_is_l .
+Proof . intros .  destruct is12 as [ ldistr0 rdistr0 ] . destruct is2 as [ assoc2 [ un2 [ lun2 run2 ] ] ] . simpl in * . apply ( invmaponpathsweq ( weqpair _ ( isweqrmultingr_is is1 ( opp2 un2 x ) ) ) ) .  simpl .  destruct is1 as [ [ assoc1 [ un1 [ lun1 run1 ] ] ] [ inv0 [ linv0 rinv0 ] ] ] .  unfold unel_is .  simpl in * . rewrite ( lun1 ( opp2 un2 x ) ) . destruct ( rdistr0 un1 un2 x ) .  rewrite ( lun2 x ) .  rewrite ( lun1 un2 ) .  rewrite ( lun2 x ) . apply idpath .  Qed.
 
 
 
 Definition minus1_is_l { X : hSet } { opp1 opp2 : binop X } ( is1 : isgrop opp1 ) ( is2 : ismonoidop opp2 ) := ( grinv_is is1 ) ( unel_is is2 ) . 
 
 Lemma islinvmultwithminus1_is_l { X : hSet } { opp1 opp2 : binop X } ( is1 : isgrop opp1 ) ( is2 : ismonoidop opp2 ) ( is12 : isdistr opp1 opp2 ) ( x : X ) : paths ( opp1 ( opp2 ( minus1_is_l is1 is2 ) x ) x ) ( unel_is ( pr1 is1 ) ) .
-Proof . intros . set ( xinv := opp2 (minus1_is_l is1 is2) x ) . rewrite ( pathsinv0 ( lunax_is is2 x ) ) . unfold xinv .  rewrite ( pathsinv0 ( pr2 is12 _ _ x ) ) . unfold minus1_is_l . unfold grinv_is . rewrite ( grlinvax_is is1 _ ) .  apply mult0x_is_l .   apply is2 . apply is12 .  Defined . 
-
-Opaque islinvmultwithminus1_is_l .
+Proof . intros . set ( xinv := opp2 (minus1_is_l is1 is2) x ) . rewrite ( pathsinv0 ( lunax_is is2 x ) ) . unfold xinv .  rewrite ( pathsinv0 ( pr2 is12 _ _ x ) ) . unfold minus1_is_l . unfold grinv_is . rewrite ( grlinvax_is is1 _ ) .  apply mult0x_is_l .   apply is2 . apply is12 .  Qed.
 
 Lemma isrinvmultwithminus1_is_l { X : hSet } { opp1 opp2 : binop X } ( is1 : isgrop opp1 ) ( is2 : ismonoidop opp2 ) ( is12 : isdistr opp1 opp2 ) ( x : X ) : paths ( opp1 x ( opp2 ( minus1_is_l is1 is2 ) x ) ) ( unel_is ( pr1 is1 ) ) .
-Proof . intros . set ( xinv := opp2 (minus1_is_l is1 is2) x ) . rewrite ( pathsinv0 ( lunax_is is2 x ) ) . unfold xinv .  rewrite ( pathsinv0 ( pr2 is12 _ _ x ) ) . unfold minus1_is_l . unfold grinv_is . rewrite ( grrinvax_is is1 _ ) .  apply mult0x_is_l .   apply is2 . apply is12 .  Defined . 
-
-Opaque isrinvmultwithminus1_is_l . 
+Proof . intros . set ( xinv := opp2 (minus1_is_l is1 is2) x ) . rewrite ( pathsinv0 ( lunax_is is2 x ) ) . unfold xinv .  rewrite ( pathsinv0 ( pr2 is12 _ _ x ) ) . unfold minus1_is_l . unfold grinv_is . rewrite ( grrinvax_is is1 _ ) .  apply mult0x_is_l .   apply is2 . apply is12 .  Qed. 
 
 
 Lemma isminusmultwithminus1_is_l { X : hSet } { opp1 opp2 : binop X } ( is1 : isgrop opp1 ) ( is2 : ismonoidop opp2 ) ( is12 : isdistr opp1 opp2 ) ( x : X ) : paths ( opp2 ( minus1_is_l is1 is2 ) x ) ( grinv_is is1 x ) .
-Proof . intros . apply ( invmaponpathsweq ( weqpair _ ( isweqrmultingr_is is1 x ) ) ) .    simpl . rewrite ( islinvmultwithminus1_is_l is1 is2 is12 x ) . unfold grinv_is . rewrite ( grlinvax_is is1 x ) .  apply idpath . Defined . 
-
-Opaque isminusmultwithminus1_is_l . 
+Proof . intros . apply ( invmaponpathsweq ( weqpair _ ( isweqrmultingr_is is1 x ) ) ) .    simpl . rewrite ( islinvmultwithminus1_is_l is1 is2 is12 x ) . unfold grinv_is . rewrite ( grlinvax_is is1 x ) .  apply idpath . Qed. 
 
 Lemma isrngopsif { X : hSet } { opp1 opp2 : binop X } ( is1 : isgrop opp1 ) ( is2 : ismonoidop opp2 ) ( is12 : isdistr opp1 opp2 ) : isrngops opp1 opp2 .
 Proof . intros .  set ( assoc1 := pr1 ( pr1 is1 ) ) . split . split .  split with is1 . 
@@ -429,9 +416,7 @@ Lemma isasetbinopfun  ( X Y : setwithbinop ) : isaset ( binopfun X Y ) .
 Proof . intros . apply ( isasetsubset ( pr1binopfun X Y  ) ) . change ( isofhlevel 2 ( X -> Y ) ) . apply impred .  intro . apply ( setproperty Y ) . apply isinclpr1 .  intro .  apply isapropisbinopfun . Defined .  
 
 Lemma isbinopfuncomp { X Y Z : setwithbinop } ( f : binopfun X Y ) ( g : binopfun Y Z ) : isbinopfun ( funcomp ( pr1 f ) ( pr1 g ) ) .
-Proof . intros . set ( axf := pr2 f ) . set ( axg := pr2 g ) .  intros a b . unfold funcomp .  rewrite ( axf a b ) . rewrite ( axg ( pr1 f a ) ( pr1 f b ) ) .  apply idpath . Defined .  
-
-Opaque isbinopfuncomp . 
+Proof . intros . set ( axf := pr2 f ) . set ( axg := pr2 g ) .  intros a b . unfold funcomp .  rewrite ( axf a b ) . rewrite ( axg ( pr1 f a ) ( pr1 f b ) ) .  apply idpath . Qed. 
 
 Definition binopfuncomp { X Y Z : setwithbinop } ( f : binopfun X Y ) ( g : binopfun Y Z ) : binopfun X Z := binopfunpair ( funcomp ( pr1 f ) ( pr1 g ) ) ( isbinopfuncomp f g ) . 
 
@@ -458,9 +443,7 @@ Coercion binopisotobinopmono : binopiso >-> binopmono .
 Definition binopisocomp { X Y Z : setwithbinop } ( f : binopiso X Y ) ( g : binopiso Y Z ) : binopiso X Z := binopisopair ( weqcomp ( pr1 f ) ( pr1 g ) ) ( isbinopfuncomp f g ) .
 
 Lemma isbinopfuninvmap { X Y : setwithbinop } ( f : binopiso X Y ) : isbinopfun ( invmap ( pr1 f ) ) . 
-Proof . intros . set ( axf := pr2 f ) . intros a b .  apply ( invmaponpathsweq ( pr1 f ) ) .  rewrite ( homotweqinvweq ( pr1 f ) ( op a b ) ) . rewrite ( axf (invmap (pr1 f) a) (invmap (pr1 f) b) ) .  rewrite ( homotweqinvweq ( pr1 f ) a ) .   rewrite ( homotweqinvweq ( pr1 f ) b ) .   apply idpath . Defined .
-
-Opaque isbinopfuninvmap .  
+Proof . intros . set ( axf := pr2 f ) . intros a b .  apply ( invmaponpathsweq ( pr1 f ) ) .  rewrite ( homotweqinvweq ( pr1 f ) ( op a b ) ) . rewrite ( axf (invmap (pr1 f) a) (invmap (pr1 f) b) ) .  rewrite ( homotweqinvweq ( pr1 f ) a ) .   rewrite ( homotweqinvweq ( pr1 f ) b ) .   apply idpath . Qed.  
 
 Definition invbinopiso { X Y : setwithbinop } ( f : binopiso X Y ) : binopiso Y X := binopisopair ( invweq ( pr1 f ) ) ( isbinopfuninvmap f ) .
 
@@ -535,43 +518,31 @@ Proof . intros . apply ( dirprodpair ( islinvertibleisof f x ( pr1 is ) ) ( isri
 
 
 Lemma isassocmonob { X Y : setwithbinop } ( f : binopmono X Y ) ( is : isassoc ( @op Y ) ) : isassoc ( @op X ) .
-Proof . intros . set ( axf := pr2 f ) .  simpl in axf .  intros a b c . apply ( invmaponpathsincl _ ( pr2 ( pr1 f ) ) ) . rewrite ( axf ( op a b ) c ) .  rewrite ( axf a b ) . rewrite ( axf a ( op b c ) ) . rewrite ( axf b c ) . apply is . Defined .   
-
-Opaque isassocmonob .
+Proof . intros . set ( axf := pr2 f ) .  simpl in axf .  intros a b c . apply ( invmaponpathsincl _ ( pr2 ( pr1 f ) ) ) . rewrite ( axf ( op a b ) c ) .  rewrite ( axf a b ) . rewrite ( axf a ( op b c ) ) . rewrite ( axf b c ) . apply is . Qed.
 
 Lemma iscommmonob { X Y : setwithbinop } ( f : binopmono X Y ) ( is : iscomm ( @op Y ) ) : iscomm ( @op X ) .
-Proof . intros . set ( axf := pr2 f ) .  simpl in axf .  intros a b . apply ( invmaponpathsincl _ ( pr2 ( pr1 f ) ) ) . rewrite ( axf a b ) .  rewrite ( axf b a  ) . apply is . Defined .  
-
-Opaque iscommmonob .
+Proof . intros . set ( axf := pr2 f ) .  simpl in axf .  intros a b . apply ( invmaponpathsincl _ ( pr2 ( pr1 f ) ) ) . rewrite ( axf a b ) .  rewrite ( axf b a  ) . apply is . Qed.
 
 Notation isassocisob := isassocmonob .
 Notation iscommisob := iscommmonob . 
 
 Lemma isassocisof  { X Y : setwithbinop } ( f : binopiso X Y ) ( is : isassoc ( @op X ) ) : isassoc ( @op Y ) .
-Proof . intros . apply ( isassocmonob ( invbinopiso f ) is ) . Defined .  
-
-Opaque isassocisof .
+Proof . intros . apply ( isassocmonob ( invbinopiso f ) is ) . Qed.
 
 Lemma iscommisof { X Y : setwithbinop } ( f : binopiso X Y ) ( is : iscomm ( @op X ) ) : iscomm ( @op Y ) .
-Proof . intros .  apply ( iscommmonob ( invbinopiso f ) is ) . Defined . 
-
-Opaque iscommisof . 
+Proof . intros .  apply ( iscommmonob ( invbinopiso f ) is ) . Qed. 
 
 Lemma isunitisof { X Y : setwithbinop } ( f : binopiso X Y ) ( unx : X ) ( is : isunit ( @op X ) unx ) : isunit ( @op Y ) ( f unx ) .
 Proof . intros . set ( axf := pr2 f ) .  split . 
 
 intro a . change ( f unx ) with ( pr1 f unx ) . apply ( invmaponpathsweq ( pr1 ( invbinopiso f ) ) ) .  rewrite ( pr2 ( invbinopiso f ) ( pr1 f unx ) a ) . simpl . rewrite ( homotinvweqweq ( pr1 f ) unx ) .  apply ( pr1 is ) .  
 
-intro a . change ( f unx ) with ( pr1 f unx ) . apply ( invmaponpathsweq ( pr1 ( invbinopiso f ) ) ) .  rewrite ( pr2 ( invbinopiso f ) a ( pr1 f unx ) ) . simpl . rewrite ( homotinvweqweq ( pr1 f ) unx ) .  apply ( pr2 is ) . Defined .   
-
-Opaque isunitisof . 
+intro a . change ( f unx ) with ( pr1 f unx ) . apply ( invmaponpathsweq ( pr1 ( invbinopiso f ) ) ) .  rewrite ( pr2 ( invbinopiso f ) a ( pr1 f unx ) ) . simpl . rewrite ( homotinvweqweq ( pr1 f ) unx ) .  apply ( pr2 is ) . Qed. 
 
 Definition isunitalisof { X Y : setwithbinop } ( f : binopiso X Y ) ( is : isunital ( @op X ) ) : isunital ( @op Y ) := isunitalpair ( f ( pr1 is ) ) ( isunitisof f ( pr1 is ) ( pr2 is ) ) .
 
 Lemma isunitisob { X Y : setwithbinop } ( f : binopiso X Y ) ( uny : Y ) ( is : isunit ( @op Y ) uny ) : isunit ( @op X ) ( ( invmap f ) uny ) .
-Proof . intros . set ( int := isunitisof ( invbinopiso f ) ) .  simpl . simpl in int . apply int .  apply is .  Defined .
-
-Opaque isunitisob .
+Proof . intros . set ( int := isunitisof ( invbinopiso f ) ) .  simpl . simpl in int . apply int .  apply is .  Qed.
 
 Definition isunitalisob  { X Y : setwithbinop } ( f : binopiso X Y ) ( is : isunital ( @op Y ) ) : isunital ( @op X ) := isunitalpair ( ( invmap f ) ( pr1 is ) ) ( isunitisob f ( pr1 is ) ( pr2 is ) ) .
 
@@ -585,16 +556,12 @@ Proof . intros . set ( axf := pr2 f ) . set ( axinvf := pr2 ( invbinopiso f ) ) 
 
 intro a .  apply ( invmaponpathsweq ( pr1 ( invbinopiso f ) ) ) .  simpl . rewrite ( axinvf ( ( pr1 f ) (invx (invmap ( pr1 f ) a))) a ) . rewrite ( homotinvweqweq ( pr1 f ) unx ) .  rewrite ( homotinvweqweq ( pr1 f ) (invx (invmap ( pr1 f ) a)) ) . apply ( pr1 is ) .   
 
-intro a .  apply ( invmaponpathsweq ( pr1 ( invbinopiso f ) ) ) .  simpl . rewrite ( axinvf a ( ( pr1 f ) (invx (invmap ( pr1 f ) a))) ) . rewrite ( homotinvweqweq ( pr1 f ) unx ) .  rewrite ( homotinvweqweq ( pr1 f ) (invx (invmap ( pr1 f ) a)) ) . apply ( pr2 is ) . Defined .      
-
-Opaque isinvisof .
+intro a .  apply ( invmaponpathsweq ( pr1 ( invbinopiso f ) ) ) .  simpl . rewrite ( axinvf a ( ( pr1 f ) (invx (invmap ( pr1 f ) a))) ) . rewrite ( homotinvweqweq ( pr1 f ) unx ) .  rewrite ( homotinvweqweq ( pr1 f ) (invx (invmap ( pr1 f ) a)) ) . apply ( pr2 is ) . Qed.
 
 Definition isgropisof  { X Y : setwithbinop } ( f : binopiso X Y ) ( is : isgrop ( @op X ) ) : isgrop ( @op Y ) :=  tpair _ ( ismonoidopisof f is ) ( tpair _ ( funcomp ( invmap ( pr1 f ) ) ( funcomp ( grinv_is is ) ( pr1 f ) ) ) ( isinvisof f ( unel_is is ) ( grinv_is is ) ( pr2 ( pr2 is ) ) ) ) .  
 
 Lemma isinvisob { X Y : setwithbinop } ( f : binopiso X Y ) ( uny : Y ) ( invy : Y -> Y ) ( is : isinv ( @op Y ) uny invy ) : isinv ( @op X ) ( invmap (  pr1 f ) uny ) ( funcomp ( pr1 f ) ( funcomp invy ( invmap ( pr1 f ) ) ) ) .
-Proof . intros . apply ( isinvisof ( invbinopiso f ) uny invy is ) . Defined .  
-
-Opaque isinvisob .
+Proof . intros . apply ( isinvisof ( invbinopiso f ) uny invy is ) . Qed.
 
 Definition isgropisob  { X Y : setwithbinop } ( f : binopiso X Y ) ( is : isgrop ( @op Y ) ) : isgrop ( @op X ) :=  tpair _ ( ismonoidopisob f is ) ( tpair _  ( funcomp ( pr1 f ) ( funcomp ( grinv_is is ) ( invmap ( pr1 f ) ) ) ) ( isinvisob f ( unel_is is ) ( grinv_is is ) ( pr2 ( pr2 is ) ) ) ) .
 
@@ -857,9 +824,7 @@ Proof . intros . set ( ax1f := pr1 ( pr2 f ) ) . set ( ax2f := pr2 ( pr2 f ) ) .
 
 
 intros a b .  apply ( invmaponpathsweq ( pr1 f ) ) .  rewrite ( homotweqinvweq ( pr1 f ) ( op1 a b ) ) .   rewrite ( ax1f (invmap (pr1 f) a) (invmap (pr1 f) b) ) .  rewrite ( homotweqinvweq ( pr1 f ) a ) .   rewrite ( homotweqinvweq ( pr1 f ) b ) .   apply idpath .
-intros a b .  apply ( invmaponpathsweq ( pr1 f ) ) .  rewrite ( homotweqinvweq ( pr1 f ) ( op2 a b ) ) . rewrite ( ax2f (invmap (pr1 f) a) (invmap (pr1 f) b) ) .  rewrite ( homotweqinvweq ( pr1 f ) a ) .   rewrite ( homotweqinvweq ( pr1 f ) b ) .   apply idpath . Defined .
-
-Opaque istwobinopfuninvmap .  
+intros a b .  apply ( invmaponpathsweq ( pr1 f ) ) .  rewrite ( homotweqinvweq ( pr1 f ) ( op2 a b ) ) . rewrite ( ax2f (invmap (pr1 f) a) (invmap (pr1 f) b) ) .  rewrite ( homotweqinvweq ( pr1 f ) a ) .   rewrite ( homotweqinvweq ( pr1 f ) b ) .   apply idpath . Qed.  
 
 Definition invtwobinopiso { X Y : setwith2binop } ( f : twobinopiso X Y ) : twobinopiso Y X := twobinopisopair ( invweq ( pr1 f ) ) ( istwobinopfuninvmap f ) .
 
@@ -871,16 +836,12 @@ Definition invtwobinopiso { X Y : setwith2binop } ( f : twobinopiso X Y ) : twob
 
 Lemma isldistrmonob { X Y : setwith2binop } ( f : twobinopmono X Y ) ( is : isldistr ( @op1 Y ) ( @op2 Y ) ) : isldistr ( @op1 X ) ( @op2 X ) .
 Proof . intros .   set ( ax1f := pr1 ( pr2 f ) ) .   set ( ax2f := pr2 ( pr2 f )  ) .   intros a b c . apply ( invmaponpathsincl _ ( pr2 ( pr1 f ) ) ) .  change ( paths ( (pr1 f) (op2 c (op1 a b)))
-     ( (pr1 f) (op1 (op2 c a) (op2 c b))) ) . rewrite ( ax2f c ( op1 a b ) ) . rewrite ( ax1f a b ) .   rewrite ( ax1f ( op2 c a ) ( op2 c b ) ) . rewrite ( ax2f c a ) . rewrite ( ax2f c b ) .  apply is .  Defined . 
-
-Opaque isldistrmonob .
+     ( (pr1 f) (op1 (op2 c a) (op2 c b))) ) . rewrite ( ax2f c ( op1 a b ) ) . rewrite ( ax1f a b ) .   rewrite ( ax1f ( op2 c a ) ( op2 c b ) ) . rewrite ( ax2f c a ) . rewrite ( ax2f c b ) .  apply is .  Qed.
 
 
 Lemma isrdistrmonob { X Y : setwith2binop } ( f : twobinopmono X Y ) ( is : isrdistr ( @op1 Y ) ( @op2 Y ) ) : isrdistr ( @op1 X ) ( @op2 X ) .
 Proof . intros .  set ( ax1f := pr1 ( pr2 f ) ) .   set ( ax2f := pr2 ( pr2 f ) ) .  intros a b c . apply ( invmaponpathsincl _ ( pr2 ( pr1 f ) ) ) . change ( paths ( (pr1 f) (op2 (op1 a b) c))
-     ( (pr1 f) (op1 (op2 a c) (op2 b c))) ) .  rewrite ( ax2f ( op1 a b ) c ) . rewrite ( ax1f a b ) .   rewrite ( ax1f ( op2 a c ) ( op2 b c ) ) . rewrite ( ax2f a c ) . rewrite ( ax2f b c ) .  apply is .  Defined . 
-
-Opaque isrdistrmonob .
+     ( (pr1 f) (op1 (op2 a c) (op2 b c))) ) .  rewrite ( ax2f ( op1 a b ) c ) . rewrite ( ax1f a b ) .   rewrite ( ax1f ( op2 a c ) ( op2 b c ) ) . rewrite ( ax2f a c ) . rewrite ( ax2f b c ) .  apply is .  Qed.
 
 Definition isdistrmonob { X Y : setwith2binop } ( f : twobinopmono X Y ) ( is : isdistr ( @op1 Y ) ( @op2 Y ) ) : isdistr ( @op1 X ) ( @op2 X ) := dirprodpair ( isldistrmonob f ( pr1 is ) ) ( isrdistrmonob f ( pr2 is ) ) .
 
