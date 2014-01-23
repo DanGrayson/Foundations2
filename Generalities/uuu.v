@@ -11,7 +11,7 @@ This is the first in the group of files which contain the (current state of) the
 (** Preamble. *)
 
 Global Set Universe Polymorphism.
-(* Global Set Asymmetric Patterns. *)
+Global Set Asymmetric Patterns.
 
 Unset Automatic Introduction.  (** This line has to be removed for the file to compile with Coq8.2 *)
 
