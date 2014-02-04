@@ -1,12 +1,9 @@
-(** * Introduction. Vladimir Voevodsky . Feb. 2010 - Sep. 2011 
+ (** * Introduction. Vladimir Voevodsky . Feb. 2010 - Sep. 2011 
 
 This is the first in the group of files which contain the (current state of) the mathematical library for theproof assistant Coq based on the Univalent Foundations. It contains some new notations for constructions defined in Coq.Init library as well as the definition of dependent sum as a record.
 
 
 *)
-
-
-
 
 (** Preamble. *)
 
@@ -83,5 +80,12 @@ Inductive Phant ( T : Type ) := phant : Phant T .
 Check (paths O O) .
 
 
+Set Default Timeout 50.         (* for debugging *)
+
+(* A temporary hack: *)
+Ltac exact_op x := (* from Jason Gross: same as "exact", but with unification the opposite way *)
+  let T := type of x in
+  let G := match goal with |- ?G => constr:(G) end in
+  exact ((@id G : T -> G) x).
 
 (* End of the file uuu.v *)

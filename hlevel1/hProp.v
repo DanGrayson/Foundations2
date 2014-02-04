@@ -85,7 +85,7 @@ Definition isdecEq ( X : UU ) : hProp := hProppair _ ( isapropisdeceq X ) .
 Definition ishinh_UU ( X : UU ) := forall P: hProp, ( ( X -> P ) -> P ). 
 
 Lemma isapropishinh ( X : UU ) : isaprop ( ishinh_UU X ). 
-Proof. intro. apply impred . intro P . apply impred.  intro. apply ( pr2 P ) .  Defined . 
+Proof. intro. apply impred . intro P . apply impred.  intro. apply ( pr2 P ) .  Qed.
 
 Definition ishinh ( X : UU ) : hProp := hProppair ( ishinh_UU X ) ( isapropishinh X ) .
 (* Canonical Structure ishinh .  (** RR1 *) *)

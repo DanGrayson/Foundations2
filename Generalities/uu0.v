@@ -1163,7 +1163,7 @@ Definition fibseq1 { X Y Z : UU } (f:X -> Y) (g:Y->Z) (z:Z) ( fs : fibseqstr f g
 
 
 
-(** Explitcit description of the first map in the second derived sequence. *)
+(** Explicit description of the first map in the second derived sequence. *)
 
 Definition d2 { X Y Z : UU } (f:X -> Y) (g:Y->Z) (z:Z) ( fs : fibseqstr f g z ) (y:Y) (x:X) ( e : paths (f x) y ) : paths (g y) z := pathscomp0 ( maponpaths g ( pathsinv0 e ) ) ( ( pr1 fs ) x ) . 
 Definition ezweq2 { X Y Z : UU } (f:X -> Y) (g:Y->Z) (z:Z) ( fs : fibseqstr f g z ) (y:Y) (x:X) : weq ( paths (f x) y ) ( hfiber  (d1 f g z fs y) x ) := ezweq1 (d1 f g z fs y) f y ( fibseq1 f g z fs y )  x.
@@ -3466,18 +3466,18 @@ assert (X1:isweq f).  apply isweqpr1. assumption. change (total2 (fun cntr : X =
 
 
 Theorem isapropiscontr (T:UU): isaprop (iscontr T).
-Proof. intros.  unfold isaprop.  unfold isofhlevel. intros x x' . assert (is: iscontr(iscontr T)). apply iscontriscontr. apply x. assert (is2: isaprop (iscontr T)). apply ( isapropifcontr is  ) . apply (is2 x x'). Defined.  
+Proof. intros.  unfold isaprop.  unfold isofhlevel. intros x x' . assert (is: iscontr(iscontr T)). apply iscontriscontr. apply x. assert (is2: isaprop (iscontr T)). apply ( isapropifcontr is  ) . apply (is2 x x'). Qed.
 
 
 Theorem isapropisweq { X Y : UU } (f:X-> Y) : isaprop (isweq f).
-Proof. intros. unfold isweq.  apply (impred (S O) (fun y:Y => iscontr (hfiber f y)) (fun y:Y => isapropiscontr (hfiber  f y))).  Defined. 
+Proof. intros. unfold isweq.  apply (impred (S O) (fun y:Y => iscontr (hfiber f y)) (fun y:Y => isapropiscontr (hfiber  f y))).  Qed.
 
 
 Theorem isapropisisolated ( X : UU ) ( x : X ) : isaprop ( isisolated X x ) .
-Proof. intros . apply isofhlevelsn .  intro is . apply impred . intro x' .  apply ( isapropdec _ ( isaproppathsfromisolated X x is x' ) ) .  Defined .  
+Proof. intros . apply isofhlevelsn .  intro is . apply impred . intro x' .  apply ( isapropdec _ ( isaproppathsfromisolated X x is x' ) ) .  Qed.
 
 Theorem isapropisdeceq (X:UU): isaprop (isdeceq X).
-Proof. intro. apply ( isofhlevelsn 0 ) .  intro is . unfold isdeceq. apply impred . intro x .  apply ( isapropisisolated X x ) .   Defined . 
+Proof. intro. apply ( isofhlevelsn 0 ) .  intro is . unfold isdeceq. apply impred . intro x .  apply ( isapropisisolated X x ) .   Qed.
 
 Definition isapropisdecprop ( X : UU ) : isaprop ( isdecprop X ) := isapropiscontr ( coprod X ( neg X ) ) .
 
@@ -3496,7 +3496,7 @@ assert (is1:
          match n0 with
          | O => iscontr X1
          | S m => forall x0 x'0 : X1, isofhlevel m (paths x0 x'0)
-         end) n (paths x x')))). intro.  apply (impred ( S O ) _  (X0 x)). apply (impred (S O) _ is1). Defined. 
+         end) n (paths x x')))). intro.  apply (impred ( S O ) _  (X0 x)). apply (impred (S O) _ is1). Qed.
 
 Corollary isapropisaprop (X:UU) : isaprop (isaprop X).
 Proof. intro. apply (isapropisofhlevel (S O)). Defined. 
@@ -3506,7 +3506,7 @@ Proof. intro. apply (isapropisofhlevel (S (S O))). Defined.
 
 
 Theorem isapropisofhlevelf ( n : nat ) { X Y : UU } ( f : X -> Y ) : isaprop ( isofhlevelf n f ) .
-Proof . intros . unfold isofhlevelf .    apply impred . intro y . apply isapropisofhlevel .  Defined .
+Proof . intros . unfold isofhlevelf .    apply impred . intro y . apply isapropisofhlevel .  Qed.
 
 Definition isapropisincl { X Y : UU } ( f : X -> Y ) := isapropisofhlevelf 1 f . 
 
@@ -3581,26 +3581,26 @@ Proof. intros .  apply ( isofhlevelweqf ( S n ) ( weqinvweq X Y ) ( isofhlevelsn
 (** *** Weak equivalences to and from contractible types *)
 
 Theorem isapropweqtocontr ( X : UU ) { Y : UU } ( is : iscontr Y ) : isaprop ( weq X Y ) .
-Proof . intros .  apply ( isofhlevelsnweqtohlevelsn 0 _ _ ( isapropifcontr is ) ) . Defined .  
+Proof . intros .  apply ( isofhlevelsnweqtohlevelsn 0 _ _ ( isapropifcontr is ) ) . Qed.
 
 Theorem isapropweqfromcontr ( X : UU ) { Y : UU } ( is : iscontr Y ) : isaprop ( weq Y X ) .
-Proof. intros .  apply ( isofhlevelsnweqfromhlevelsn 0 X _ ( isapropifcontr is ) ) . Defined . 
+Proof. intros .  apply ( isofhlevelsnweqfromhlevelsn 0 X _ ( isapropifcontr is ) ) . Qed.
 
 
 (** *** Weak equivalences to and from propositions *)
 
 
 Theorem isapropweqtoprop ( X  Y : UU ) ( is : isaprop Y ) : isaprop ( weq X Y ) .
-Proof . intros .  apply ( isofhlevelsnweqtohlevelsn 0 _ _ is ) . Defined .  
+Proof . intros .  apply ( isofhlevelsnweqtohlevelsn 0 _ _ is ) . Qed.
 
 Theorem isapropweqfromprop ( X Y : UU )( is : isaprop Y ) : isaprop ( weq Y X ) .
-Proof. intros .  apply ( isofhlevelsnweqfromhlevelsn 0 X _ is ) . Defined . 
+Proof. intros .  apply ( isofhlevelsnweqfromhlevelsn 0 X _ is ) . Qed.
 
 
 (** *** Weak equivalences to and from sets *)
 
 Theorem isasetweqtoset ( X  Y : UU ) ( is : isaset Y ) : isaset ( weq X Y ) .
-Proof . intros .  apply ( isofhlevelsnweqtohlevelsn 1 _ _ is ) . Defined .  
+Proof . intros .  apply ( isofhlevelsnweqtohlevelsn 1 _ _ is ) . Qed.
 
 Theorem isasetweqfromset ( X Y : UU )( is : isaset Y ) : isaset ( weq Y X ) .
 Proof. intros .  apply ( isofhlevelsnweqfromhlevelsn 1 X _ is ) . Defined . 
