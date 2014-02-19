@@ -88,20 +88,20 @@ endif
 #                    #
 ######################
 
-VFILES:=hlevel2/hq.v\
-  hlevel2/hz.v\
-  hlevel2/finitesets.v\
-  hlevel2/stnfsets.v\
-  hlevel2/hnat.v\
-  hlevel2/algebra1d.v\
-  hlevel2/algebra1c.v\
-  hlevel2/algebra1b.v\
-  hlevel2/algebra1a.v\
-  hlevel2/hSet.v\
-  hlevel1/hProp.v\
-  Proof_of_Extensionality/funextfun.v\
+VFILES:=Generalities/uuu.v\
   Generalities/uu0.v\
-  Generalities/uuu.v
+  Proof_of_Extensionality/funextfun.v\
+  hlevel1/hProp.v\
+  hlevel2/hSet.v\
+  hlevel2/algebra1a.v\
+  hlevel2/algebra1b.v\
+  hlevel2/algebra1c.v\
+  hlevel2/algebra1d.v\
+  hlevel2/hnat.v\
+  hlevel2/stnfsets.v\
+  hlevel2/finitesets.v\
+  hlevel2/hz.v\
+  hlevel2/hq.v
 
 -include $(addsuffix .d,$(VFILES))
 .SECONDARY: $(addsuffix .d,$(VFILES))
@@ -127,7 +127,9 @@ endif
 all: $(VOFILES) 
 
 quick:
-	$(MAKE) all VO=vi
+	$(MAKE) -f $(firstword $(MAKEFILE_LIST)) all VO=vi
+checkproofs:
+	$(COQC) $(COQDEBUG) $(COQFLAGS) -schedule-vi-checking $(J) $(VOFILES:%.vo=%.vi)
 gallina: $(GFILES)
 
 html: $(GLOBFILES) $(VFILES)
