@@ -106,7 +106,7 @@ Definition logeqnegs { X Y : UU } ( l : X <-> Y ) : ( neg X ) <-> ( neg Y ) := d
 
 
 
-(* end of "Some standard constructions not using idenity types (paths)". *)
+(* end of "Some standard constructions not using identity types (paths)". *)
 
 
 
