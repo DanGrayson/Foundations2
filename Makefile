@@ -9,15 +9,19 @@ OTHERFLAGS += -no-sharing
 else
 endif
 
-COQTIME=yes
-ifeq ("$(COQTIME)","yes")
-OTHERFLAGS += -time
-endif
-
 all:announce
 announce:; which $(COQBIN)coqc
 
 include Make.makefile
+
+COQTIME=no
+ifeq ("$(COQTIME)","yes")
+# this option was added after coq v8.4
+OTHERFLAGS += -time
+COQC = : compiling $*.v ; >$*.timing $(TIMECMD) $(COQBIN)coqc
+else
+COQC = : compiling $*.v ;            $(TIMECMD) $(COQBIN)coqc
+endif
 
 # install: installN
 # installN:
@@ -25,7 +29,7 @@ include Make.makefile
 # 	do (set -x ; install -m 0644 $$i "$(DSTROOT)$(COQLIBINSTALL)/Foundations/." ); \
 # 	done
 
-TIME=gnu
+TIME=bash
 ifeq ($(TIME),gnu)
 TIMECMD = \time -f "%U sec, %M bytes: $*"
 else
@@ -39,7 +43,6 @@ TIMECMD = time
 endif
 endif
 endif
-COQC = : compiling $*.v ; >$*.timing $(TIMECMD) $(COQBIN)coqc
 
 show-vfiles:; @for i in $(VFILES) ; do echo `pwd`/$$i ; done
 topten:$(VOFILES)
