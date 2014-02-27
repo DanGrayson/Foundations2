@@ -1,5 +1,7 @@
 This directory contains patches for Coq-8.3pl2 written by Hugo Hereblin and Dan Grayson which are needed for proper compilation of the "Foundations" library. The source code for Coq-8.3pl2 can be found at http://coq.inria.fr/distrib/  .
 
+(For coq 8.4, read the instructions at the top of the file coq-8.4-ufpatches.diff, and skip the instructions below.)
+
 Hugo's patches "inductive-indice-levels-matter-8.3.patch" and "patch.type-in-type" are intended only as a temporary solution for the universe management issues in Coq which arise in connection with the univalent approach. 
 
 The first of these patches changes the way the universe level of inductive types is computed for those definitions which do not specify [ Set ] or [ Prop ] as the target of the inductive construction explicitely. The new computation rule for the universe level takes into account not only the u-levels of the types occuring in the constructors but also the u-levels of types occuring in "pseudo-parametrs" i.e. in the [ forall ] expressions in the type of the inductive definition. For example, in the definition:
